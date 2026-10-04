@@ -11,10 +11,9 @@ import kotlin.test.assertNull
 
 class LanaContextLocationTest {
     private val language = LanguageContext(
-        localeTag = "hr-HR",
-        detectedLanguageTag = "hr",
-        detectionConfidence = 1.0,
-        userOverrideLanguageTag = null,
+        languageTag = "hr-HR",
+        confidence = 1.0,
+        userOverride = false,
     )
 
     @Test
