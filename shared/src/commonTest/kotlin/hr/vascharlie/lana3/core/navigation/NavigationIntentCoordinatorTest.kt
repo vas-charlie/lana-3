@@ -1,6 +1,7 @@
 package hr.vascharlie.lana3.core.navigation
 
 import hr.vascharlie.lana3.core.intent.Intent
+import hr.vascharlie.lana3.core.intent.Intent.NavigationStop
 import hr.vascharlie.lana3.core.location.GeoPoint
 import kotlin.coroutines.Continuation
 import kotlin.coroutines.EmptyCoroutineContext
@@ -35,6 +36,40 @@ class NavigationIntentCoordinatorTest {
 
         assertEquals(
             NavigationIntentResolution.NeedsChoice(0, "Park", candidates),
+            result,
+        )
+    }
+
+    @Test
+    fun multipleStopsAreResolvedInSpokenOrder() {
+        val hotel = PlaceCandidate("Hotel Osijek", GeoPoint(45.5592, 18.6937))
+        val airport = PlaceCandidate("Zracna luka Osijek", GeoPoint(45.4627, 18.8102))
+        val provider = object : PlaceResolver {
+            override suspend fun resolve(query: String) = when (query) {
+                "Hotel Osijek" -> listOf(hotel)
+                "Zracna luka Osijek" -> listOf(airport)
+                else -> emptyList()
+            }
+        }
+        val coordinator = NavigationIntentCoordinator(DestinationResolver(provider))
+        val intent = Intent.Navigate(
+            listOf(
+                NavigationStop("Hotel Osijek"),
+                NavigationStop("Zracna luka Osijek"),
+            )
+        )
+
+        val result = runSuspend { coordinator.resolve(intent) }
+
+        assertEquals(
+            NavigationIntentResolution.Ready(
+                Intent.Navigate(
+                    listOf(
+                        NavigationStop("Hotel Osijek", hotel.point),
+                        NavigationStop("Zracna luka Osijek", airport.point),
+                    )
+                )
+            ),
             result,
         )
     }
