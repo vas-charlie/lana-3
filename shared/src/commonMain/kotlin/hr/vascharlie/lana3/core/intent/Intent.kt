@@ -6,15 +6,23 @@ sealed interface Intent {
     data class SaveNote(val text: String) : Intent
     data class TaxiProfitability(val revenue: Double, val totalKilometers: Double) : Intent
 
-    /**
-     * Semantic navigation intent. Destination resolution is intentionally separate:
-     * speech/NLU may supply a place name first, while a geocoder or user selection
-     * later supplies coordinates.
-     */
-    data class Navigate(
+    data class NavigationStop(
         val destinationText: String,
         val resolvedDestination: GeoPoint? = null,
-    ) : Intent
+    )
+
+    /**
+     * Ordered navigation plan. One stop is ordinary navigation; multiple stops preserve
+     * the user's spoken order, e.g. Hotel Osijek then Osijek Airport.
+     */
+    data class Navigate(
+        val stops: List<NavigationStop>,
+    ) : Intent {
+        constructor(
+            destinationText: String,
+            resolvedDestination: GeoPoint? = null,
+        ) : this(listOf(NavigationStop(destinationText, resolvedDestination)))
+    }
 
     data class Unknown(val originalText: String) : Intent
 }
