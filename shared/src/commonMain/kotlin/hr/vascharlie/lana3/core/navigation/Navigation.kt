@@ -100,11 +100,19 @@ sealed interface NavigationPlanResult {
  */
 class MultiStopNavigationCoordinator(
     private val provider: NavigationProvider,
+    private val policy: NavigationPolicy = NavigationPolicy(),
 ) {
     suspend fun preparePlan(
         context: hr.vascharlie.lana3.core.context.LanaContext,
         intent: hr.vascharlie.lana3.core.intent.Intent.Navigate,
     ): NavigationPlanResult {
+        if (intent.stops.isEmpty()) {
+            return NavigationPlanResult.NotReady(
+                stopIndex = 0,
+                reason = "At least one navigation stop is required.",
+            )
+        }
+
         var origin = context.location?.usablePoint()
             ?: return NavigationPlanResult.NotReady(
                 stopIndex = 0,
@@ -119,7 +127,18 @@ class MultiStopNavigationCoordinator(
                     reason = "Navigation stop has not been resolved to coordinates.",
                 )
 
-            val request = NavigationRequest(origin = origin, destination = destination)
+            val legContext = context.copy(
+                location = context.location?.copy(
+                    location = context.location.location.copy(point = origin),
+                )
+            )
+            val assessment = policy.prepare(legContext, destination)
+            val request = assessment.request
+                ?: return NavigationPlanResult.NotReady(
+                    stopIndex = index,
+                    reason = assessment.reason,
+                )
+
             val route = provider.route(request)
                 ?: return NavigationPlanResult.RouteNotFound(
                     stopIndex = index,
