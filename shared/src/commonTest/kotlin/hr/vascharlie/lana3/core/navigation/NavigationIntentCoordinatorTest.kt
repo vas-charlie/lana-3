@@ -34,7 +34,7 @@ class NavigationIntentCoordinatorTest {
         val result = runSuspend { coordinator.resolve(Intent.Navigate("Park")) }
 
         assertEquals(
-            NavigationIntentResolution.NeedsChoice("Park", candidates),
+            NavigationIntentResolution.NeedsChoice(0, "Park", candidates),
             result,
         )
     }
@@ -45,7 +45,7 @@ class NavigationIntentCoordinatorTest {
         val result = runSuspend { coordinator.resolve(Intent.Navigate("Nepostojece mjesto")) }
 
         assertEquals(
-            NavigationIntentResolution.DestinationNotFound("Nepostojece mjesto"),
+            NavigationIntentResolution.DestinationNotFound(0, "Nepostojece mjesto"),
             result,
         )
     }
