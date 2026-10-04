@@ -6,8 +6,9 @@ This repository is the active engineering workshop for LANA 3.
 ## Source of truth
 The approved LANA 3 MASTER PLAN contains 43 functional units. Those 43 units remain the functional scope and are not to be silently changed, renumbered, or expanded during implementation.
 
-## Confirmed amendment
-LANA 3 is multilingual from the initial architecture. The system must be designed for all languages rather than a fixed shortlist or a later language retrofit.
+## Confirmed amendments
+1. LANA 3 is multilingual from the initial architecture. The system must be designed for all languages rather than a fixed shortlist or a later language retrofit.
+2. LANA 3 is device- and vendor-independent by architecture. Samsung devices are initial physical test devices, not a product boundary. Platform-specific capabilities must live behind adapters/interfaces, with real limitations tested and documented.
 
 ## Engineering rules
 1. Inspect the existing state before making a change.
@@ -31,4 +32,5 @@ Architecture first. Implementation follows the approved dependency/build order. 
 - GitHub write access verified.
 - Repository initialized.
 - Engineering baseline recorded.
-- Next: import the approved 43-unit MASTER PLAN as the detailed specification, then derive the implementation architecture and build sequence from it.
+- MASTER PLAN v0.2 recorded with all 43 functional units and confirmed amendments.
+- Next: derive the technical architecture and implementation build sequence from v0.2 before writing product code.
