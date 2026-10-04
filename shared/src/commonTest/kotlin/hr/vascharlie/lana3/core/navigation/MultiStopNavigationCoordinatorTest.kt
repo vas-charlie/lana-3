@@ -3,7 +3,7 @@ package hr.vascharlie.lana3.core.navigation
 import hr.vascharlie.lana3.core.context.LanaContext
 import hr.vascharlie.lana3.core.intent.Intent
 import hr.vascharlie.lana3.core.intent.Intent.NavigationStop
-import hr.vascharlie.lana3.core.language.LanguageContext
+import hr.vascharlie.lana3.core.model.LanguageContext
 import hr.vascharlie.lana3.core.location.*
 import kotlin.coroutines.*
 import kotlin.test.*
@@ -62,15 +62,14 @@ class MultiStopNavigationCoordinatorTest {
     }
 
     private fun contextAt(point: GeoPoint) = LanaContext(
-        language = LanguageContext("hr-HR"),
+        language = LanguageContext("hr-HR", 1.0, false),
         location = LocationSnapshot(
-            reading = LocationReading(
+            location = LocationAssessment(
+                status = LocationStatus.AVAILABLE,
                 point = point,
-                capturedAtEpochMillis = 1000,
                 accuracyMeters = 5.0,
-            ),
-            assessment = LocationAssessment(LocationStatus.AVAILABLE, "test"),
-            enrichment = emptyList(),
+                reason = "test",
+            )
         ),
     )
 
