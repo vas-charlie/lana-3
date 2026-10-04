@@ -61,6 +61,61 @@ class MultiStopNavigationCoordinatorTest {
         assertEquals(1, calls)
     }
 
+    @Test
+    fun unavailableRoutingBlocksProviderForEveryLeg() {
+        val start = GeoPoint(45.55, 18.67)
+        val hotel = GeoPoint(45.5592, 18.6937)
+        var calls = 0
+        val provider = object : NavigationProvider {
+            override suspend fun route(request: NavigationRequest): NavigationRoute {
+                calls++
+                return NavigationRoute(1000, 120, "test")
+            }
+        }
+        val context = contextAt(start).copy(
+            location = contextAt(start).location?.copy(
+                enrichments = listOf(
+                    LocationEnrichmentAvailability(
+                        feature = LocationEnrichmentFeature.ROUTING,
+                        available = false,
+                        reason = "Routing unavailable",
+                    )
+                )
+            )
+        )
+
+        val result = runSuspend {
+            MultiStopNavigationCoordinator(provider).preparePlan(
+                context,
+                Intent.Navigate("Hotel Osijek", hotel),
+            )
+        }
+
+        assertEquals(NavigationPlanResult.NotReady(0, "Routing unavailable"), result)
+        assertEquals(0, calls)
+    }
+
+    @Test
+    fun emptyStopListIsRejectedWithoutCallingProvider() {
+        var calls = 0
+        val provider = object : NavigationProvider {
+            override suspend fun route(request: NavigationRequest): NavigationRoute {
+                calls++
+                return NavigationRoute(1000, 120, "test")
+            }
+        }
+
+        val result = runSuspend {
+            MultiStopNavigationCoordinator(provider).preparePlan(
+                contextAt(GeoPoint(45.55, 18.67)),
+                Intent.Navigate(emptyList()),
+            )
+        }
+
+        assertEquals(NavigationPlanResult.NotReady(0, "At least one navigation stop is required."), result)
+        assertEquals(0, calls)
+    }
+
     private fun contextAt(point: GeoPoint) = LanaContext(
         language = LanguageContext("hr-HR", 1.0, false),
         location = LocationSnapshot(
