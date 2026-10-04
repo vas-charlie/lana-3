@@ -79,3 +79,62 @@ class NavigationCoordinator(
         )
     }
 }
+
+
+data class NavigationLeg(
+    val stopIndex: Int,
+    val destinationText: String,
+    val request: NavigationRequest,
+    val route: NavigationRoute,
+)
+
+sealed interface NavigationPlanResult {
+    data class Ready(val legs: List<NavigationLeg>) : NavigationPlanResult
+    data class NotReady(val stopIndex: Int, val reason: String) : NavigationPlanResult
+    data class RouteNotFound(val stopIndex: Int, val reason: String) : NavigationPlanResult
+}
+
+/**
+ * Builds an ordered route plan for every resolved stop. The first leg starts at the
+ * current reliable location; each following leg starts at the previous destination.
+ */
+class MultiStopNavigationCoordinator(
+    private val provider: NavigationProvider,
+) {
+    suspend fun preparePlan(
+        context: hr.vascharlie.lana3.core.context.LanaContext,
+        intent: hr.vascharlie.lana3.core.intent.Intent.Navigate,
+    ): NavigationPlanResult {
+        var origin = context.location?.usablePoint()
+            ?: return NavigationPlanResult.NotReady(
+                stopIndex = 0,
+                reason = "A reliable current location is required for navigation.",
+            )
+
+        val legs = mutableListOf<NavigationLeg>()
+        intent.stops.forEachIndexed { index, stop ->
+            val destination = stop.resolvedDestination
+                ?: return NavigationPlanResult.NotReady(
+                    stopIndex = index,
+                    reason = "Navigation stop has not been resolved to coordinates.",
+                )
+
+            val request = NavigationRequest(origin = origin, destination = destination)
+            val route = provider.route(request)
+                ?: return NavigationPlanResult.RouteNotFound(
+                    stopIndex = index,
+                    reason = "Routing provider could not produce route for stop " + (index + 1) + ".",
+                )
+
+            legs += NavigationLeg(
+                stopIndex = index,
+                destinationText = stop.destinationText,
+                request = request,
+                route = route,
+            )
+            origin = destination
+        }
+
+        return NavigationPlanResult.Ready(legs)
+    }
+}
