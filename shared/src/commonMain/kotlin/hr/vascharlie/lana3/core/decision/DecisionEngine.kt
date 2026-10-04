@@ -27,6 +27,21 @@ class DecisionEngine {
                 )
             }
         }
+        is Intent.Navigate -> {
+            when {
+                intent.destinationText.isBlank() ->
+                    Decision.CannotDecide("Navigation destination is missing.")
+                intent.resolvedDestination == null ->
+                    Decision.CannotDecide("Navigation destination has not been resolved to coordinates.")
+                context.location?.usablePoint() == null ->
+                    Decision.CannotDecide("A reliable current location is required for navigation.")
+                else ->
+                    Decision.Proposed(
+                        explanation = "Navigation can be prepared for the resolved destination.",
+                        requiredAuthorization = AuthorizationLevel.EXECUTE,
+                    )
+            }
+        }
         is Intent.Unknown -> Decision.CannotDecide("Intent is unknown; Lana must not guess.")
     }
 }
