@@ -6,6 +6,8 @@ import android.content.BroadcastReceiver
 import android.content.Context
 import android.content.Intent
 import android.content.IntentFilter
+import android.content.pm.PackageInfo
+import android.content.pm.PackageManager
 import android.net.Uri
 import android.os.Build
 import android.os.Environment
@@ -13,8 +15,10 @@ import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
 import org.json.JSONObject
+import java.io.File
 import java.net.HttpURLConnection
 import java.net.URL
+import java.security.MessageDigest
 import kotlin.concurrent.thread
 
 class AutoUpdater(
@@ -180,7 +184,7 @@ class AutoUpdater(
     }
 
     private fun downloadUpdate(release: ReleaseInfo) {
-        val fileName = "lana-3-${release.versionCode}.apk"
+        val fileName = apkFileName(release.versionCode)
 
         val request = DownloadManager.Request(Uri.parse(release.downloadUrl))
             .setTitle("LANA 3 ažuriranje")
@@ -231,25 +235,28 @@ class AutoUpdater(
                 }
 
                 DownloadManager.STATUS_SUCCESSFUL -> {
-                    promptInstall(downloadId)
+                    promptInstall(downloadId, remoteVersion)
                 }
 
                 DownloadManager.STATUS_FAILED -> {
-                    prefs.edit()
-                        .remove(KEY_DOWNLOAD_ID)
-                        .remove(KEY_REMOTE_VERSION)
-                        .apply()
+                    clearPendingUpdate()
                     postStatus("Preuzimanje ažuriranja nije uspjelo. Pokušat ću ponovno.")
                 }
             }
         }
     }
 
-    private fun promptInstall(downloadId: Long) {
+    private fun promptInstall(downloadId: Long, remoteVersion: Int) {
+        if (!verifyDownloadedApk(remoteVersion)) {
+            clearPendingUpdate()
+            postStatus("Sigurnosna provjera ažuriranja nije prošla. APK neće biti instaliran.")
+            return
+        }
+
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
             !activity.packageManager.canRequestPackageInstalls()
         ) {
-            postStatus("Ažuriranje je spremno. Dopusti LANI instaliranje novih verzija.")
+            postStatus("Ažuriranje je provjereno. Dopusti LANI instaliranje novih verzija.")
             val settingsIntent = Intent(
                 Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
                 Uri.parse("package:${activity.packageName}")
@@ -265,7 +272,7 @@ class AutoUpdater(
         }
 
         openingInstaller = true
-        postStatus("Ažuriranje je spremno za instalaciju.")
+        postStatus("Ažuriranje je provjereno i spremno za instalaciju.")
 
         val installIntent = Intent(Intent.ACTION_VIEW).apply {
             setDataAndType(apkUri, "application/vnd.android.package-archive")
@@ -273,6 +280,87 @@ class AutoUpdater(
         }
         activity.startActivity(installIntent)
     }
+
+    private fun verifyDownloadedApk(remoteVersion: Int): Boolean {
+        val downloadsDir =
+            activity.getExternalFilesDir(Environment.DIRECTORY_DOWNLOADS) ?: return false
+        val apkFile = File(downloadsDir, apkFileName(remoteVersion))
+        if (!apkFile.isFile) return false
+
+        val packageManager = activity.packageManager
+        val archiveInfo = getArchivePackageInfo(packageManager, apkFile) ?: return false
+        if (archiveInfo.packageName != activity.packageName) return false
+
+        val archiveVersion = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            archiveInfo.longVersionCode
+        } else {
+            @Suppress("DEPRECATION")
+            archiveInfo.versionCode.toLong()
+        }
+
+        if (archiveVersion != remoteVersion.toLong()) return false
+        if (archiveVersion <= BuildConfig.VERSION_CODE.toLong()) return false
+
+        val installedInfo = getInstalledPackageInfo(packageManager) ?: return false
+        val installedSigners = currentSignerDigests(installedInfo)
+        val archiveSigners = currentSignerDigests(archiveInfo)
+
+        return installedSigners.isNotEmpty() &&
+            installedSigners == archiveSigners
+    }
+
+    private fun getArchivePackageInfo(
+        packageManager: PackageManager,
+        apkFile: File
+    ): PackageInfo? {
+        return if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            packageManager.getPackageArchiveInfo(
+                apkFile.absolutePath,
+                PackageManager.GET_SIGNING_CERTIFICATES
+            )
+        } else {
+            @Suppress("DEPRECATION")
+            packageManager.getPackageArchiveInfo(
+                apkFile.absolutePath,
+                PackageManager.GET_SIGNATURES
+            )
+        }
+    }
+
+    private fun getInstalledPackageInfo(packageManager: PackageManager): PackageInfo? {
+        return runCatching {
+            if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+                packageManager.getPackageInfo(
+                    activity.packageName,
+                    PackageManager.GET_SIGNING_CERTIFICATES
+                )
+            } else {
+                @Suppress("DEPRECATION")
+                packageManager.getPackageInfo(
+                    activity.packageName,
+                    PackageManager.GET_SIGNATURES
+                )
+            }
+        }.getOrNull()
+    }
+
+    private fun currentSignerDigests(packageInfo: PackageInfo): Set<String> {
+        val signatures = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
+            packageInfo.signingInfo?.apkContentsSigners?.toList().orEmpty()
+        } else {
+            @Suppress("DEPRECATION")
+            packageInfo.signatures?.toList().orEmpty()
+        }
+
+        return signatures.map { signature ->
+            val digest = MessageDigest.getInstance("SHA-256")
+                .digest(signature.toByteArray())
+            digest.joinToString(separator = "") { byte -> "%02X".format(byte) }
+        }.toSet()
+    }
+
+    private fun apkFileName(versionCode: Int): String =
+        "lana-3-$versionCode.apk"
 
     private fun registerReceiver() {
         if (receiverRegistered) return
@@ -294,11 +382,15 @@ class AutoUpdater(
     private fun clearCompletedUpdateState() {
         val remoteVersion = prefs.getInt(KEY_REMOTE_VERSION, -1)
         if (remoteVersion != -1 && BuildConfig.VERSION_CODE >= remoteVersion) {
-            prefs.edit()
-                .remove(KEY_DOWNLOAD_ID)
-                .remove(KEY_REMOTE_VERSION)
-                .apply()
+            clearPendingUpdate()
         }
+    }
+
+    private fun clearPendingUpdate() {
+        prefs.edit()
+            .remove(KEY_DOWNLOAD_ID)
+            .remove(KEY_REMOTE_VERSION)
+            .apply()
     }
 
     private fun postStatus(message: String) {
