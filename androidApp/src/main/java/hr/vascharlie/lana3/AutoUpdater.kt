@@ -84,7 +84,9 @@ class AutoUpdater(
         if (openingInstaller) {
             openingInstaller = false
             clearCompletedUpdateState()
+            return
         }
+
         resumePendingInstall()
         checkNow(force = false)
     }
