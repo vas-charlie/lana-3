@@ -1,14 +1,10 @@
 package hr.vascharlie.lana3
 
-import android.animation.AnimatorSet
-import android.animation.ObjectAnimator
 import android.app.Activity
 import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
 import android.view.Gravity
-import android.view.View
-import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.LinearLayout
@@ -20,8 +16,9 @@ class MainActivity : Activity() {
     private lateinit var avatar: TextView
     private lateinit var stateLabel: TextView
     private lateinit var status: TextView
+    private lateinit var updateStatus: TextView
+    private lateinit var autoUpdater: AutoUpdater
     private var visualState = LanaVisualState.IDLE
-    private var idleAnimator: AnimatorSet? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -39,11 +36,21 @@ class MainActivity : Activity() {
             setTextColor(Color.WHITE)
             typeface = Typeface.DEFAULT_BOLD
         })
+
         root.addView(TextView(this).apply {
-            text = "Developer Preview 0.1"
+            text = "Developer Preview ${BuildConfig.VERSION_NAME}"
             textSize = 14f
             setTextColor(Color.rgb(90, 180, 255))
         })
+
+        updateStatus = TextView(this).apply {
+            text = "Provjeravam ima li nove verzije..."
+            textSize = 12f
+            gravity = Gravity.CENTER
+            setPadding(0, 8, 0, 0)
+            setTextColor(Color.rgb(150, 165, 180))
+        }
+        root.addView(updateStatus)
 
         val avatarStage = FrameLayout(this).apply {
             setBackgroundColor(Color.rgb(10, 27, 48))
@@ -102,10 +109,24 @@ class MainActivity : Activity() {
 
         setContentView(root)
         renderState(LanaVisualState.IDLE)
+
+        autoUpdater = AutoUpdater(this) { message ->
+            updateStatus.text = message
+        }
+        autoUpdater.start()
+    }
+
+    override fun onResume() {
+        super.onResume()
+        if (::autoUpdater.isInitialized) {
+            autoUpdater.onResume()
+        }
     }
 
     override fun onDestroy() {
-        idleAnimator?.cancel()
+        if (::autoUpdater.isInitialized) {
+            autoUpdater.stop()
+        }
         super.onDestroy()
     }
 
@@ -123,7 +144,6 @@ class MainActivity : Activity() {
 
     private fun renderState(state: LanaVisualState) {
         visualState = state
-        idleAnimator?.cancel()
         avatar.alpha = 1f
         avatar.scaleX = 1f
         avatar.scaleY = 1f
@@ -133,8 +153,8 @@ class MainActivity : Activity() {
                 stateLabel.text = "IDLE"
                 status.text = "Tu sam, Charlie."
                 avatar.setBackgroundColor(Color.rgb(15, 39, 67))
-                startIdlePresence()
             }
+
             LanaVisualState.LISTENING -> {
                 stateLabel.text = "LISTENING"
                 status.text = "Slusam."
@@ -142,12 +162,14 @@ class MainActivity : Activity() {
                 avatar.scaleX = 1.025f
                 avatar.scaleY = 1.025f
             }
+
             LanaVisualState.THINKING -> {
                 stateLabel.text = "THINKING"
                 status.text = "Razmisljam..."
                 avatar.setBackgroundColor(Color.rgb(31, 43, 72))
                 avatar.alpha = 0.88f
             }
+
             LanaVisualState.SPEAKING -> {
                 stateLabel.text = "SPEAKING"
                 status.text = "Govorim."
@@ -155,32 +177,19 @@ class MainActivity : Activity() {
                 avatar.scaleX = 1.035f
                 avatar.scaleY = 1.035f
             }
+
             LanaVisualState.OFFLINE -> {
                 stateLabel.text = "OFFLINE"
                 status.text = "Offline sam. Dostupne su lokalne sposobnosti."
                 avatar.setBackgroundColor(Color.rgb(48, 52, 61))
                 avatar.alpha = 0.72f
             }
+
             LanaVisualState.ERROR -> {
                 stateLabel.text = "ERROR"
                 status.text = "Nesto nije u redu. Necu pogadjati."
                 avatar.setBackgroundColor(Color.rgb(74, 38, 45))
             }
-        }
-    }
-
-    private fun startIdlePresence() {
-        val breatheX = ObjectAnimator.ofFloat(avatar, View.SCALE_X, 1f, 1.012f, 1f)
-        val breatheY = ObjectAnimator.ofFloat(avatar, View.SCALE_Y, 1f, 1.012f, 1f)
-        breatheX.duration = 3200
-        breatheY.duration = 3200
-        breatheX.repeatCount = ObjectAnimator.INFINITE
-        breatheY.repeatCount = ObjectAnimator.INFINITE
-        breatheX.interpolator = AccelerateDecelerateInterpolator()
-        breatheY.interpolator = AccelerateDecelerateInterpolator()
-        idleAnimator = AnimatorSet().apply {
-            playTogether(breatheX, breatheY)
-            start()
         }
     }
 }
