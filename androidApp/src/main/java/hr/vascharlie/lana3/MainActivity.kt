@@ -1,23 +1,38 @@
 package hr.vascharlie.lana3
 
+import android.animation.AnimatorSet
+import android.animation.ObjectAnimator
 import android.app.Activity
-import android.os.Bundle
 import android.graphics.Color
 import android.graphics.Typeface
+import android.os.Bundle
 import android.view.Gravity
+import android.view.View
+import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.Button
+import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
 
+enum class LanaVisualState { IDLE, LISTENING, THINKING, SPEAKING, OFFLINE, ERROR }
+
 class MainActivity : Activity() {
+    private lateinit var avatar: TextView
+    private lateinit var stateLabel: TextView
+    private lateinit var status: TextView
+    private var visualState = LanaVisualState.IDLE
+    private var idleAnimator: AnimatorSet? = null
+
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
+
         val root = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             gravity = Gravity.CENTER_HORIZONTAL
             setPadding(40, 56, 40, 40)
             setBackgroundColor(Color.rgb(8, 17, 31))
         }
+
         root.addView(TextView(this).apply {
             text = "LANA 3"
             textSize = 30f
@@ -29,38 +44,143 @@ class MainActivity : Activity() {
             textSize = 14f
             setTextColor(Color.rgb(90, 180, 255))
         })
-        val avatar = TextView(this).apply {
+
+        val avatarStage = FrameLayout(this).apply {
+            setBackgroundColor(Color.rgb(10, 27, 48))
+        }
+        avatar = TextView(this).apply {
             text = "LANA"
             textSize = 54f
             gravity = Gravity.CENTER
             setTextColor(Color.WHITE)
             setBackgroundColor(Color.rgb(15, 39, 67))
-            contentDescription = "Lana avatar placeholder"
+            contentDescription = "Lana visual presence"
         }
-        root.addView(avatar, LinearLayout.LayoutParams(
-            LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f
-        ).apply { setMargins(0, 36, 0, 28) })
-        val status = TextView(this).apply {
-            text = "Tu sam, Charlie."
+        avatarStage.addView(
+            avatar,
+            FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT
+            ).apply { setMargins(22, 22, 22, 22) }
+        )
+        root.addView(
+            avatarStage,
+            LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f
+            ).apply { setMargins(0, 36, 0, 20) }
+        )
+
+        stateLabel = TextView(this).apply {
+            textSize = 13f
+            gravity = Gravity.CENTER
+            setTextColor(Color.rgb(90, 180, 255))
+        }
+        root.addView(stateLabel)
+
+        status = TextView(this).apply {
             textSize = 20f
             gravity = Gravity.CENTER
             setTextColor(Color.WHITE)
+            setPadding(0, 8, 0, 18)
         }
         root.addView(status)
-        root.addView(TextView(this).apply {
-            text = "Prvo gradimo Lanu. Zavrsene sposobnosti dodajemo jednu po jednu."
-            textSize = 15f
-            gravity = Gravity.CENTER
-            setPadding(0, 16, 0, 24)
-            setTextColor(Color.LTGRAY)
-        })
+
+        val stateButton = Button(this).apply {
+            text = "Promijeni stanje Lane"
+            isAllCaps = false
+            setOnClickListener { cycleVisualState() }
+        }
+        root.addView(stateButton)
+
         root.addView(Button(this).apply {
             text = "Smart Ride Acceptance - TESTNO"
             isAllCaps = false
             setOnClickListener {
-                status.text = "Smart Ride Acceptance je u jezgri. UI povezivanje slijedi."
+                status.text = "Smart Ride Acceptance je u jezgri. Sljedece ga spajamo na ovaj ekran."
             }
         })
+
         setContentView(root)
+        renderState(LanaVisualState.IDLE)
+    }
+
+    override fun onDestroy() {
+        idleAnimator?.cancel()
+        super.onDestroy()
+    }
+
+    private fun cycleVisualState() {
+        val next = when (visualState) {
+            LanaVisualState.IDLE -> LanaVisualState.LISTENING
+            LanaVisualState.LISTENING -> LanaVisualState.THINKING
+            LanaVisualState.THINKING -> LanaVisualState.SPEAKING
+            LanaVisualState.SPEAKING -> LanaVisualState.OFFLINE
+            LanaVisualState.OFFLINE -> LanaVisualState.ERROR
+            LanaVisualState.ERROR -> LanaVisualState.IDLE
+        }
+        renderState(next)
+    }
+
+    private fun renderState(state: LanaVisualState) {
+        visualState = state
+        idleAnimator?.cancel()
+        avatar.alpha = 1f
+        avatar.scaleX = 1f
+        avatar.scaleY = 1f
+
+        when (state) {
+            LanaVisualState.IDLE -> {
+                stateLabel.text = "IDLE"
+                status.text = "Tu sam, Charlie."
+                avatar.setBackgroundColor(Color.rgb(15, 39, 67))
+                startIdlePresence()
+            }
+            LanaVisualState.LISTENING -> {
+                stateLabel.text = "LISTENING"
+                status.text = "Slusam."
+                avatar.setBackgroundColor(Color.rgb(12, 55, 82))
+                avatar.scaleX = 1.025f
+                avatar.scaleY = 1.025f
+            }
+            LanaVisualState.THINKING -> {
+                stateLabel.text = "THINKING"
+                status.text = "Razmisljam..."
+                avatar.setBackgroundColor(Color.rgb(31, 43, 72))
+                avatar.alpha = 0.88f
+            }
+            LanaVisualState.SPEAKING -> {
+                stateLabel.text = "SPEAKING"
+                status.text = "Govorim."
+                avatar.setBackgroundColor(Color.rgb(18, 65, 77))
+                avatar.scaleX = 1.035f
+                avatar.scaleY = 1.035f
+            }
+            LanaVisualState.OFFLINE -> {
+                stateLabel.text = "OFFLINE"
+                status.text = "Offline sam. Dostupne su lokalne sposobnosti."
+                avatar.setBackgroundColor(Color.rgb(48, 52, 61))
+                avatar.alpha = 0.72f
+            }
+            LanaVisualState.ERROR -> {
+                stateLabel.text = "ERROR"
+                status.text = "Nesto nije u redu. Necu pogadjati."
+                avatar.setBackgroundColor(Color.rgb(74, 38, 45))
+            }
+        }
+    }
+
+    private fun startIdlePresence() {
+        val breatheX = ObjectAnimator.ofFloat(avatar, View.SCALE_X, 1f, 1.012f, 1f)
+        val breatheY = ObjectAnimator.ofFloat(avatar, View.SCALE_Y, 1f, 1.012f, 1f)
+        breatheX.duration = 3200
+        breatheY.duration = 3200
+        breatheX.repeatCount = ObjectAnimator.INFINITE
+        breatheY.repeatCount = ObjectAnimator.INFINITE
+        breatheX.interpolator = AccelerateDecelerateInterpolator()
+        breatheY.interpolator = AccelerateDecelerateInterpolator()
+        idleAnimator = AnimatorSet().apply {
+            playTogether(breatheX, breatheY)
+            start()
+        }
     }
 }
