@@ -16,6 +16,8 @@ class MainActivity : Activity() {
     private lateinit var avatar: TextView
     private lateinit var stateLabel: TextView
     private lateinit var status: TextView
+    private lateinit var updateStatus: TextView
+    private lateinit var autoUpdater: AutoUpdater
     private var visualState = LanaVisualState.IDLE
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -34,11 +36,21 @@ class MainActivity : Activity() {
             setTextColor(Color.WHITE)
             typeface = Typeface.DEFAULT_BOLD
         })
+
         root.addView(TextView(this).apply {
-            text = "Developer Preview 0.1"
+            text = "Developer Preview ${BuildConfig.VERSION_NAME}"
             textSize = 14f
             setTextColor(Color.rgb(90, 180, 255))
         })
+
+        updateStatus = TextView(this).apply {
+            text = "Provjeravam ima li nove verzije..."
+            textSize = 12f
+            gravity = Gravity.CENTER
+            setPadding(0, 8, 0, 0)
+            setTextColor(Color.rgb(150, 165, 180))
+        }
+        root.addView(updateStatus)
 
         val avatarStage = FrameLayout(this).apply {
             setBackgroundColor(Color.rgb(10, 27, 48))
@@ -97,8 +109,26 @@ class MainActivity : Activity() {
 
         setContentView(root)
         renderState(LanaVisualState.IDLE)
+
+        autoUpdater = AutoUpdater(this) { message ->
+            updateStatus.text = message
+        }
+        autoUpdater.start()
     }
 
+    override fun onResume() {
+        super.onResume()
+        if (::autoUpdater.isInitialized) {
+            autoUpdater.onResume()
+        }
+    }
+
+    override fun onDestroy() {
+        if (::autoUpdater.isInitialized) {
+            autoUpdater.stop()
+        }
+        super.onDestroy()
+    }
 
     private fun cycleVisualState() {
         val next = when (visualState) {
@@ -124,6 +154,7 @@ class MainActivity : Activity() {
                 status.text = "Tu sam, Charlie."
                 avatar.setBackgroundColor(Color.rgb(15, 39, 67))
             }
+
             LanaVisualState.LISTENING -> {
                 stateLabel.text = "LISTENING"
                 status.text = "Slusam."
@@ -131,12 +162,14 @@ class MainActivity : Activity() {
                 avatar.scaleX = 1.025f
                 avatar.scaleY = 1.025f
             }
+
             LanaVisualState.THINKING -> {
                 stateLabel.text = "THINKING"
                 status.text = "Razmisljam..."
                 avatar.setBackgroundColor(Color.rgb(31, 43, 72))
                 avatar.alpha = 0.88f
             }
+
             LanaVisualState.SPEAKING -> {
                 stateLabel.text = "SPEAKING"
                 status.text = "Govorim."
@@ -144,12 +177,14 @@ class MainActivity : Activity() {
                 avatar.scaleX = 1.035f
                 avatar.scaleY = 1.035f
             }
+
             LanaVisualState.OFFLINE -> {
                 stateLabel.text = "OFFLINE"
                 status.text = "Offline sam. Dostupne su lokalne sposobnosti."
                 avatar.setBackgroundColor(Color.rgb(48, 52, 61))
                 avatar.alpha = 0.72f
             }
+
             LanaVisualState.ERROR -> {
                 stateLabel.text = "ERROR"
                 status.text = "Nesto nije u redu. Necu pogadjati."
@@ -157,5 +192,4 @@ class MainActivity : Activity() {
             }
         }
     }
-
 }
