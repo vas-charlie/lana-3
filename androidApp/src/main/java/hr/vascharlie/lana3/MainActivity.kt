@@ -1,14 +1,10 @@
 package hr.vascharlie.lana3
 
-import android.animation.AnimatorSet
-import android.animation.ObjectAnimator
 import android.app.Activity
 import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
 import android.view.Gravity
-import android.view.View
-import android.view.animation.AccelerateDecelerateInterpolator
 import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.LinearLayout
@@ -21,7 +17,6 @@ class MainActivity : Activity() {
     private lateinit var stateLabel: TextView
     private lateinit var status: TextView
     private var visualState = LanaVisualState.IDLE
-    private var idleAnimator: AnimatorSet? = null
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -104,10 +99,6 @@ class MainActivity : Activity() {
         renderState(LanaVisualState.IDLE)
     }
 
-    override fun onDestroy() {
-        idleAnimator?.cancel()
-        super.onDestroy()
-    }
 
     private fun cycleVisualState() {
         val next = when (visualState) {
@@ -123,7 +114,6 @@ class MainActivity : Activity() {
 
     private fun renderState(state: LanaVisualState) {
         visualState = state
-        idleAnimator?.cancel()
         avatar.alpha = 1f
         avatar.scaleX = 1f
         avatar.scaleY = 1f
@@ -133,7 +123,6 @@ class MainActivity : Activity() {
                 stateLabel.text = "IDLE"
                 status.text = "Tu sam, Charlie."
                 avatar.setBackgroundColor(Color.rgb(15, 39, 67))
-                startIdlePresence()
             }
             LanaVisualState.LISTENING -> {
                 stateLabel.text = "LISTENING"
@@ -169,18 +158,4 @@ class MainActivity : Activity() {
         }
     }
 
-    private fun startIdlePresence() {
-        val breatheX = ObjectAnimator.ofFloat(avatar, View.SCALE_X, 1f, 1.012f, 1f)
-        val breatheY = ObjectAnimator.ofFloat(avatar, View.SCALE_Y, 1f, 1.012f, 1f)
-        breatheX.duration = 3200
-        breatheY.duration = 3200
-        breatheX.repeatCount = ObjectAnimator.INFINITE
-        breatheY.repeatCount = ObjectAnimator.INFINITE
-        breatheX.interpolator = AccelerateDecelerateInterpolator()
-        breatheY.interpolator = AccelerateDecelerateInterpolator()
-        idleAnimator = AnimatorSet().apply {
-            playTogether(breatheX, breatheY)
-            start()
-        }
-    }
 }
