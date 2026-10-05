@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: write
+  contents: read
 
 jobs:
   shared-core:
@@ -67,9 +67,11 @@ jobs:
           if-no-files-found: error
 
   android-signed-release:
-    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
     needs: [shared-core, android-preview]
     runs-on: ubuntu-latest
+    permissions:
+      contents: write
     env:
       LANA_SIGNING_KEY_B64: ${{ secrets.LANA_SIGNING_KEY_B64 }}
       LANA_SIGNING_STORE_PASSWORD: ${{ secrets.LANA_SIGNING_STORE_PASSWORD }}
@@ -77,38 +79,51 @@ jobs:
       LANA_SIGNING_KEY_PASSWORD: ${{ secrets.LANA_SIGNING_KEY_PASSWORD }}
 
     steps:
+      - name: Check private signing configuration
+        id: signing
+        run: |
+          if [ -n "$LANA_SIGNING_KEY_B64" ] && \
+             [ -n "$LANA_SIGNING_STORE_PASSWORD" ] && \
+             [ -n "$LANA_SIGNING_KEY_ALIAS" ] && \
+             [ -n "$LANA_SIGNING_KEY_PASSWORD" ]; then
+            echo "ready=true" >> "$GITHUB_OUTPUT"
+            echo "Private Android signing configuration is ready."
+          else
+            echo "ready=false" >> "$GITHUB_OUTPUT"
+            echo "::notice::Signed APK publishing skipped until the LANA_SIGNING_* repository secrets are configured."
+          fi
+
       - name: Checkout
+        if: steps.signing.outputs.ready == 'true'
         uses: actions/checkout@v5
 
       - name: Set up Java 17
+        if: steps.signing.outputs.ready == 'true'
         uses: actions/setup-java@v5
         with:
           distribution: temurin
           java-version: "17"
 
       - name: Install Android SDK 36
+        if: steps.signing.outputs.ready == 'true'
         run: |
           SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
           yes | "$SDKMANAGER" --licenses > /dev/null || true
           "$SDKMANAGER" "platforms;android-36" "build-tools;36.0.0"
 
       - name: Set up Gradle
+        if: steps.signing.outputs.ready == 'true'
         uses: gradle/actions/setup-gradle@v5
         with:
           gradle-version: "8.14.4"
 
-      - name: Validate private signing configuration
-        run: |
-          test -n "$LANA_SIGNING_KEY_B64" || { echo "::error::Missing LANA_SIGNING_KEY_B64"; exit 1; }
-          test -n "$LANA_SIGNING_STORE_PASSWORD" || { echo "::error::Missing LANA_SIGNING_STORE_PASSWORD"; exit 1; }
-          test -n "$LANA_SIGNING_KEY_ALIAS" || { echo "::error::Missing LANA_SIGNING_KEY_ALIAS"; exit 1; }
-          test -n "$LANA_SIGNING_KEY_PASSWORD" || { echo "::error::Missing LANA_SIGNING_KEY_PASSWORD"; exit 1; }
-
       - name: Restore private signing key
+        if: steps.signing.outputs.ready == 'true'
         run: |
           printf '%s' "$LANA_SIGNING_KEY_B64" | base64 --decode > "$RUNNER_TEMP/lana3-release.jks"
 
       - name: Build signed update APK
+        if: steps.signing.outputs.ready == 'true'
         run: |
           gradle --no-daemon :androidApp:assembleRelease \
             -PlanaVersionCode=${GITHUB_RUN_NUMBER} \
@@ -119,11 +134,13 @@ jobs:
             -PlanaSigningKeyPassword="$LANA_SIGNING_KEY_PASSWORD"
 
       - name: Verify APK signature
+        if: steps.signing.outputs.ready == 'true'
         run: |
           "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs \
             androidApp/build/outputs/apk/release/androidApp-release.apk
 
       - name: Publish latest LANA update
+        if: steps.signing.outputs.ready == 'true'
         env:
           GH_TOKEN: ${{ github.token }}
         run: |
