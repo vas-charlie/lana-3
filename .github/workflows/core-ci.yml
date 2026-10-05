@@ -7,7 +7,7 @@ on:
   workflow_dispatch:
 
 permissions:
-  contents: read
+  contents: write
 
 jobs:
   shared-core:
@@ -54,7 +54,10 @@ jobs:
           gradle-version: "8.14.4"
 
       - name: Build Android developer preview
-        run: gradle --no-daemon :androidApp:assembleDebug
+        run: |
+          gradle --no-daemon :androidApp:assembleDebug \
+            -PlanaVersionCode=${GITHUB_RUN_NUMBER} \
+            -PlanaVersionName="0.1.${GITHUB_RUN_NUMBER}-dev"
 
       - name: Upload developer preview APK
         uses: actions/upload-artifact@v4
@@ -62,3 +65,71 @@ jobs:
           name: lana-3-developer-preview
           path: androidApp/build/outputs/apk/debug/androidApp-debug.apk
           if-no-files-found: error
+
+  android-signed-release:
+    if: github.event_name == 'push' && github.ref == 'refs/heads/main'
+    needs: [shared-core, android-preview]
+    runs-on: ubuntu-latest
+    env:
+      LANA_SIGNING_KEY_B64: ${{ secrets.LANA_SIGNING_KEY_B64 }}
+      LANA_SIGNING_STORE_PASSWORD: ${{ secrets.LANA_SIGNING_STORE_PASSWORD }}
+      LANA_SIGNING_KEY_ALIAS: ${{ secrets.LANA_SIGNING_KEY_ALIAS }}
+      LANA_SIGNING_KEY_PASSWORD: ${{ secrets.LANA_SIGNING_KEY_PASSWORD }}
+
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Install Android SDK 36
+        run: |
+          SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          yes | "$SDKMANAGER" --licenses > /dev/null || true
+          "$SDKMANAGER" "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v5
+        with:
+          gradle-version: "8.14.4"
+
+      - name: Validate private signing configuration
+        run: |
+          test -n "$LANA_SIGNING_KEY_B64" || { echo "::error::Missing LANA_SIGNING_KEY_B64"; exit 1; }
+          test -n "$LANA_SIGNING_STORE_PASSWORD" || { echo "::error::Missing LANA_SIGNING_STORE_PASSWORD"; exit 1; }
+          test -n "$LANA_SIGNING_KEY_ALIAS" || { echo "::error::Missing LANA_SIGNING_KEY_ALIAS"; exit 1; }
+          test -n "$LANA_SIGNING_KEY_PASSWORD" || { echo "::error::Missing LANA_SIGNING_KEY_PASSWORD"; exit 1; }
+
+      - name: Restore private signing key
+        run: |
+          printf '%s' "$LANA_SIGNING_KEY_B64" | base64 --decode > "$RUNNER_TEMP/lana3-release.jks"
+
+      - name: Build signed update APK
+        run: |
+          gradle --no-daemon :androidApp:assembleRelease \
+            -PlanaVersionCode=${GITHUB_RUN_NUMBER} \
+            -PlanaVersionName="0.1.${GITHUB_RUN_NUMBER}-dev" \
+            -PlanaSigningStoreFile="$RUNNER_TEMP/lana3-release.jks" \
+            -PlanaSigningStorePassword="$LANA_SIGNING_STORE_PASSWORD" \
+            -PlanaSigningKeyAlias="$LANA_SIGNING_KEY_ALIAS" \
+            -PlanaSigningKeyPassword="$LANA_SIGNING_KEY_PASSWORD"
+
+      - name: Verify APK signature
+        run: |
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs \
+            androidApp/build/outputs/apk/release/androidApp-release.apk
+
+      - name: Publish latest LANA update
+        env:
+          GH_TOKEN: ${{ github.token }}
+        run: |
+          TAG="dev-${GITHUB_RUN_NUMBER}"
+          cp androidApp/build/outputs/apk/release/androidApp-release.apk lana-3.apk
+          gh release create "$TAG" lana-3.apk \
+            --title "LANA 3 Developer Preview ${GITHUB_RUN_NUMBER}" \
+            --notes "Automatic update build. versionCode=${GITHUB_RUN_NUMBER}" \
+            --latest
