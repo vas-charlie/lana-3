@@ -29,7 +29,7 @@ class SmartRideAcceptanceTest {
     @Test
     fun considersBorderlineOffer() {
         val result = engine.assess(
-            RideOffer(15.0, 2.0, 8.0, 10.0, 20.0),
+            RideOffer(12.0, 2.0, 8.0, 10.0, 20.0),
             rules,
         )
         val assessed = assertIs<RideAssessmentResult.Assessed>(result)
