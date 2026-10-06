@@ -460,6 +460,14 @@ Produkcijski kandidat postoji tek kada:
 - [x] 43 funkcionalne cjeline prenesene
 - [x] Izmjena: svi jezici od početka
 - [x] Izmjena: uređajno neovisna arhitektura
-- [ ] Tehnička arhitektura izvedena iz v0.2
-- [ ] Početni skeleton projekta
-- [ ] Prvi kompletni razvojni ciklus
+- [x] Tehnička arhitektura izvedena iz v0.2
+- [x] Početni skeleton projekta i automatski CI
+- [x] Shared core: intent, context, Decision Engine, authorization, task/prioriteti, diagnostics, offline temelj, lokacija/navigacija i Smart Ride početna jezgra
+- [x] Platform capability model i sigurnosni capability gate
+- [x] Test mode sigurnosna osnova: OBSERVE → SUGGEST → CONFIRM → EXECUTE
+- [x] Android developer preview, provjera uređaja i osnovne runtime dozvole
+- [x] Android Smart Ride testni ekran bez automatskog prihvaćanja vožnje
+- [ ] Privatni signing secrets dodani u GitHub Actions
+- [ ] Prvi potpisani APK instaliran na S24 Ultra
+- [ ] Fizički test dozvola, capability bridgea i Smart Ride ekrana na S24 Ultra
+- [ ] Prvi kompletni razvojni ciklus prihvaćen od Charlieja
