@@ -5,13 +5,17 @@ import android.app.ActivityManager
 import android.content.Context
 import android.content.pm.PackageManager
 import android.os.Build
-import java.util.Locale
+
+enum class AndroidFormFactor {
+    PHONE,
+    TABLET,
+}
 
 data class AndroidDeviceReadiness(
     val manufacturer: String,
     val model: String,
     val androidVersion: String,
-    val formFactor: String,
+    val formFactor: AndroidFormFactor,
     val totalMemoryGb: Double,
     val cameraAvailable: Boolean,
     val cameraPermissionGranted: Boolean,
@@ -26,45 +30,6 @@ data class AndroidDeviceReadiness(
             (cameraAvailable && !cameraPermissionGranted) ||
                 (microphoneAvailable && !microphonePermissionGranted) ||
                 (locationAvailable && !coarseLocationGranted)
-
-    fun toDisplayText(): String {
-        val cameraText = when {
-            !cameraAvailable -> "Kamera: nije dostupna"
-            cameraPermissionGranted -> "Kamera: spremna"
-            else -> "Kamera: treba dozvolu"
-        }
-
-        val microphoneText = when {
-            !microphoneAvailable -> "Mikrofon: nije dostupan"
-            microphonePermissionGranted -> "Mikrofon: spreman"
-            else -> "Mikrofon: treba dozvolu"
-        }
-
-        val locationText = when {
-            !locationAvailable -> "Lokacija: nije dostupna"
-            preciseLocationGranted -> "Lokacija: precizna"
-            coarseLocationGranted -> "Lokacija: približna"
-            else -> "Lokacija: treba dozvolu"
-        }
-
-        return buildString {
-            append(manufacturer)
-            append(" ")
-            append(model)
-            append(" • ")
-            append(formFactor)
-            append(" • Android ")
-            append(androidVersion)
-            append(" • ")
-            append(String.format(Locale.ROOT, "%.1f GB RAM", totalMemoryGb))
-            append("\n")
-            append(cameraText)
-            append(" • ")
-            append(microphoneText)
-            append(" • ")
-            append(locationText)
-        }
-    }
 }
 
 object AndroidDeviceReadinessProbe {
@@ -91,7 +56,11 @@ object AndroidDeviceReadinessProbe {
             model = Build.MODEL,
             androidVersion = Build.VERSION.RELEASE,
             formFactor =
-                if (configuration.smallestScreenWidthDp >= 600) "tablet" else "telefon",
+                if (configuration.smallestScreenWidthDp >= 600) {
+                    AndroidFormFactor.TABLET
+                } else {
+                    AndroidFormFactor.PHONE
+                },
             totalMemoryGb = memoryInfo.totalMem / (1024.0 * 1024.0 * 1024.0),
             cameraAvailable = cameraAvailable,
             cameraPermissionGranted =
