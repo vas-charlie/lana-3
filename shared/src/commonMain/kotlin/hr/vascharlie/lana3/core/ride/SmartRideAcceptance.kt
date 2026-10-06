@@ -27,6 +27,8 @@ data class RideAssessment(
 sealed interface RideAssessmentResult {
     data class Assessed(val assessment: RideAssessment) : RideAssessmentResult
     data class InsufficientData(val missingFields: List<String>) : RideAssessmentResult
+    data class InvalidOffer(val reasons: List<String>) : RideAssessmentResult
+    data class InvalidRules(val reasons: List<String>) : RideAssessmentResult
 }
 
 /**
@@ -45,21 +47,40 @@ class SmartRideAcceptance {
         }
         if (missing.isNotEmpty()) return RideAssessmentResult.InsufficientData(missing)
 
-        val price = offer.priceEur!!
-        val totalKm = offer.pickupKm!! + offer.tripKm!!
-        val totalMinutes = offer.pickupMinutes!! + offer.tripMinutes!!
-        if (price < 0.0 || totalKm <= 0.0 || totalMinutes <= 0.0) {
-            return RideAssessmentResult.InsufficientData(listOf("validPositiveOfferMetrics"))
+        validateRules(rules)?.let {
+            return RideAssessmentResult.InvalidRules(it)
         }
 
+        val price = offer.priceEur!!
+        val pickupKm = offer.pickupKm!!
+        val tripKm = offer.tripKm!!
+        val pickupMinutes = offer.pickupMinutes!!
+        val tripMinutes = offer.tripMinutes!!
+
+        validateOffer(
+            price = price,
+            pickupKm = pickupKm,
+            tripKm = tripKm,
+            pickupMinutes = pickupMinutes,
+            tripMinutes = tripMinutes,
+        )?.let {
+            return RideAssessmentResult.InvalidOffer(it)
+        }
+
+        val totalKm = pickupKm + tripKm
+        val totalMinutes = pickupMinutes + tripMinutes
         val eurPerKm = price / totalKm
         val eurPerHour = price / totalMinutes * 60.0
 
         val recommendation = when {
-            eurPerKm >= rules.acceptMinEurPerKm && eurPerHour >= rules.acceptMinEurPerHour ->
+            eurPerKm >= rules.acceptMinEurPerKm &&
+                eurPerHour >= rules.acceptMinEurPerHour ->
                 RideRecommendation.ACCEPT
-            eurPerKm >= rules.considerMinEurPerKm && eurPerHour >= rules.considerMinEurPerHour ->
+
+            eurPerKm >= rules.considerMinEurPerKm &&
+                eurPerHour >= rules.considerMinEurPerHour ->
                 RideRecommendation.CONSIDER
+
             else -> RideRecommendation.SKIP
         }
 
@@ -77,5 +98,70 @@ class SmartRideAcceptance {
                 ),
             )
         )
+    }
+
+    private fun validateRules(rules: RideAcceptanceRules): List<String>? {
+        val reasons = buildList {
+            val values = listOf(
+                rules.acceptMinEurPerKm,
+                rules.considerMinEurPerKm,
+                rules.acceptMinEurPerHour,
+                rules.considerMinEurPerHour,
+            )
+
+            if (values.any { !it.isFinite() }) {
+                add("Rule thresholds must be finite numbers.")
+            }
+            if (values.any { it < 0.0 }) {
+                add("Rule thresholds must not be negative.")
+            }
+            if (rules.acceptMinEurPerKm < rules.considerMinEurPerKm) {
+                add("Accept EUR/km threshold must be at least the consider threshold.")
+            }
+            if (rules.acceptMinEurPerHour < rules.considerMinEurPerHour) {
+                add("Accept EUR/h threshold must be at least the consider threshold.")
+            }
+        }
+
+        return reasons.takeIf { it.isNotEmpty() }
+    }
+
+    private fun validateOffer(
+        price: Double,
+        pickupKm: Double,
+        tripKm: Double,
+        pickupMinutes: Double,
+        tripMinutes: Double,
+    ): List<String>? {
+        val reasons = buildList {
+            val values = listOf(
+                price,
+                pickupKm,
+                tripKm,
+                pickupMinutes,
+                tripMinutes,
+            )
+
+            if (values.any { !it.isFinite() }) {
+                add("Offer metrics must be finite numbers.")
+            }
+            if (price < 0.0) {
+                add("Price must not be negative.")
+            }
+            if (pickupKm < 0.0 || tripKm < 0.0) {
+                add("Pickup and trip distance must not be negative.")
+            }
+            if (pickupMinutes < 0.0 || tripMinutes < 0.0) {
+                add("Pickup and trip time must not be negative.")
+            }
+            if (pickupKm + tripKm <= 0.0) {
+                add("Total distance must be greater than zero.")
+            }
+            if (pickupMinutes + tripMinutes <= 0.0) {
+                add("Total time must be greater than zero.")
+            }
+        }
+
+        return reasons.takeIf { it.isNotEmpty() }
     }
 }
