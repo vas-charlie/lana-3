@@ -13,11 +13,60 @@ class DiagnosticSanitizerTest {
             level = DiagnosticLevel.ERROR,
             component = "voice",
             message = "Voice action failed",
-            attributes = mapOf("token" to "top-secret", "platform" to "android")
+            attributes = mapOf(
+                "token" to "top-secret",
+                "platform" to "android",
+            )
         )
         val result = sanitizer.sanitize(event)
         assertEquals("[REDACTED]", result.attributes["token"])
         assertEquals("android", result.attributes["platform"])
+    }
+
+    @Test
+    fun redactsSensitiveFragmentsInsideRealisticAttributeNames() {
+        val event = DiagnosticEvent(
+            code = "AUTH_FAILURE",
+            level = DiagnosticLevel.ERROR,
+            component = "auth",
+            message = "Authentication failed",
+            attributes = mapOf(
+                "access_token" to "abc",
+                "refreshToken" to "def",
+                "user_email" to "x@example.test",
+                "customerPhoneNumber" to "+385000000",
+                "apiKeyValue" to "secret-value",
+                "platform_version" to "Android 16",
+            )
+        )
+
+        val result = sanitizer.sanitize(event)
+
+        assertEquals("[REDACTED]", result.attributes["access_token"])
+        assertEquals("[REDACTED]", result.attributes["refreshToken"])
+        assertEquals("[REDACTED]", result.attributes["user_email"])
+        assertEquals("[REDACTED]", result.attributes["customerPhoneNumber"])
+        assertEquals("[REDACTED]", result.attributes["apiKeyValue"])
+        assertEquals("Android 16", result.attributes["platform_version"])
+    }
+
+    @Test
+    fun mixedCaseSensitiveKeysAreStillRedacted() {
+        val event = DiagnosticEvent(
+            code = "TEST",
+            level = DiagnosticLevel.INFO,
+            component = "test",
+            message = "test",
+            attributes = mapOf(
+                "AuthorizationHeader" to "Bearer secret",
+                "Precise_Location_LatLng" to "45.0,15.0",
+            )
+        )
+
+        val result = sanitizer.sanitize(event)
+
+        assertEquals("[REDACTED]", result.attributes["AuthorizationHeader"])
+        assertEquals("[REDACTED]", result.attributes["Precise_Location_LatLng"])
     }
 
     @Test
