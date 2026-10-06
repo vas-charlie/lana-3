@@ -19,11 +19,7 @@ jobs:
       - name: Reject tracked private signing material
         shell: bash
         run: |
-          mapfile -t blocked < <(
-            git ls-files | grep -E -i "(^|/)([^/]+\\.(jks|keystore|p12|pfx|pkcs12)|local\\.properties|\\.env(\\..*)?)$" \\
-              | grep -E -v "(\\.env\\.example|\\.env\\.sample)$" \\
-              || true
-          )
+          mapfile -t blocked < <(git ls-files | grep -E -i "(^|/)([^/]+\\.(jks|keystore|p12|pfx|pkcs12)|local\\.properties|\\.env(\\..*)?)$" | grep -E -v "(\\.env\\.example|\\.env\\.sample)$" || true)
 
           if [ "${#blocked[@]}" -gt 0 ]; then
             echo "::error::Private signing/configuration material must not be tracked in Git."
