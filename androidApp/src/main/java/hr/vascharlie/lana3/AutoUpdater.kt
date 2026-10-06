@@ -22,9 +22,22 @@ import java.net.URL
 import java.security.MessageDigest
 import kotlin.concurrent.thread
 
+sealed interface AutoUpdateStatus {
+    data object UpToDate : AutoUpdateStatus
+    data object AlreadyDownloading : AutoUpdateStatus
+    data object CheckUnavailable : AutoUpdateStatus
+    data object DownloadStarted : AutoUpdateStatus
+    data object Downloading : AutoUpdateStatus
+    data object DownloadFailed : AutoUpdateStatus
+    data object VerificationFailed : AutoUpdateStatus
+    data object InstallPermissionRequired : AutoUpdateStatus
+    data object ApkUnavailable : AutoUpdateStatus
+    data object ReadyToInstall : AutoUpdateStatus
+}
+
 class AutoUpdater(
     private val activity: Activity,
-    private val onStatus: (String) -> Unit
+    private val onStatus: (AutoUpdateStatus) -> Unit
 ) {
     companion object {
         private const val RELEASE_API =
@@ -110,14 +123,14 @@ class AutoUpdater(
                 prefs.edit().putLong(KEY_LAST_CHECK, System.currentTimeMillis()).apply()
 
                 if (release.versionCode <= BuildConfig.VERSION_CODE) {
-                    postStatus("LANA je ažurna.")
+                    postStatus(AutoUpdateStatus.UpToDate)
                     return@thread
                 }
 
                 val existingVersion = prefs.getInt(KEY_REMOTE_VERSION, -1)
                 val existingId = prefs.getLong(KEY_DOWNLOAD_ID, -1L)
                 if (existingVersion == release.versionCode && existingId != -1L) {
-                    postStatus("Nova verzija je već preuzeta ili se preuzima.")
+                    postStatus(AutoUpdateStatus.AlreadyDownloading)
                     activity.runOnUiThread { resumePendingInstall() }
                     return@thread
                 }
@@ -126,7 +139,7 @@ class AutoUpdater(
                     downloadUpdate(release)
                 }
             } catch (e: Exception) {
-                postStatus("Provjera ažuriranja trenutačno nije dostupna.")
+                postStatus(AutoUpdateStatus.CheckUnavailable)
             } finally {
                 checking = false
             }
@@ -188,8 +201,13 @@ class AutoUpdater(
         val fileName = apkFileName(release.versionCode)
 
         val request = DownloadManager.Request(Uri.parse(release.downloadUrl))
-            .setTitle("LANA 3 ažuriranje")
-            .setDescription("Preuzimam verziju ${release.versionName}.")
+            .setTitle(activity.getString(R.string.updater_notification_title))
+            .setDescription(
+                activity.getString(
+                    R.string.updater_notification_description,
+                    release.versionName,
+                )
+            )
             .setMimeType("application/vnd.android.package-archive")
             .setNotificationVisibility(
                 DownloadManager.Request.VISIBILITY_VISIBLE_NOTIFY_COMPLETED
@@ -208,7 +226,7 @@ class AutoUpdater(
             .putInt(KEY_REMOTE_VERSION, release.versionCode)
             .apply()
 
-        postStatus("Nova verzija LANE se automatski preuzima.")
+        postStatus(AutoUpdateStatus.DownloadStarted)
     }
 
     fun resumePendingInstall() {
@@ -232,7 +250,7 @@ class AutoUpdater(
                 DownloadManager.STATUS_PENDING,
                 DownloadManager.STATUS_RUNNING,
                 DownloadManager.STATUS_PAUSED -> {
-                    postStatus("Nova verzija LANE se preuzima.")
+                    postStatus(AutoUpdateStatus.Downloading)
                 }
 
                 DownloadManager.STATUS_SUCCESSFUL -> {
@@ -241,7 +259,7 @@ class AutoUpdater(
 
                 DownloadManager.STATUS_FAILED -> {
                     clearPendingUpdate()
-                    postStatus("Preuzimanje ažuriranja nije uspjelo. Pokušat ću ponovno.")
+                    postStatus(AutoUpdateStatus.DownloadFailed)
                 }
             }
         }
@@ -250,14 +268,14 @@ class AutoUpdater(
     private fun promptInstall(downloadId: Long, remoteVersion: Int) {
         if (!verifyDownloadedApk(remoteVersion)) {
             clearPendingUpdate()
-            postStatus("Sigurnosna provjera ažuriranja nije prošla. APK neće biti instaliran.")
+            postStatus(AutoUpdateStatus.VerificationFailed)
             return
         }
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
             !activity.packageManager.canRequestPackageInstalls()
         ) {
-            postStatus("Ažuriranje je provjereno. Dopusti LANI instaliranje novih verzija.")
+            postStatus(AutoUpdateStatus.InstallPermissionRequired)
             val settingsIntent = Intent(
                 Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
                 Uri.parse("package:${activity.packageName}")
@@ -268,12 +286,12 @@ class AutoUpdater(
 
         val apkUri = downloadManager.getUriForDownloadedFile(downloadId)
         if (apkUri == null) {
-            postStatus("Preuzeti APK nije dostupan za instalaciju.")
+            postStatus(AutoUpdateStatus.ApkUnavailable)
             return
         }
 
         openingInstaller = true
-        postStatus("Ažuriranje je provjereno i spremno za instalaciju.")
+        postStatus(AutoUpdateStatus.ReadyToInstall)
 
         val installIntent = Intent(Intent.ACTION_VIEW).apply {
             setDataAndType(apkUri, "application/vnd.android.package-archive")
@@ -390,9 +408,9 @@ class AutoUpdater(
             .apply()
     }
 
-    private fun postStatus(message: String) {
+    private fun postStatus(status: AutoUpdateStatus) {
         activity.runOnUiThread {
-            onStatus(message)
+            onStatus(status)
         }
     }
 }
