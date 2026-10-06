@@ -159,4 +159,23 @@
     <string name="updater_ready_to_install">Ažuriranje je provjereno i spremno za instalaciju.</string>
     <string name="updater_notification_title">LANA 3 ažuriranje</string>
     <string name="updater_notification_description">Preuzimam verziju %1$s.</string>
+
+    <string name="voice_stt_error_recognizer_unavailable">Android usluga prepoznavanja govora nije dostupna.</string>
+    <string name="voice_stt_error_empty_result">Govor je obrađen, ali nije dobiven pouzdan prijepis.</string>
+    <string name="voice_stt_error_audio">Snimanje zvuka nije uspjelo.</string>
+    <string name="voice_stt_error_client">Prepoznavanje govora je prekinuto.</string>
+    <string name="voice_stt_error_permission">Mikrofon nema potrebnu dozvolu.</string>
+    <string name="voice_stt_error_network">Mrežna pogreška pri prepoznavanju govora.</string>
+    <string name="voice_stt_error_network_timeout">Mrežni zahtjev za prepoznavanje govora je istekao.</string>
+    <string name="voice_stt_error_no_match">Govor je čut, ali nije pronađeno pouzdano podudaranje.</string>
+    <string name="voice_stt_error_busy">Usluga prepoznavanja govora je zauzeta.</string>
+    <string name="voice_stt_error_server">Pogreška usluge prepoznavanja govora.</string>
+    <string name="voice_stt_error_speech_timeout">Govor nije prepoznat u zadanom vremenu.</string>
+    <string name="voice_stt_error_generic">Prepoznavanje govora nije uspjelo.</string>
+    <string name="voice_tts_error_failed">Pretvaranje teksta u govor nije uspjelo.</string>
+    <string name="voice_tts_error_unavailable">Pretvaranje teksta u govor nije dostupno.</string>
+    <string name="voice_tts_error_initializing">Pretvaranje teksta u govor još se pokreće.</string>
+    <string name="voice_tts_error_empty_text">Nema teksta za izgovor.</string>
+    <string name="voice_tts_error_language">Odabrani TTS jezik nije podržan na ovom uređaju.</string>
+    <string name="voice_tts_error_start_failed">Pretvaranje teksta u govor nije se moglo pokrenuti.</string>
 </resources>
