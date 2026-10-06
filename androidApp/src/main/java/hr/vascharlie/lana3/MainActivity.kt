@@ -10,6 +10,7 @@ import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
+import androidx.core.content.edit
 import hr.vascharlie.lana3.core.model.CapabilityGate
 import hr.vascharlie.lana3.core.model.CapabilityGateResult
 import hr.vascharlie.lana3.core.model.CapabilityIds
@@ -200,7 +201,9 @@ class MainActivity : Activity() {
         if (prefs.getBoolean(KEY_INITIAL_PERMISSION_REQUESTED, false)) return
 
         val permissions = AndroidDeviceReadinessProbe.permissionsToRequest(this)
-        prefs.edit().putBoolean(KEY_INITIAL_PERMISSION_REQUESTED, true).apply()
+        prefs.edit {
+            putBoolean(KEY_INITIAL_PERMISSION_REQUESTED, true)
+        }
 
         if (permissions.isNotEmpty()) {
             requestPermissions(permissions, REQUEST_LANA_PERMISSIONS)
