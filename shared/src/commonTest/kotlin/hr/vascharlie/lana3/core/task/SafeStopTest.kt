@@ -17,14 +17,19 @@ class SafeStopTest {
         val result = safeStop.apply(tasks)
 
         assertEquals(listOf("nav", "guide", "note"), result.stoppedTaskIds)
-        assertEquals(listOf(TaskState.CANCELLED, TaskState.CANCELLED, TaskState.CANCELLED), result.tasks.map { it.state })
+        assertEquals(
+            listOf(TaskState.CANCELLED, TaskState.CANCELLED, TaskState.CANCELLED),
+            result.tasks.map { it.state },
+        )
     }
 
     @Test
-    fun leavesAlreadyTerminalTasksTerminal() {
+    fun leavesAllTerminalTasksTerminal() {
         val tasks = listOf(
             LanaTask("done", "note", TaskPriority.NORMAL, state = TaskState.COMPLETED),
             LanaTask("cancelled", "call", TaskPriority.IMPORTANT, state = TaskState.CANCELLED),
+            LanaTask("failed", "sync", TaskPriority.NORMAL, state = TaskState.FAILED),
+            LanaTask("degraded", "guide", TaskPriority.NORMAL, state = TaskState.DEGRADED),
         )
 
         val result = safeStop.apply(tasks)

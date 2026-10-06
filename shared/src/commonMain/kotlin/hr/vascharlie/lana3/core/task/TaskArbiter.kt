@@ -9,8 +9,8 @@ sealed interface TaskDecision {
 
 class TaskArbiter {
     fun decide(active: LanaTask?, incoming: LanaTask): TaskDecision {
-        if (incoming.state == TaskState.CANCELLED || incoming.state == TaskState.COMPLETED) {
-            return TaskDecision.Reject(incoming, "Incoming task is not runnable")
+        if (incoming.state.isTerminal) {
+            return TaskDecision.Reject(incoming, "Incoming task is already terminal")
         }
         if (active == null) return TaskDecision.Start(incoming)
         if (active.state != TaskState.ACTIVE) return TaskDecision.Start(incoming)
@@ -18,8 +18,14 @@ class TaskArbiter {
         val outranks = incoming.priority.rank > active.priority.rank
         return when {
             outranks && active.interruptible -> TaskDecision.Preempt(active, incoming)
-            outranks -> TaskDecision.Queue(incoming, "Higher priority task cannot interrupt active task safely")
-            else -> TaskDecision.Queue(incoming, "Active task has equal or higher priority")
+            outranks -> TaskDecision.Queue(
+                incoming,
+                "Higher priority task cannot interrupt active task safely"
+            )
+            else -> TaskDecision.Queue(
+                incoming,
+                "Active task has equal or higher priority"
+            )
         }
     }
 }

@@ -8,7 +8,23 @@ enum class TaskPriority(val rank: Int) {
     SAFETY_CRITICAL(50)
 }
 
-enum class TaskState { QUEUED, ACTIVE, PAUSED, COMPLETED, CANCELLED }
+enum class TaskState {
+    QUEUED,
+    ACTIVE,
+    PAUSED,
+    COMPLETED,
+    CANCELLED,
+    FAILED,
+    DEGRADED,
+}
+
+val TaskState.isTerminal: Boolean
+    get() = this in setOf(
+        TaskState.COMPLETED,
+        TaskState.CANCELLED,
+        TaskState.FAILED,
+        TaskState.DEGRADED,
+    )
 
 data class LanaTask(
     val id: String,
