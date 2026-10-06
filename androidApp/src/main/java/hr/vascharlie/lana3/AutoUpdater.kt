@@ -8,13 +8,14 @@ import android.content.Intent
 import android.content.IntentFilter
 import android.content.pm.PackageInfo
 import android.content.pm.PackageManager
-import android.net.Uri
 import android.os.Build
 import android.os.Environment
 import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
 import androidx.core.content.ContextCompat
+import androidx.core.content.edit
+import androidx.core.net.toUri
 import org.json.JSONObject
 import java.io.File
 import java.net.HttpURLConnection
@@ -120,7 +121,9 @@ class AutoUpdater(
         thread(name = "lana-auto-update-check") {
             try {
                 val release = fetchLatestRelease()
-                prefs.edit().putLong(KEY_LAST_CHECK, System.currentTimeMillis()).apply()
+                prefs.edit {
+                    putLong(KEY_LAST_CHECK, System.currentTimeMillis())
+                }
 
                 if (release.versionCode <= BuildConfig.VERSION_CODE) {
                     postStatus(AutoUpdateStatus.UpToDate)
@@ -200,7 +203,7 @@ class AutoUpdater(
     private fun downloadUpdate(release: ReleaseInfo) {
         val fileName = apkFileName(release.versionCode)
 
-        val request = DownloadManager.Request(Uri.parse(release.downloadUrl))
+        val request = DownloadManager.Request(release.downloadUrl.toUri())
             .setTitle(activity.getString(R.string.updater_notification_title))
             .setDescription(
                 activity.getString(
@@ -221,10 +224,10 @@ class AutoUpdater(
             )
 
         val downloadId = downloadManager.enqueue(request)
-        prefs.edit()
-            .putLong(KEY_DOWNLOAD_ID, downloadId)
-            .putInt(KEY_REMOTE_VERSION, release.versionCode)
-            .apply()
+        prefs.edit {
+            putLong(KEY_DOWNLOAD_ID, downloadId)
+            putInt(KEY_REMOTE_VERSION, release.versionCode)
+        }
 
         postStatus(AutoUpdateStatus.DownloadStarted)
     }
@@ -276,7 +279,7 @@ class AutoUpdater(
             postStatus(AutoUpdateStatus.InstallPermissionRequired)
             val settingsIntent = Intent(
                 Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
-                Uri.parse("package:${activity.packageName}")
+                "package:${activity.packageName}".toUri()
             )
             activity.startActivity(settingsIntent)
             return
@@ -400,10 +403,10 @@ class AutoUpdater(
     }
 
     private fun clearPendingUpdate() {
-        prefs.edit()
-            .remove(KEY_DOWNLOAD_ID)
-            .remove(KEY_REMOTE_VERSION)
-            .apply()
+        prefs.edit {
+            remove(KEY_DOWNLOAD_ID)
+            remove(KEY_REMOTE_VERSION)
+        }
     }
 
     private fun postStatus(status: AutoUpdateStatus) {
