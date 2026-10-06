@@ -130,4 +130,20 @@
     <string name="smart_ride_field_trip_km">km vožnje</string>
     <string name="smart_ride_field_pickup_minutes">minute do putnika</string>
     <string name="smart_ride_field_trip_minutes">minute vožnje</string>
+
+    <string name="device_form_factor_phone">telefon</string>
+    <string name="device_form_factor_tablet">tablet</string>
+    <string name="device_camera_unavailable">Kamera: nije dostupna</string>
+    <string name="device_camera_ready">Kamera: spremna</string>
+    <string name="device_camera_permission_needed">Kamera: treba dozvolu</string>
+    <string name="device_microphone_unavailable">Mikrofon: nije dostupan</string>
+    <string name="device_microphone_ready">Mikrofon: spreman</string>
+    <string name="device_microphone_permission_needed">Mikrofon: treba dozvolu</string>
+    <string name="device_location_unavailable">Lokacija: nije dostupna</string>
+    <string name="device_location_precise">Lokacija: precizna</string>
+    <string name="device_location_approximate">Lokacija: približna</string>
+    <string name="device_location_permission_needed">Lokacija: treba dozvolu</string>
+    <string name="device_identity_line">%1$s %2$s • %3$s • Android %4$s • %5$.1f GB RAM</string>
+    <string name="device_sensor_line">%1$s • %2$s • %3$s</string>
+    <string name="device_readiness_block">%1$s\n%2$s</string>
 </resources>
