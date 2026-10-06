@@ -19,14 +19,22 @@ data class SanitizedDiagnosticEvent(
 )
 
 class DiagnosticSanitizer(
-    private val sensitiveKeys: Set<String> = setOf(
-        "password", "token", "secret", "authorization", "api_key",
-        "phone", "email", "message_body", "precise_location"
+    private val sensitiveKeyFragments: Set<String> = setOf(
+        "password",
+        "token",
+        "secret",
+        "authorization",
+        "api_key",
+        "apikey",
+        "phone",
+        "email",
+        "message_body",
+        "precise_location",
     )
 ) {
     fun sanitize(event: DiagnosticEvent): SanitizedDiagnosticEvent {
         val cleaned = event.attributes.mapValues { (key, value) ->
-            if (key.lowercase() in sensitiveKeys) "[REDACTED]" else value
+            if (isSensitiveKey(key)) "[REDACTED]" else value
         }
         return SanitizedDiagnosticEvent(
             code = event.code,
@@ -35,5 +43,12 @@ class DiagnosticSanitizer(
             message = event.message,
             attributes = cleaned
         )
+    }
+
+    private fun isSensitiveKey(key: String): Boolean {
+        val normalized = key.lowercase()
+        return sensitiveKeyFragments.any { fragment ->
+            normalized.contains(fragment)
+        }
     }
 }
