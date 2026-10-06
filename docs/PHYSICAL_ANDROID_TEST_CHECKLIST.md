@@ -18,7 +18,10 @@ A CI-green feature is not automatically physically accepted. Record what happene
 
 Test camera, microphone and location separately.
 
-- [ ] Permission prompt appears when appropriate.
+- [ ] First app launch does not automatically prompt for camera, microphone, or location.
+- [ ] Readiness control requests missing sensor permissions only after the user taps it.
+- [ ] Voice Lab requests microphone only after the user starts listening.
+- [ ] Permission prompt appears when the corresponding action is explicitly invoked.
 - [ ] Denying a permission does not produce false “ready” state.
 - [ ] Granting permission updates readiness.
 - [ ] Approximate location is reported as approximate.
