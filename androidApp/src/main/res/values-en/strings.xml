@@ -19,4 +19,36 @@
     <string name="status_speaking">Speaking.</string>
     <string name="status_offline">I’m offline. Local capabilities are still available.</string>
     <string name="status_error">Something went wrong. I won’t guess.</string>
+
+    <string name="voice_lab_title" translatable="false">LANA Voice Lab</string>
+    <string name="voice_lab_description">Test Android speech through LANA’s shared ports. The language is not fixed to Croatian and can be changed with a BCP-47 tag.</string>
+    <string name="voice_language_label">Speech language</string>
+    <string name="voice_language_hint">e.g. hr-HR, en-US, de-DE</string>
+    <string name="voice_transcript_hint">Recognized speech will appear here…</string>
+    <string name="voice_start_listening">Start listening</string>
+    <string name="voice_stop_listening">Stop listening</string>
+    <string name="voice_speak_text">LANA speaks the text</string>
+    <string name="voice_stop_speaking">Stop speaking</string>
+    <string name="voice_to_note">Turn text into a note</string>
+    <string name="back">Back</string>
+    <string name="voice_stopping_listen">Stopping listening…</string>
+    <string name="voice_speaking_stopped">Speech stopped.</string>
+    <string name="voice_microphone_denied">Microphone permission is not granted. LANA will not try to listen.</string>
+    <string name="voice_stt_available">STT available</string>
+    <string name="voice_stt_unavailable">STT unavailable</string>
+    <string name="voice_tts_ready">TTS ready</string>
+    <string name="voice_tts_unavailable">TTS is preparing or unavailable</string>
+    <string name="voice_availability_status">%1$s • %2$s</string>
+    <string name="voice_no_stt_service">No Android STT service is available on this device.</string>
+    <string name="voice_listening">Listening…</string>
+    <string name="voice_recognizing">Recognizing speech…</string>
+    <string name="voice_recognized">Speech recognized.</string>
+    <string name="voice_stt_error">STT: %1$s%2$s</string>
+    <string name="voice_retry_suffix"> You can try again.</string>
+    <string name="voice_no_text_for_note">There is no text to save as a note.</string>
+    <string name="voice_sent_to_notes">Text was sent to Notes Lab. Saving still requires your action.</string>
+    <string name="voice_no_text_to_speak">There is no text for LANA to speak.</string>
+    <string name="voice_tts_started">LANA is speaking…</string>
+    <string name="voice_tts_completed">Speech completed.</string>
+    <string name="voice_tts_error">TTS: %1$s</string>
 </resources>
