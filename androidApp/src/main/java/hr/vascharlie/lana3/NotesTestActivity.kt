@@ -407,7 +407,7 @@ class NotesTestActivity : Activity() {
             }
 
             is NoteResult.NotFound -> {
-                status.text = "Bilješka više ne postoji."
+                status.text = getString(R.string.notes_not_found)
                 refreshNotes()
             }
 
