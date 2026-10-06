@@ -62,23 +62,21 @@ class NotesTestActivity : Activity() {
         scroll.addView(root)
 
         root.addView(TextView(this).apply {
-            text = "LANA Notes Lab"
+            text = getString(R.string.notes_lab_title)
             textSize = 28f
             typeface = Typeface.DEFAULT_BOLD
             setTextColor(Color.WHITE)
         })
 
         root.addView(TextView(this).apply {
-            text =
-                "Lokalne bilješke bez clouda. Nova bilješka prolazi kroz " +
-                    "Decision Engine, autorizaciju, EXECUTE gate i tek onda kroz spremanje."
+            text = getString(R.string.notes_lab_description)
             textSize = 14f
             setPadding(0, 10, 0, 18)
             setTextColor(Color.rgb(180, 195, 210))
         })
 
         noteEditor = EditText(this).apply {
-            hint = "Upiši bilješku..."
+            hint = getString(R.string.notes_editor_hint)
             minLines = 3
             gravity = Gravity.TOP
             setTextColor(Color.WHITE)
@@ -93,18 +91,18 @@ class NotesTestActivity : Activity() {
         )
 
         saveButton = Button(this).apply {
-            text = "Spremi novu bilješku"
+            text = getString(R.string.notes_save_new)
             isAllCaps = false
             setOnClickListener { saveOrUpdate() }
         }
         root.addView(saveButton)
 
         root.addView(Button(this).apply {
-            text = "Odustani od uređivanja"
+            text = getString(R.string.notes_cancel_edit)
             isAllCaps = false
             setOnClickListener {
                 clearEditor()
-                status.text = "Uređivanje poništeno."
+                status.text = getString(R.string.notes_edit_cancelled)
             }
         })
 
@@ -116,14 +114,14 @@ class NotesTestActivity : Activity() {
         root.addView(status)
 
         root.addView(TextView(this).apply {
-            text = "Pretraga"
+            text = getString(R.string.notes_search_title)
             textSize = 18f
             typeface = Typeface.DEFAULT_BOLD
             setTextColor(Color.WHITE)
         })
 
         searchEditor = EditText(this).apply {
-            hint = "Traži po tekstu..."
+            hint = getString(R.string.notes_search_hint)
             setTextColor(Color.WHITE)
             setHintTextColor(Color.rgb(120, 135, 150))
         }
@@ -134,7 +132,7 @@ class NotesTestActivity : Activity() {
         }
         searchRow.addView(
             Button(this).apply {
-                text = "Traži"
+                text = getString(R.string.notes_search_button)
                 isAllCaps = false
                 setOnClickListener { runSearch() }
             },
@@ -142,7 +140,7 @@ class NotesTestActivity : Activity() {
         )
         searchRow.addView(
             Button(this).apply {
-                text = "Sve"
+                text = getString(R.string.notes_show_all)
                 isAllCaps = false
                 setOnClickListener {
                     searchEditor.setText("")
@@ -154,7 +152,7 @@ class NotesTestActivity : Activity() {
         root.addView(searchRow)
 
         root.addView(TextView(this).apply {
-            text = "Spremljene bilješke"
+            text = getString(R.string.notes_saved_title)
             textSize = 18f
             typeface = Typeface.DEFAULT_BOLD
             setPadding(0, 18, 0, 8)
@@ -167,7 +165,7 @@ class NotesTestActivity : Activity() {
         root.addView(notesContainer)
 
         root.addView(Button(this).apply {
-            text = "Natrag"
+            text = getString(R.string.back)
             isAllCaps = false
             setOnClickListener { finish() }
         })
@@ -180,7 +178,7 @@ class NotesTestActivity : Activity() {
             ?.let { prefill ->
                 noteEditor.setText(prefill)
                 noteEditor.setSelection(noteEditor.text.length)
-                status.text = "Tekst iz Voice Laba je spreman za tvoju potvrdu."
+                status.text = getString(R.string.notes_voice_prefill_ready)
             }
     }
 
@@ -209,9 +207,10 @@ class NotesTestActivity : Activity() {
             )
         ) {
             is SaveNoteFlowResult.Completed -> {
-                status.text =
-                    "Bilješka spremljena kroz puni LANA tok. Zadatak: " +
-                        result.task.state.name
+                status.text = getString(
+                    R.string.notes_saved_flow,
+                    result.task.state.name,
+                )
                 clearEditor()
                 refreshNotes()
             }
@@ -221,27 +220,32 @@ class NotesTestActivity : Activity() {
             }
 
             is SaveNoteFlowResult.Blocked -> {
-                status.text = "Spremanje blokirano: " + result.reason
+                status.text = getString(
+                    R.string.notes_save_blocked,
+                    result.reason,
+                )
             }
 
             is SaveNoteFlowResult.AwaitingConfirmation -> {
-                status.text = "Čeka potvrdu: " + result.reason
+                status.text = getString(
+                    R.string.notes_awaiting_confirmation,
+                    result.reason,
+                )
             }
 
             is SaveNoteFlowResult.Failed -> {
-                status.text =
-                    "Spremanje nije uspjelo. Zadatak: " +
-                        result.task.state.name +
-                        ". " +
-                        result.reason
+                status.text = getString(
+                    R.string.notes_save_failed,
+                    result.task.state.name,
+                    result.reason,
+                )
             }
 
             is SaveNoteFlowResult.Degraded -> {
                 status.text =
-                    "Spremanje je završilo u DEGRADED stanju. " +
-                        result.reason +
+                    getString(R.string.notes_save_degraded, result.reason) +
                         if (result.note != null) {
-                            " Bilješka je ipak spremljena."
+                            getString(R.string.notes_save_degraded_persisted_suffix)
                         } else {
                             ""
                         }
@@ -253,7 +257,7 @@ class NotesTestActivity : Activity() {
     private fun handleUpdate(result: NoteResult) {
         when (result) {
             is NoteResult.Updated -> {
-                status.text = "Bilješka ažurirana."
+                status.text = getString(R.string.notes_updated)
                 clearEditor()
                 refreshNotes()
             }
@@ -263,13 +267,13 @@ class NotesTestActivity : Activity() {
             }
 
             is NoteResult.NotFound -> {
-                status.text = "Bilješka više ne postoji."
+                status.text = getString(R.string.notes_not_found)
                 clearEditor()
                 refreshNotes()
             }
 
             else -> {
-                status.text = "Neočekivan rezultat uređivanja."
+                status.text = getString(R.string.notes_update_unexpected)
             }
         }
     }
@@ -279,7 +283,10 @@ class NotesTestActivity : Activity() {
         when (val result = service.search(query)) {
             is NoteResult.Found -> {
                 renderNotes(result.notes)
-                status.text = "Pronađeno: " + result.notes.size
+                status.text = getString(
+                    R.string.notes_found_count,
+                    result.notes.size,
+                )
             }
 
             is NoteResult.Invalid -> {
@@ -287,7 +294,7 @@ class NotesTestActivity : Activity() {
             }
 
             else -> {
-                status.text = "Pretraga nije uspjela."
+                status.text = getString(R.string.notes_search_failed)
             }
         }
     }
@@ -296,11 +303,14 @@ class NotesTestActivity : Activity() {
         when (val result = service.listAll()) {
             is NoteResult.Found -> {
                 renderNotes(result.notes)
-                status.text = "Lokalno spremljeno: " + result.notes.size
+                status.text = getString(
+                    R.string.notes_local_count,
+                    result.notes.size,
+                )
             }
 
             else -> {
-                status.text = "Bilješke se ne mogu učitati."
+                status.text = getString(R.string.notes_load_failed)
             }
         }
     }
@@ -310,7 +320,7 @@ class NotesTestActivity : Activity() {
 
         if (notes.isEmpty()) {
             notesContainer.addView(TextView(this).apply {
-                text = "Nema bilješki."
+                text = getString(R.string.notes_empty)
                 textSize = 14f
                 setTextColor(Color.rgb(150, 165, 180))
             })
@@ -331,7 +341,7 @@ class NotesTestActivity : Activity() {
             })
 
             card.addView(TextView(this).apply {
-                text = "ID: " + note.id.take(8)
+                text = getString(R.string.notes_id, note.id.take(8))
                 textSize = 11f
                 setTextColor(Color.rgb(130, 150, 170))
             })
@@ -341,14 +351,17 @@ class NotesTestActivity : Activity() {
             }
             actions.addView(
                 Button(this).apply {
-                    text = "Uredi"
+                    text = getString(R.string.notes_edit)
                     isAllCaps = false
                     setOnClickListener {
                         editingNoteId = note.id
                         noteEditor.setText(note.text)
                         noteEditor.setSelection(noteEditor.text.length)
-                        saveButton.text = "Spremi izmjene"
-                        status.text = "Uređuješ bilješku " + note.id.take(8)
+                        saveButton.text = getString(R.string.notes_save_changes)
+                        status.text = getString(
+                            R.string.notes_editing,
+                            note.id.take(8),
+                        )
                     }
                 },
                 LinearLayout.LayoutParams(
@@ -359,7 +372,7 @@ class NotesTestActivity : Activity() {
             )
             actions.addView(
                 Button(this).apply {
-                    text = "Obriši"
+                    text = getString(R.string.notes_delete)
                     isAllCaps = false
                     setOnClickListener { deleteNote(note.id) }
                 },
@@ -389,7 +402,7 @@ class NotesTestActivity : Activity() {
                 if (editingNoteId == id) {
                     clearEditor()
                 }
-                status.text = "Bilješka obrisana."
+                status.text = getString(R.string.notes_deleted)
                 refreshNotes()
             }
 
@@ -399,7 +412,7 @@ class NotesTestActivity : Activity() {
             }
 
             else -> {
-                status.text = "Bilješku nije moguće obrisati."
+                status.text = getString(R.string.notes_delete_failed)
             }
         }
     }
@@ -407,6 +420,6 @@ class NotesTestActivity : Activity() {
     private fun clearEditor() {
         editingNoteId = null
         noteEditor.setText("")
-        saveButton.text = "Spremi novu bilješku"
+        saveButton.text = getString(R.string.notes_save_new)
     }
 }
