@@ -60,4 +60,38 @@
     <string name="voice_tts_started">LANA govori…</string>
     <string name="voice_tts_completed">Govor završen.</string>
     <string name="voice_tts_error">TTS: %1$s</string>
+
+    <string name="notes_lab_title" translatable="false">LANA Notes Lab</string>
+    <string name="notes_lab_description">Lokalne bilješke bez clouda. Nova bilješka prolazi kroz Decision Engine, autorizaciju, EXECUTE gate i tek onda kroz spremanje.</string>
+    <string name="notes_editor_hint">Upiši bilješku…</string>
+    <string name="notes_save_new">Spremi novu bilješku</string>
+    <string name="notes_cancel_edit">Odustani od uređivanja</string>
+    <string name="notes_edit_cancelled">Uređivanje poništeno.</string>
+    <string name="notes_search_title">Pretraga</string>
+    <string name="notes_search_hint">Traži po tekstu…</string>
+    <string name="notes_search_button">Traži</string>
+    <string name="notes_show_all">Sve</string>
+    <string name="notes_saved_title">Spremljene bilješke</string>
+    <string name="notes_voice_prefill_ready">Tekst iz Voice Laba je spreman za tvoju potvrdu.</string>
+    <string name="notes_saved_flow">Bilješka spremljena kroz puni LANA tok. Zadatak: %1$s</string>
+    <string name="notes_save_blocked">Spremanje blokirano: %1$s</string>
+    <string name="notes_awaiting_confirmation">Čeka potvrdu: %1$s</string>
+    <string name="notes_save_failed">Spremanje nije uspjelo. Zadatak: %1$s. %2$s</string>
+    <string name="notes_save_degraded">Spremanje je završilo u DEGRADED stanju. %1$s</string>
+    <string name="notes_save_degraded_persisted_suffix"> Bilješka je ipak spremljena.</string>
+    <string name="notes_updated">Bilješka ažurirana.</string>
+    <string name="notes_not_found">Bilješka više ne postoji.</string>
+    <string name="notes_update_unexpected">Neočekivan rezultat uređivanja.</string>
+    <string name="notes_found_count">Pronađeno: %1$d</string>
+    <string name="notes_search_failed">Pretraga nije uspjela.</string>
+    <string name="notes_local_count">Lokalno spremljeno: %1$d</string>
+    <string name="notes_load_failed">Bilješke se ne mogu učitati.</string>
+    <string name="notes_empty">Nema bilješki.</string>
+    <string name="notes_id">ID: %1$s</string>
+    <string name="notes_edit">Uredi</string>
+    <string name="notes_delete">Obriši</string>
+    <string name="notes_save_changes">Spremi izmjene</string>
+    <string name="notes_editing">Uređuješ bilješku %1$s</string>
+    <string name="notes_deleted">Bilješka obrisana.</string>
+    <string name="notes_delete_failed">Bilješku nije moguće obrisati.</string>
 </resources>
