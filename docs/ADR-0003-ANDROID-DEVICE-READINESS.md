@@ -15,10 +15,11 @@ The first Android readiness slice must:
 2. distinguish phone/tablet form factor by Android configuration;
 3. report camera, microphone, and location capability honestly;
 4. request only the runtime permissions needed for capabilities that exist on the device;
-5. request the initial permission set once, not on every app launch;
-6. keep a visible retry button when a permission was denied or later revoked;
-7. treat approximate location as degraded rather than pretending precise location exists;
-8. avoid requesting screen-capture permission until the user actually invokes a screen-awareness feature.
+5. never request camera, microphone, or location automatically just because the application launched;
+6. keep a visible user-triggered readiness control for requesting missing sensor permissions;
+7. let feature-specific surfaces request sensitive permissions contextually when the user invokes that feature;
+8. treat approximate location as degraded rather than pretending precise location exists;
+9. avoid requesting screen-capture permission until the user actually invokes a screen-awareness feature.
 
 ## Why
 
@@ -30,8 +31,10 @@ This slice creates a reusable platform probe so later camera, voice, and locatio
 
 - Camera, microphone, and location remain under Android runtime permission control.
 - No permission is silently escalated.
-- If the user denies a permission, the application records only that the initial request was already shown; it does not nag again on every launch.
-- The user can explicitly retry missing permissions from the readiness control.
+- App launch itself does not trigger camera, microphone, or location permission prompts.
+- The user can explicitly request missing sensor permissions from the readiness control.
+- Feature-specific surfaces should request only the permission needed for the action the user just invoked. Voice Lab already follows this pattern for microphone access.
+- A denied permission remains denied until the user explicitly retries or changes Android settings; LANA does not nag on every launch.
 - Screen capture is intentionally excluded because Android requires a separate user-approved MediaProjection flow when screen access is actually needed.
 - Contacts, phone, messages, and other sensitive permissions are not requested before the corresponding feature exists.
 
@@ -39,9 +42,10 @@ This slice creates a reusable platform probe so later camera, voice, and locatio
 
 - [x] Android developer preview compiles in CI.
 - [x] Existing shared-core tests continue to pass.
-- [ ] First launch requests available camera/microphone/location permissions once.
+- [ ] First launch does not automatically request camera/microphone/location permissions.
+- [ ] Manual readiness button explicitly requests only missing permissions for capabilities available on the device.
+- [ ] Voice Lab requests microphone access only after the user invokes listening.
 - [ ] Relaunch does not automatically repeat a denied permission request.
-- [ ] Manual readiness button can retry missing permissions.
 - [ ] UI shows the actual device model, Android version, form factor, RAM, and sensor permission state.
 - [ ] Approximate location is shown as approximate, not precise.
 - [ ] Device without a capability reports it as unavailable instead of requesting a useless permission.
@@ -55,4 +59,4 @@ GitHub Actions run **37453080660** completed both relevant jobs successfully:
 
 ## Lifecycle status
 
-Specification → Architecture → Implementation → **CI PASSED** → Physical-device test → Charlie acceptance
+Specification → Architecture → Contextual-permission refinement → **IN TEST** → Physical-device test → Charlie acceptance

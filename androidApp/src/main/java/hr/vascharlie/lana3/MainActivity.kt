@@ -10,7 +10,6 @@ import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
-import androidx.core.content.edit
 import hr.vascharlie.lana3.core.model.CapabilityGate
 import hr.vascharlie.lana3.core.model.CapabilityGateResult
 import hr.vascharlie.lana3.core.model.CapabilityIds
@@ -21,8 +20,6 @@ enum class LanaVisualState { IDLE, LISTENING, THINKING, SPEAKING, OFFLINE, ERROR
 class MainActivity : Activity() {
     companion object {
         private const val REQUEST_LANA_PERMISSIONS = 3101
-        private const val SETUP_PREFS = "lana_device_setup"
-        private const val KEY_INITIAL_PERMISSION_REQUESTED = "initial_permission_requested"
     }
 
     private lateinit var avatar: TextView
@@ -162,7 +159,6 @@ class MainActivity : Activity() {
         setContentView(root)
         renderState(LanaVisualState.IDLE)
         refreshDeviceReadiness()
-        maybeRequestInitialPermissions()
 
         autoUpdater = AutoUpdater(this) { status ->
             updateStatus.text = formatAutoUpdateStatus(status)
@@ -198,20 +194,6 @@ class MainActivity : Activity() {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_LANA_PERMISSIONS) {
             refreshDeviceReadiness()
-        }
-    }
-
-    private fun maybeRequestInitialPermissions() {
-        val prefs = getSharedPreferences(SETUP_PREFS, MODE_PRIVATE)
-        if (prefs.getBoolean(KEY_INITIAL_PERMISSION_REQUESTED, false)) return
-
-        val permissions = AndroidDeviceReadinessProbe.permissionsToRequest(this)
-        prefs.edit {
-            putBoolean(KEY_INITIAL_PERMISSION_REQUESTED, true)
-        }
-
-        if (permissions.isNotEmpty()) {
-            requestPermissions(permissions, REQUEST_LANA_PERMISSIONS)
         }
     }
 
