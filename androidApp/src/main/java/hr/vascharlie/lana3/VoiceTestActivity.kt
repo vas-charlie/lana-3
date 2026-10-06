@@ -246,7 +246,7 @@ class VoiceTestActivity : Activity() {
                     is SpeechInputEvent.Error -> {
                         status.text = getString(
                             R.string.voice_stt_error,
-                            event.message,
+                            localizedSpeechInputError(event.code),
                             if (event.retryable) {
                                 getString(R.string.voice_retry_suffix)
                             } else {
@@ -257,6 +257,67 @@ class VoiceTestActivity : Activity() {
                 }
             }
         }
+    }
+
+    private fun localizedSpeechInputError(code: String): String = when (code) {
+        "recognizer_unavailable" ->
+            getString(R.string.voice_stt_error_recognizer_unavailable)
+
+        "empty_result" ->
+            getString(R.string.voice_stt_error_empty_result)
+
+        "audio" ->
+            getString(R.string.voice_stt_error_audio)
+
+        "client" ->
+            getString(R.string.voice_stt_error_client)
+
+        "permission" ->
+            getString(R.string.voice_stt_error_permission)
+
+        "network" ->
+            getString(R.string.voice_stt_error_network)
+
+        "network_timeout" ->
+            getString(R.string.voice_stt_error_network_timeout)
+
+        "no_match" ->
+            getString(R.string.voice_stt_error_no_match)
+
+        "busy" ->
+            getString(R.string.voice_stt_error_busy)
+
+        "server" ->
+            getString(R.string.voice_stt_error_server)
+
+        "speech_timeout" ->
+            getString(R.string.voice_stt_error_speech_timeout)
+
+        else ->
+            getString(R.string.voice_stt_error_generic)
+    }
+
+    private fun localizedSpeechOutputError(code: String): String = when {
+        code == "tts_init_failed" ->
+            getString(R.string.voice_tts_error_unavailable)
+
+        code == "tts_not_ready" ->
+            getString(R.string.voice_tts_error_initializing)
+
+        code == "empty_text" ->
+            getString(R.string.voice_tts_error_empty_text)
+
+        code == "language_not_supported" ->
+            getString(R.string.voice_tts_error_language)
+
+        code == "tts_start_failed" ->
+            getString(R.string.voice_tts_error_start_failed)
+
+        code == "tts_error" || code.startsWith("tts_error_") ->
+            getString(R.string.voice_tts_error_failed)
+
+        else ->
+            getString(R.string.voice_tts_error_failed)
     }
 
     private fun handOffToNotes() {
@@ -307,7 +368,11 @@ class VoiceTestActivity : Activity() {
                 status.text = when (event) {
                     SpeechOutputEvent.Started -> getString(R.string.voice_tts_started)
                     SpeechOutputEvent.Completed -> getString(R.string.voice_tts_completed)
-                    is SpeechOutputEvent.Error -> getString(R.string.voice_tts_error, event.message)
+                    is SpeechOutputEvent.Error ->
+                        getString(
+                            R.string.voice_tts_error,
+                            localizedSpeechOutputError(event.code),
+                        )
                 }
             }
         }
