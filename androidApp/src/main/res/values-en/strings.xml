@@ -137,4 +137,17 @@
     <string name="device_identity_line">%1$s %2$s • %3$s • Android %4$s • %5$.1f GB RAM</string>
     <string name="device_sensor_line">%1$s • %2$s • %3$s</string>
     <string name="device_readiness_block">%1$s\n%2$s</string>
+
+    <string name="updater_up_to_date">LANA is up to date.</string>
+    <string name="updater_already_downloading">The new version is already downloaded or downloading.</string>
+    <string name="updater_check_unavailable">Update checking is currently unavailable.</string>
+    <string name="updater_download_started">A new LANA version is downloading automatically.</string>
+    <string name="updater_downloading">A new LANA version is downloading.</string>
+    <string name="updater_download_failed">Update download failed. I’ll try again.</string>
+    <string name="updater_verification_failed">Update security verification failed. The APK will not be installed.</string>
+    <string name="updater_install_permission_required">The update is verified. Allow LANA to install new versions.</string>
+    <string name="updater_apk_unavailable">The downloaded APK is not available for installation.</string>
+    <string name="updater_ready_to_install">The update is verified and ready to install.</string>
+    <string name="updater_notification_title">LANA 3 update</string>
+    <string name="updater_notification_description">Downloading version %1$s.</string>
 </resources>
