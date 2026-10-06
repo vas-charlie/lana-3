@@ -121,4 +121,20 @@
     <string name="smart_ride_field_trip_km">trip km</string>
     <string name="smart_ride_field_pickup_minutes">pickup minutes</string>
     <string name="smart_ride_field_trip_minutes">trip minutes</string>
+
+    <string name="device_form_factor_phone">phone</string>
+    <string name="device_form_factor_tablet">tablet</string>
+    <string name="device_camera_unavailable">Camera: unavailable</string>
+    <string name="device_camera_ready">Camera: ready</string>
+    <string name="device_camera_permission_needed">Camera: permission required</string>
+    <string name="device_microphone_unavailable">Microphone: unavailable</string>
+    <string name="device_microphone_ready">Microphone: ready</string>
+    <string name="device_microphone_permission_needed">Microphone: permission required</string>
+    <string name="device_location_unavailable">Location: unavailable</string>
+    <string name="device_location_precise">Location: precise</string>
+    <string name="device_location_approximate">Location: approximate</string>
+    <string name="device_location_permission_needed">Location: permission required</string>
+    <string name="device_identity_line">%1$s %2$s • %3$s • Android %4$s • %5$.1f GB RAM</string>
+    <string name="device_sensor_line">%1$s • %2$s • %3$s</string>
+    <string name="device_readiness_block">%1$s\n%2$s</string>
 </resources>
