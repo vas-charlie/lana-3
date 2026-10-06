@@ -15,7 +15,7 @@ The GitHub workflow expects exactly these repository secrets:
 - `LANA_SIGNING_KEY_ALIAS`
 - `LANA_SIGNING_KEY_PASSWORD`
 
-The workflow restores the private keystore only inside the GitHub runner, builds a release APK, verifies its signature with `apksigner`, and publishes `lana-3.apk` as the latest GitHub Release asset.
+The workflow restores the private keystore only inside the GitHub runner, builds a release APK, verifies its signature with `apksigner`, generates a SHA-256 checksum, and publishes `lana-3.apk` plus `lana-3.apk.sha256` as the latest GitHub Release assets.
 
 The private keystore itself must never be committed to Git.
 
@@ -78,7 +78,9 @@ A successful signed release must create a GitHub Release with:
 
 - tag form `dev-<number>`;
 - asset named exactly `lana-3.apk`;
-- a successful APK signature verification step.
+- checksum asset named exactly `lana-3.apk.sha256`;
+- a successful APK signature verification step;
+- a checksum verification step that passes before publishing.
 
 Do not install until those checks pass.
 
@@ -99,6 +101,6 @@ Signing is not DONE until:
 - all four GitHub secrets are configured;
 - signed release steps actually execute;
 - signature verification passes;
-- `lana-3.apk` is published;
+- `lana-3.apk` and `lana-3.apk.sha256` are published;
 - first signed installation succeeds on a physical Android device;
 - a later signed release successfully updates over the first one.
