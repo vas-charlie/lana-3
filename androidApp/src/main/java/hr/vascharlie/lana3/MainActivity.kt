@@ -9,6 +9,10 @@ import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.LinearLayout
 import android.widget.TextView
+import hr.vascharlie.lana3.core.model.CapabilityGate
+import hr.vascharlie.lana3.core.model.CapabilityGateResult
+import hr.vascharlie.lana3.core.model.CapabilityIds
+import hr.vascharlie.lana3.core.model.CapabilityRequirement
 
 enum class LanaVisualState { IDLE, LISTENING, THINKING, SPEAKING, OFFLINE, ERROR }
 
@@ -194,8 +198,26 @@ class MainActivity : Activity() {
     private fun refreshDeviceReadiness() {
         val snapshot = AndroidDeviceReadinessProbe.snapshot(this)
         val permissions = AndroidDeviceReadinessProbe.permissionsToRequest(this)
+        val coreSnapshot = AndroidCapabilityBridge.toCoreSnapshot(snapshot)
+        val gateResult = CapabilityGate().evaluate(
+            coreSnapshot,
+            listOf(
+                CapabilityRequirement(CapabilityIds.CAMERA),
+                CapabilityRequirement(CapabilityIds.MICROPHONE),
+                CapabilityRequirement(CapabilityIds.LOCATION, allowDegraded = true),
+            )
+        )
 
-        readinessStatus.text = snapshot.toDisplayText()
+        val coreStatus = when (gateResult) {
+            CapabilityGateResult.Ready ->
+                "Jezgra senzora: spremna."
+
+            is CapabilityGateResult.Blocked ->
+                "Jezgra senzora ceka: " +
+                    gateResult.failures.joinToString { it.capabilityId }
+        }
+
+        readinessStatus.text = snapshot.toDisplayText() + "\n" + coreStatus
         readinessButton.isEnabled = permissions.isNotEmpty()
         readinessButton.text =
             if (permissions.isEmpty()) {
