@@ -243,7 +243,7 @@ class MainActivity : Activity() {
 
         readinessStatus.text = getString(
             R.string.readiness_with_core_status,
-            snapshot.toDisplayText(),
+            formatDeviceReadiness(snapshot),
             coreStatus,
         )
         readinessButton.isEnabled = permissions.isNotEmpty()
@@ -253,6 +253,75 @@ class MainActivity : Activity() {
             } else {
                 getString(R.string.allow_required_sensors, permissions.size)
             }
+    }
+
+    private fun formatDeviceReadiness(
+        snapshot: AndroidDeviceReadiness,
+    ): String {
+        val formFactor = when (snapshot.formFactor) {
+            AndroidFormFactor.PHONE ->
+                getString(R.string.device_form_factor_phone)
+
+            AndroidFormFactor.TABLET ->
+                getString(R.string.device_form_factor_tablet)
+        }
+
+        val camera = when {
+            !snapshot.cameraAvailable ->
+                getString(R.string.device_camera_unavailable)
+
+            snapshot.cameraPermissionGranted ->
+                getString(R.string.device_camera_ready)
+
+            else ->
+                getString(R.string.device_camera_permission_needed)
+        }
+
+        val microphone = when {
+            !snapshot.microphoneAvailable ->
+                getString(R.string.device_microphone_unavailable)
+
+            snapshot.microphonePermissionGranted ->
+                getString(R.string.device_microphone_ready)
+
+            else ->
+                getString(R.string.device_microphone_permission_needed)
+        }
+
+        val location = when {
+            !snapshot.locationAvailable ->
+                getString(R.string.device_location_unavailable)
+
+            snapshot.preciseLocationGranted ->
+                getString(R.string.device_location_precise)
+
+            snapshot.coarseLocationGranted ->
+                getString(R.string.device_location_approximate)
+
+            else ->
+                getString(R.string.device_location_permission_needed)
+        }
+
+        val identity = getString(
+            R.string.device_identity_line,
+            snapshot.manufacturer,
+            snapshot.model,
+            formFactor,
+            snapshot.androidVersion,
+            snapshot.totalMemoryGb,
+        )
+        val sensors = getString(
+            R.string.device_sensor_line,
+            camera,
+            microphone,
+            location,
+        )
+
+        return getString(
+            R.string.device_readiness_block,
+            identity,
+            sensors,
+        )
     }
 
     private fun cycleVisualState() {
