@@ -20,11 +20,35 @@ class PlatformCapabilityTest {
     }
 
     @Test
+    fun localCapabilityWithNoPermissionRequirementIsUsable() {
+        val capability = PlatformCapability(
+            id = "local_notes",
+            availability = CapabilityAvailability.AVAILABLE,
+            permissionState = CapabilityPermissionState.NOT_REQUIRED,
+            executionMode = CapabilityExecutionMode.LOCAL,
+        )
+
+        assertTrue(capability.usable)
+    }
+
+    @Test
     fun deniedPermissionBlocksOtherwiseAvailableCapability() {
         val capability = PlatformCapability(
             id = "microphone",
             availability = CapabilityAvailability.AVAILABLE,
             permissionState = CapabilityPermissionState.DENIED,
+            executionMode = CapabilityExecutionMode.PLATFORM,
+        )
+
+        assertFalse(capability.usable)
+    }
+
+    @Test
+    fun unknownPermissionDoesNotPretendCapabilityIsUsable() {
+        val capability = PlatformCapability(
+            id = "camera",
+            availability = CapabilityAvailability.AVAILABLE,
+            permissionState = CapabilityPermissionState.UNKNOWN,
             executionMode = CapabilityExecutionMode.PLATFORM,
         )
 
