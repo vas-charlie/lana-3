@@ -10,14 +10,21 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
+import hr.vascharlie.lana3.application.SaveNoteFlow
+import hr.vascharlie.lana3.application.SaveNoteFlowResult
+import hr.vascharlie.lana3.core.authorization.AutomationMode
+import hr.vascharlie.lana3.core.context.LanaContext
+import hr.vascharlie.lana3.core.model.LanguageContext
 import hr.vascharlie.lana3.core.notes.LanaNote
 import hr.vascharlie.lana3.core.notes.NoteResult
 import hr.vascharlie.lana3.core.notes.NoteService
+import java.util.Locale
 import java.util.UUID
 
 class NotesTestActivity : Activity() {
     private lateinit var repository: AndroidNoteRepository
     private lateinit var service: NoteService
+    private lateinit var saveFlow: SaveNoteFlow
 
     private lateinit var noteEditor: EditText
     private lateinit var searchEditor: EditText
@@ -35,6 +42,11 @@ class NotesTestActivity : Activity() {
             repository = repository,
             nowEpochMillis = { System.currentTimeMillis() },
             newId = { UUID.randomUUID().toString() },
+        )
+        saveFlow = SaveNoteFlow(
+            noteService = service,
+            diagnosticSink = AndroidLogDiagnosticSink(),
+            taskIdFactory = { UUID.randomUUID().toString() },
         )
 
         val scroll = ScrollView(this)
@@ -54,8 +66,8 @@ class NotesTestActivity : Activity() {
 
         root.addView(TextView(this).apply {
             text =
-                "Lokalne bilješke bez clouda. Ovaj ekran testira spremanje, " +
-                    "uređivanje, brisanje i pretragu kroz zajedničku LANA jezgru."
+                "Lokalne bilješke bez clouda. Nova bilješka prolazi kroz " +
+                    "Decision Engine, autorizaciju, EXECUTE gate i tek onda kroz spremanje."
             textSize = 14f
             setPadding(0, 10, 0, 18)
             setTextColor(Color.rgb(180, 195, 210))
@@ -167,18 +179,55 @@ class NotesTestActivity : Activity() {
 
     private fun saveOrUpdate() {
         val text = noteEditor.text?.toString().orEmpty()
+        val editingId = editingNoteId
 
-        val result = editingNoteId
-            ?.let { service.update(it, text) }
-            ?: service.save(text)
+        if (editingId != null) {
+            handleUpdate(service.update(editingId, text))
+            return
+        }
 
-        when (result) {
-            is NoteResult.Saved -> {
-                status.text = "Bilješka spremljena lokalno."
+        val context = LanaContext(
+            language = LanguageContext(Locale.getDefault().toLanguageTag()),
+        )
+        when (
+            val result = saveFlow.run(
+                text = text,
+                context = context,
+                automationMode = AutomationMode.EXECUTE,
+            )
+        ) {
+            is SaveNoteFlowResult.Completed -> {
+                status.text =
+                    "Bilješka spremljena kroz puni LANA tok. Zadatak: " +
+                        result.task.state.name
                 clearEditor()
                 refreshNotes()
             }
 
+            is SaveNoteFlowResult.Rejected -> {
+                status.text = result.reason
+            }
+
+            is SaveNoteFlowResult.Blocked -> {
+                status.text = "Spremanje blokirano: " + result.reason
+            }
+
+            is SaveNoteFlowResult.AwaitingConfirmation -> {
+                status.text = "Čeka potvrdu: " + result.reason
+            }
+
+            is SaveNoteFlowResult.Failed -> {
+                status.text =
+                    "Spremanje nije uspjelo. Zadatak: " +
+                        result.task.state.name +
+                        ". " +
+                        result.reason
+            }
+        }
+    }
+
+    private fun handleUpdate(result: NoteResult) {
+        when (result) {
             is NoteResult.Updated -> {
                 status.text = "Bilješka ažurirana."
                 clearEditor()
@@ -195,9 +244,8 @@ class NotesTestActivity : Activity() {
                 refreshNotes()
             }
 
-            is NoteResult.Deleted,
-            is NoteResult.Found -> {
-                status.text = "Neočekivan rezultat operacije."
+            else -> {
+                status.text = "Neočekivan rezultat uređivanja."
             }
         }
     }
