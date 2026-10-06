@@ -73,7 +73,7 @@ class NoteService(
             return NoteResult.Invalid(NoteInvalidReason.NOTE_ID_BLANK)
         }
         if (text.isBlank()) {
-            return NoteResult.Invalid("Note text must not be blank.")
+            return NoteResult.Invalid(NoteInvalidReason.NOTE_TEXT_BLANK)
         }
 
         val existing = repository.findById(id)
@@ -91,7 +91,7 @@ class NoteService(
 
     fun delete(id: String): NoteResult {
         if (id.isBlank()) {
-            return NoteResult.Invalid("Note id must not be blank.")
+            return NoteResult.Invalid(NoteInvalidReason.NOTE_ID_BLANK)
         }
 
         return if (repository.delete(id)) {
