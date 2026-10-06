@@ -2,12 +2,24 @@ package hr.vascharlie.lana3.core.diagnostics
 
 enum class DiagnosticLevel { INFO, WARNING, ERROR }
 
+enum class DiagnosticOutcome {
+    SUCCESS,
+    FAILURE,
+    BLOCKED,
+    DEGRADED,
+    UNKNOWN,
+}
+
 data class DiagnosticEvent(
     val code: String,
     val level: DiagnosticLevel,
     val component: String,
     val message: String,
-    val attributes: Map<String, String> = emptyMap()
+    val attributes: Map<String, String> = emptyMap(),
+    val traceId: String? = null,
+    val outcome: DiagnosticOutcome = DiagnosticOutcome.UNKNOWN,
+    val durationMillis: Long? = null,
+    val occurredAtEpochMillis: Long? = null,
 )
 
 data class SanitizedDiagnosticEvent(
@@ -15,7 +27,11 @@ data class SanitizedDiagnosticEvent(
     val level: DiagnosticLevel,
     val component: String,
     val message: String,
-    val attributes: Map<String, String>
+    val attributes: Map<String, String>,
+    val traceId: String?,
+    val outcome: DiagnosticOutcome,
+    val durationMillis: Long?,
+    val occurredAtEpochMillis: Long?,
 )
 
 class DiagnosticSanitizer(
@@ -41,7 +57,11 @@ class DiagnosticSanitizer(
             level = event.level,
             component = event.component,
             message = event.message,
-            attributes = cleaned
+            attributes = cleaned,
+            traceId = event.traceId,
+            outcome = event.outcome,
+            durationMillis = event.durationMillis,
+            occurredAtEpochMillis = event.occurredAtEpochMillis,
         )
     }
 

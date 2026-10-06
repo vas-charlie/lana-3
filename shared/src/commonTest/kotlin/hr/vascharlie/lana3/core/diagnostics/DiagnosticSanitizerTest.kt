@@ -75,11 +75,38 @@ class DiagnosticSanitizerTest {
             code = "TASK_QUEUE_BLOCKED",
             level = DiagnosticLevel.WARNING,
             component = "task-arbiter",
-            message = "Task queued by priority rule"
+            message = "Task queued by priority rule",
+            traceId = "trace-123",
+            outcome = DiagnosticOutcome.BLOCKED,
+            durationMillis = 42L,
+            occurredAtEpochMillis = 1_000L,
         )
+
         val result = sanitizer.sanitize(event)
+
         assertEquals("TASK_QUEUE_BLOCKED", result.code)
         assertEquals("task-arbiter", result.component)
         assertEquals(DiagnosticLevel.WARNING, result.level)
+        assertEquals("trace-123", result.traceId)
+        assertEquals(DiagnosticOutcome.BLOCKED, result.outcome)
+        assertEquals(42L, result.durationMillis)
+        assertEquals(1_000L, result.occurredAtEpochMillis)
+    }
+
+    @Test
+    fun structuredFieldsAreOptionalForExistingEvents() {
+        val event = DiagnosticEvent(
+            code = "LEGACY_EVENT",
+            level = DiagnosticLevel.INFO,
+            component = "test",
+            message = "Existing event",
+        )
+
+        val result = sanitizer.sanitize(event)
+
+        assertEquals(null, result.traceId)
+        assertEquals(DiagnosticOutcome.UNKNOWN, result.outcome)
+        assertEquals(null, result.durationMillis)
+        assertEquals(null, result.occurredAtEpochMillis)
     }
 }
