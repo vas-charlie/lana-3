@@ -129,8 +129,9 @@ class MainActivity : Activity() {
             text = "Smart Ride Acceptance - TESTNO"
             isAllCaps = false
             setOnClickListener {
-                status.text =
-                    "Smart Ride Acceptance je u jezgri. Sljedece ga spajamo na ovaj ekran."
+                startActivity(
+                    Intent(this@MainActivity, SmartRideTestActivity::class.java)
+                )
             }
         })
 
