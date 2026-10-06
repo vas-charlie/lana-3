@@ -217,7 +217,7 @@ class NotesTestActivity : Activity() {
             }
 
             is SaveNoteFlowResult.Rejected -> {
-                status.text = formatNoteInvalidReason(result.reason)
+                status.text = result.reason
             }
 
             is SaveNoteFlowResult.Blocked -> {
@@ -266,7 +266,7 @@ class NotesTestActivity : Activity() {
             }
 
             is NoteResult.Invalid -> {
-                status.text = result.reason
+                status.text = formatNoteInvalidReason(result.reason)
             }
 
             is NoteResult.NotFound -> {
@@ -293,7 +293,7 @@ class NotesTestActivity : Activity() {
             }
 
             is NoteResult.Invalid -> {
-                status.text = result.reason
+                status.text = formatNoteInvalidReason(result.reason)
             }
 
             else -> {
