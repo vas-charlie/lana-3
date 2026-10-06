@@ -29,8 +29,20 @@ The approved LANA 3 MASTER PLAN contains 43 functional units. Those 43 units rem
 Architecture first. Implementation follows the approved dependency/build order. A feature is not DONE merely because code exists: its relevant tests and acceptance criteria must pass.
 
 ## Current repository milestone
-- GitHub write access verified.
-- Repository initialized.
-- Engineering baseline recorded.
-- MASTER PLAN v0.2 recorded with all 43 functional units and confirmed amendments.
-- Next: derive the technical architecture and implementation build sequence from v0.2 before writing product code.
+- GitHub write access is verified and the active repository is initialized.
+- MASTER PLAN v0.2 and TECHNICAL ARCHITECTURE v0.1 are recorded.
+- The Kotlin Multiplatform shared core and Android developer-preview skeleton compile in CI.
+- Shared-core regression tests run automatically on pull requests and main.
+- The Android preview has a secure update path in code; signed release publishing remains intentionally inactive until the private signing secrets are configured.
+- Android device readiness now measures phone/tablet form factor, RAM, camera, microphone and location state without Samsung model hard-coding.
+- Android runtime permission setup is implemented for camera, microphone and location; physical-device verification remains pending.
+- Android device readiness is bridged into the shared platform-capability model and deterministic capability gate.
+- Unknown or denied permission state is not treated as usable.
+- OBSERVE → SUGGEST → CONFIRM → EXECUTE automation-mode safety is implemented and covered by tests.
+- Smart Ride Acceptance includes deterministic €/km and €/h calculation, validation of impossible/invalid inputs, and an Android developer test screen.
+- Smart Ride does not invent thresholds and does not automate Uber/Bolt actions.
+- Physical S24 Ultra testing, private release signing setup and the first signed installation remain pending manual gates.
+- Future Samsung tablet testing is a second physical target, not an architectural dependency.
+
+## Current rule for progress
+Work that can be verified safely in CI may continue without waiting for release signing. Anything that depends on real device behavior, Android user consent, private signing secrets, or Charlie's product acceptance remains explicitly pending rather than being marked DONE.
