@@ -9,3 +9,4 @@ Projekt LANA 3.
 - `docs/TECHNICAL_ARCHITECTURE_v0.1.md` — architectural boundaries
 - `docs/SIGNING_AND_FIRST_INSTALL_RUNBOOK.md` — private signing and first signed install
 - `docs/PHYSICAL_ANDROID_TEST_CHECKLIST.md` — real-device acceptance checklist
+- `docs/MAIN_BRANCH_PROTECTION_RUNBOOK.md` — intended GitHub main-branch protection settings
