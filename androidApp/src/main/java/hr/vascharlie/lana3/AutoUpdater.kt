@@ -16,6 +16,8 @@ import android.provider.Settings
 import androidx.core.content.ContextCompat
 import androidx.core.content.edit
 import androidx.core.net.toUri
+import hr.vascharlie.lana3.core.update.UpdateDecision
+import hr.vascharlie.lana3.core.update.UpdatePolicy
 import org.json.JSONObject
 import java.io.File
 import java.net.HttpURLConnection
@@ -56,6 +58,7 @@ class AutoUpdater(
         activity.getSystemService(Context.DOWNLOAD_SERVICE) as DownloadManager
     private val prefs = activity.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
     private val handler = Handler(Looper.getMainLooper())
+    private val updatePolicy = UpdatePolicy()
 
     @Volatile
     private var checking = false
@@ -125,21 +128,33 @@ class AutoUpdater(
                     putLong(KEY_LAST_CHECK, System.currentTimeMillis())
                 }
 
-                if (release.versionCode <= BuildConfig.VERSION_CODE) {
-                    postStatus(AutoUpdateStatus.UpToDate)
-                    return@thread
-                }
+                val pendingVersion =
+                    prefs.getInt(KEY_REMOTE_VERSION, -1).takeIf { it >= 0 }
+                val pendingDownloadId =
+                    prefs.getLong(KEY_DOWNLOAD_ID, -1L).takeIf { it >= 0L }
 
-                val existingVersion = prefs.getInt(KEY_REMOTE_VERSION, -1)
-                val existingId = prefs.getLong(KEY_DOWNLOAD_ID, -1L)
-                if (existingVersion == release.versionCode && existingId != -1L) {
-                    postStatus(AutoUpdateStatus.AlreadyDownloading)
-                    activity.runOnUiThread { resumePendingInstall() }
-                    return@thread
-                }
+                when (
+                    updatePolicy.decide(
+                        installedVersion = BuildConfig.VERSION_CODE,
+                        remoteVersion = release.versionCode,
+                        pendingVersion = pendingVersion,
+                        pendingDownloadId = pendingDownloadId,
+                    )
+                ) {
+                    UpdateDecision.UpToDate -> {
+                        postStatus(AutoUpdateStatus.UpToDate)
+                    }
 
-                activity.runOnUiThread {
-                    downloadUpdate(release)
+                    UpdateDecision.ResumeExistingDownload -> {
+                        postStatus(AutoUpdateStatus.AlreadyDownloading)
+                        activity.runOnUiThread { resumePendingInstall() }
+                    }
+
+                    UpdateDecision.Download -> {
+                        activity.runOnUiThread {
+                            downloadUpdate(release)
+                        }
+                    }
                 }
             } catch (e: Exception) {
                 postStatus(AutoUpdateStatus.CheckUnavailable)
