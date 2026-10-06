@@ -32,6 +32,7 @@ class MainActivity : Activity() {
     private lateinit var readinessStatus: TextView
     private lateinit var readinessButton: Button
     private lateinit var autoUpdater: AutoUpdater
+    private lateinit var avatarMotion: LanaAvatarMotionController
     private var visualState = LanaVisualState.IDLE
 
     override fun onCreate(savedInstanceState: Bundle?) {
@@ -157,6 +158,7 @@ class MainActivity : Activity() {
             }
         })
 
+        avatarMotion = LanaAvatarMotionController(avatar)
         setContentView(root)
         renderState(LanaVisualState.IDLE)
         refreshDeviceReadiness()
@@ -179,6 +181,9 @@ class MainActivity : Activity() {
     }
 
     override fun onDestroy() {
+        if (::avatarMotion.isInitialized) {
+            avatarMotion.stop()
+        }
         if (::autoUpdater.isInitialized) {
             autoUpdater.stop()
         }
@@ -375,6 +380,7 @@ class MainActivity : Activity() {
 
     private fun renderState(state: LanaVisualState) {
         visualState = state
+        avatarMotion.stop()
         avatar.alpha = 1f
         avatar.scaleX = 1f
         avatar.scaleY = 1f
@@ -422,5 +428,7 @@ class MainActivity : Activity() {
                 avatar.setBackgroundColor(Color.rgb(74, 38, 45))
             }
         }
+
+        avatarMotion.applyState(state)
     }
 }
