@@ -32,7 +32,10 @@ The developer preview gets a Voice Lab screen that can:
 3. stop or cancel listening;
 4. send entered/transcribed text to Android TTS;
 5. change the requested language tag manually;
-6. report unsupported/unavailable services instead of pretending voice works.
+6. report unsupported/unavailable services instead of pretending voice works;
+7. hand recognized/entered text to Notes Lab as a **prefill only**.
+
+The voice-to-note handoff does not save automatically. Notes Lab opens with the text ready for review, and the user still chooses whether to save it through the normal LANA note flow.
 
 ## Important limits
 
@@ -51,6 +54,7 @@ The developer preview gets a Voice Lab screen that can:
 - No audio recording is stored by LANA in this slice.
 - The shared ports carry transcripts/events, not raw Android objects.
 - Voice input does not grant permission to execute unrelated actions.
+- A recognized transcript is never silently persisted as a note.
 
 ## Acceptance criteria
 
@@ -61,6 +65,7 @@ The developer preview gets a Voice Lab screen that can:
 - [ ] speech recognizer unavailability is reported honestly;
 - [ ] partial/final transcript flow compiles;
 - [ ] TTS unsupported language produces a structured error;
+- [ ] voice-to-note handoff prefills Notes Lab without automatic save;
 - [ ] Android developer preview CI passes;
 - [ ] physical STT/TTS test passes on at least one real Android device;
 - [ ] at least one non-Croatian language is physically tested before voice is accepted.

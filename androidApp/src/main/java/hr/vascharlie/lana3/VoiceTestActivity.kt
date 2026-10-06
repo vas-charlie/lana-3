@@ -2,6 +2,7 @@ package hr.vascharlie.lana3
 
 import android.Manifest
 import android.app.Activity
+import android.content.Intent
 import android.content.pm.PackageManager
 import android.graphics.Color
 import android.graphics.Typeface
@@ -135,6 +136,12 @@ class VoiceTestActivity : Activity() {
         })
 
         root.addView(Button(this).apply {
+            text = "Pretvori tekst u bilješku"
+            isAllCaps = false
+            setOnClickListener { handOffToNotes() }
+        })
+
+        root.addView(Button(this).apply {
             text = "Natrag"
             isAllCaps = false
             setOnClickListener { finish() }
@@ -238,6 +245,26 @@ class VoiceTestActivity : Activity() {
                 }
             }
         }
+    }
+
+    private fun handOffToNotes() {
+        val text = transcript
+            .text
+            ?.toString()
+            ?.trim()
+            .orEmpty()
+
+        if (text.isBlank()) {
+            status.text = "Nema teksta za bilješku."
+            return
+        }
+
+        startActivity(
+            Intent(this, NotesTestActivity::class.java).apply {
+                putExtra(NotesTestActivity.EXTRA_PREFILL_NOTE_TEXT, text)
+            }
+        )
+        status.text = "Tekst je poslan u Notes Lab. Spremanje i dalje traži tvoju radnju."
     }
 
     private fun speakTranscript() {
