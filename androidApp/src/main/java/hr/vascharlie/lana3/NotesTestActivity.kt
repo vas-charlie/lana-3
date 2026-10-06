@@ -173,6 +173,7 @@ class NotesTestActivity : Activity() {
         })
 
         setContentView(scroll)
+        refreshNotes()
 
         intent.getStringExtra(EXTRA_PREFILL_NOTE_TEXT)
             ?.takeIf { it.isNotBlank() }
@@ -181,8 +182,6 @@ class NotesTestActivity : Activity() {
                 noteEditor.setSelection(noteEditor.text.length)
                 status.text = "Tekst iz Voice Laba je spreman za tvoju potvrdu."
             }
-
-        refreshNotes()
     }
 
     override fun onDestroy() {
