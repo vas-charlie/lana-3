@@ -8,7 +8,7 @@ class ActiveTaskStatusResolverTest {
     private val resolver = ActiveTaskStatusResolver()
 
     @Test
-    fun reportsActualActiveTask() {
+    fun reportsActualActiveTaskSemantically() {
         val status = resolver.resolve(
             listOf(
                 LanaTask("queued", "note", TaskPriority.NORMAL, state = TaskState.QUEUED),
@@ -16,14 +16,15 @@ class ActiveTaskStatusResolverTest {
             )
         )
 
+        assertEquals(ActiveTaskStatusKind.ACTIVE, status.kind)
         assertEquals("nav", status.taskId)
-        assertEquals("navigation", status.kind)
+        assertEquals("navigation", status.taskKind)
         assertEquals(TaskState.ACTIVE, status.state)
-        assertEquals("Active task: navigation.", status.summary)
+        assertEquals(TaskPriority.DRIVING_CRITICAL, status.priority)
     }
 
     @Test
-    fun pausedOrQueuedTasksAreNotReportedAsActive() {
+    fun pausedOrQueuedTasksProduceIdleSemanticStatus() {
         val status = resolver.resolve(
             listOf(
                 LanaTask("paused", "guide", TaskPriority.NORMAL, state = TaskState.PAUSED),
@@ -31,8 +32,11 @@ class ActiveTaskStatusResolverTest {
             )
         )
 
+        assertEquals(ActiveTaskStatusKind.IDLE, status.kind)
         assertNull(status.taskId)
-        assertEquals("No active task.", status.summary)
+        assertNull(status.taskKind)
+        assertNull(status.state)
+        assertNull(status.priority)
     }
 
     @Test
@@ -45,10 +49,11 @@ class ActiveTaskStatusResolverTest {
         )
 
         assertEquals("nav", status.taskId)
+        assertEquals(TaskPriority.DRIVING_CRITICAL, status.priority)
     }
 
     @Test
-    fun safeStopLeavesNoActiveTask() {
+    fun safeStopLeavesSemanticIdleStatus() {
         val tasks = listOf(
             LanaTask("nav", "navigation", TaskPriority.DRIVING_CRITICAL, state = TaskState.ACTIVE),
         )
@@ -56,7 +61,7 @@ class ActiveTaskStatusResolverTest {
         val stopped = SafeStop().apply(tasks)
         val status = resolver.resolve(stopped.tasks)
 
+        assertEquals(ActiveTaskStatusKind.IDLE, status.kind)
         assertNull(status.taskId)
-        assertEquals("No active task.", status.summary)
     }
 }
