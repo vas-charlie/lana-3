@@ -28,4 +28,36 @@
     <string name="status_speaking">Govorim.</string>
     <string name="status_offline">Offline sam. Dostupne su lokalne sposobnosti.</string>
     <string name="status_error">Nešto nije u redu. Neću pogađati.</string>
+
+    <string name="voice_lab_title" translatable="false">LANA Voice Lab</string>
+    <string name="voice_lab_description">Test Android govora kroz zajedničke LANA portove. Jezik nije fiksiran na hrvatski i može se promijeniti BCP-47 oznakom.</string>
+    <string name="voice_language_label">Jezik govora</string>
+    <string name="voice_language_hint">npr. hr-HR, en-US, de-DE</string>
+    <string name="voice_transcript_hint">Ovdje će se pojaviti prepoznati govor…</string>
+    <string name="voice_start_listening">Počni slušati</string>
+    <string name="voice_stop_listening">Zaustavi slušanje</string>
+    <string name="voice_speak_text">LANA izgovori tekst</string>
+    <string name="voice_stop_speaking">Zaustavi govor</string>
+    <string name="voice_to_note">Pretvori tekst u bilješku</string>
+    <string name="back">Natrag</string>
+    <string name="voice_stopping_listen">Zaustavljam slušanje…</string>
+    <string name="voice_speaking_stopped">Govor zaustavljen.</string>
+    <string name="voice_microphone_denied">Mikrofon nije dopušten. LANA neće pokušavati slušati.</string>
+    <string name="voice_stt_available">STT dostupan</string>
+    <string name="voice_stt_unavailable">STT nije dostupan</string>
+    <string name="voice_tts_ready">TTS spreman</string>
+    <string name="voice_tts_unavailable">TTS se priprema ili nije dostupan</string>
+    <string name="voice_availability_status">%1$s • %2$s</string>
+    <string name="voice_no_stt_service">Na ovom uređaju nema dostupne Android STT usluge.</string>
+    <string name="voice_listening">Slušam…</string>
+    <string name="voice_recognizing">Prepoznajem govor…</string>
+    <string name="voice_recognized">Govor prepoznat.</string>
+    <string name="voice_stt_error">STT: %1$s%2$s</string>
+    <string name="voice_retry_suffix"> Možeš pokušati ponovno.</string>
+    <string name="voice_no_text_for_note">Nema teksta za bilješku.</string>
+    <string name="voice_sent_to_notes">Tekst je poslan u Notes Lab. Spremanje i dalje traži tvoju radnju.</string>
+    <string name="voice_no_text_to_speak">Nema teksta koji bi LANA izgovorila.</string>
+    <string name="voice_tts_started">LANA govori…</string>
+    <string name="voice_tts_completed">Govor završen.</string>
+    <string name="voice_tts_error">TTS: %1$s</string>
 </resources>
