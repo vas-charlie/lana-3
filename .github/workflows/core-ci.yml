@@ -10,6 +10,24 @@ permissions:
   contents: read
 
 jobs:
+  security-baseline:
+    runs-on: ubuntu-latest
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Reject tracked private signing material
+        shell: bash
+        run: |
+          mapfile -t blocked < <(git ls-files | grep -E -i "(^|/)([^/]+\\.(jks|keystore|p12|pfx|pkcs12)|local\\.properties|\\.env(\\..*)?)$" | grep -E -v "(\\.env\\.example|\\.env\\.sample)$" || true)
+
+          if [ "${#blocked[@]}" -gt 0 ]; then
+            echo "::error::Private signing/configuration material must not be tracked in Git."
+            printf 'Blocked tracked file: %s\\n' "${blocked[@]}"
+            exit 1
+          fi
+
+          echo "No blocked private signing/configuration files are tracked."
   shared-core:
     runs-on: ubuntu-latest
     steps:
@@ -79,7 +97,7 @@ jobs:
 
   android-signed-release:
     if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
-    needs: [shared-core, android-preview]
+    needs: [security-baseline, shared-core, android-preview]
     runs-on: ubuntu-latest
     permissions:
       contents: write
