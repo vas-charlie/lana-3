@@ -58,6 +58,50 @@ class CapabilityGateTest {
     }
 
     @Test
+    fun unknownPermissionStateBlocksExecution() {
+        val snapshot = PlatformCapabilitiesSnapshot(
+            listOf(
+                PlatformCapability(
+                    id = "camera",
+                    availability = CapabilityAvailability.AVAILABLE,
+                    permissionState = CapabilityPermissionState.UNKNOWN,
+                    executionMode = CapabilityExecutionMode.PLATFORM,
+                )
+            )
+        )
+
+        val result = gate.evaluate(snapshot, listOf(CapabilityRequirement("camera")))
+        val blocked = assertIs<CapabilityGateResult.Blocked>(result)
+
+        assertEquals("camera", blocked.failures.single().capabilityId)
+        assertEquals(
+            "Permission state has not been verified.",
+            blocked.failures.single().reason,
+        )
+    }
+
+    @Test
+    fun notRequiredPermissionAllowsLocalCapability() {
+        val snapshot = PlatformCapabilitiesSnapshot(
+            listOf(
+                PlatformCapability(
+                    id = "local_notes",
+                    availability = CapabilityAvailability.AVAILABLE,
+                    permissionState = CapabilityPermissionState.NOT_REQUIRED,
+                    executionMode = CapabilityExecutionMode.LOCAL,
+                )
+            )
+        )
+
+        val result = gate.evaluate(
+            snapshot,
+            listOf(CapabilityRequirement("local_notes"))
+        )
+
+        assertIs<CapabilityGateResult.Ready>(result)
+    }
+
+    @Test
     fun unknownCapabilityBlocksInsteadOfGuessing() {
         val result = gate.evaluate(
             PlatformCapabilitiesSnapshot(emptyList()),
@@ -67,7 +111,7 @@ class CapabilityGateTest {
 
         assertEquals("screen_context", blocked.failures.single().capabilityId)
         assertEquals(
-            "Capability has not been verified on this platform.",
+            "Permission state has not been verified.",
             blocked.failures.single().reason,
         )
     }
@@ -110,6 +154,7 @@ class CapabilityGateTest {
                 PlatformCapability(
                     id = "camera",
                     availability = CapabilityAvailability.UNAVAILABLE,
+                    permissionState = CapabilityPermissionState.NOT_REQUIRED,
                     limitation = "No camera hardware.",
                 )
             )
