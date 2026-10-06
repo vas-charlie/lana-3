@@ -16,6 +16,7 @@ import hr.vascharlie.lana3.core.authorization.AutomationMode
 import hr.vascharlie.lana3.core.context.LanaContext
 import hr.vascharlie.lana3.core.model.LanguageContext
 import hr.vascharlie.lana3.core.notes.LanaNote
+import hr.vascharlie.lana3.core.notes.NoteInvalidReason
 import hr.vascharlie.lana3.core.notes.NoteResult
 import hr.vascharlie.lana3.core.notes.NoteService
 import java.util.Locale
@@ -265,7 +266,7 @@ class NotesTestActivity : Activity() {
             }
 
             is NoteResult.Invalid -> {
-                status.text = result.reason
+                status.text = formatNoteInvalidReason(result.reason)
             }
 
             is NoteResult.NotFound -> {
@@ -292,7 +293,7 @@ class NotesTestActivity : Activity() {
             }
 
             is NoteResult.Invalid -> {
-                status.text = result.reason
+                status.text = formatNoteInvalidReason(result.reason)
             }
 
             else -> {
@@ -417,6 +418,25 @@ class NotesTestActivity : Activity() {
                 status.text = getString(R.string.notes_delete_failed)
             }
         }
+    }
+
+    private fun formatNoteInvalidReason(
+        reason: NoteInvalidReason,
+    ): String = when (reason) {
+        NoteInvalidReason.NOTE_TEXT_BLANK ->
+            getString(R.string.notes_invalid_text_blank)
+
+        NoteInvalidReason.NOTE_ID_BLANK ->
+            getString(R.string.notes_invalid_id_blank)
+
+        NoteInvalidReason.SEARCH_QUERY_BLANK ->
+            getString(R.string.notes_invalid_search_blank)
+
+        NoteInvalidReason.ACTION_NOT_AUTHORIZED ->
+            getString(R.string.notes_invalid_action_not_authorized)
+
+        NoteInvalidReason.ACTION_NOT_SAVE_NOTE ->
+            getString(R.string.notes_invalid_action_type)
     }
 
     private fun clearEditor() {

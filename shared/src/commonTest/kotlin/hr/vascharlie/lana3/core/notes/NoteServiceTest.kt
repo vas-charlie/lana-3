@@ -3,7 +3,6 @@ package hr.vascharlie.lana3.core.notes
 import kotlin.test.Test
 import kotlin.test.assertEquals
 import kotlin.test.assertIs
-import kotlin.test.assertTrue
 
 class NoteServiceTest {
     private class FakeRepository : NoteRepository {
@@ -60,7 +59,7 @@ class NoteServiceTest {
         val result = service().save("   ")
 
         val invalid = assertIs<NoteResult.Invalid>(result)
-        assertTrue(invalid.reason.contains("blank", ignoreCase = true))
+        assertEquals(NoteInvalidReason.NOTE_TEXT_BLANK, invalid.reason)
     }
 
     @Test
@@ -116,6 +115,7 @@ class NoteServiceTest {
 
         assertEquals(1, found.size)
         assertEquals("Aerodrom Zadar u 18:15", found.single().text)
-        assertIs<NoteResult.Invalid>(service.search("   "))
+        val invalid = assertIs<NoteResult.Invalid>(service.search("   "))
+        assertEquals(NoteInvalidReason.SEARCH_QUERY_BLANK, invalid.reason)
     }
 }
