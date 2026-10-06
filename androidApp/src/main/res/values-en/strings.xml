@@ -85,4 +85,40 @@
     <string name="notes_editing">Editing note %1$s</string>
     <string name="notes_deleted">Note deleted.</string>
     <string name="notes_delete_failed">The note could not be deleted.</string>
+
+    <string name="smart_ride_title" translatable="false">Smart Ride Acceptance</string>
+    <string name="smart_ride_description">Test screen. LANA does not accept a ride automatically. Enter the real offer data and your thresholds.</string>
+    <string name="smart_ride_offer_section">Offer</string>
+    <string name="smart_ride_price_label">Ride price (€)</string>
+    <string name="smart_ride_price_hint">e.g. 18.50</string>
+    <string name="smart_ride_pickup_km_label">Pickup distance (km)</string>
+    <string name="smart_ride_pickup_km_hint">e.g. 2.4</string>
+    <string name="smart_ride_trip_km_label">Passenger trip distance (km)</string>
+    <string name="smart_ride_trip_km_hint">e.g. 8.7</string>
+    <string name="smart_ride_pickup_minutes_label">Pickup time (min)</string>
+    <string name="smart_ride_pickup_minutes_hint">e.g. 6</string>
+    <string name="smart_ride_trip_minutes_label">Passenger trip time (min)</string>
+    <string name="smart_ride_trip_minutes_hint">e.g. 18</string>
+    <string name="smart_ride_thresholds_section">Your thresholds</string>
+    <string name="smart_ride_consider_km_label">CONSIDER from at least €/km</string>
+    <string name="smart_ride_accept_km_label">ACCEPT from at least €/km</string>
+    <string name="smart_ride_consider_hour_label">CONSIDER from at least €/h</string>
+    <string name="smart_ride_accept_hour_label">ACCEPT from at least €/h</string>
+    <string name="smart_ride_threshold_hint">enter your threshold</string>
+    <string name="smart_ride_evaluate">Evaluate ride</string>
+    <string name="smart_ride_missing_thresholds">Thresholds are missing. LANA will not invent them.</string>
+    <string name="smart_ride_missing_offer_data">Missing offer data: %1$s</string>
+    <string name="smart_ride_invalid_offer_header">Invalid offer data:</string>
+    <string name="smart_ride_invalid_rules_header">Invalid thresholds:</string>
+    <string name="smart_ride_recommend_accept">ACCEPT</string>
+    <string name="smart_ride_recommend_consider">CONSIDER</string>
+    <string name="smart_ride_recommend_skip">SKIP</string>
+    <string name="smart_ride_metrics">%1$.2f €/km • %2$.2f €/h</string>
+    <string name="smart_ride_calculation_note">The calculation includes pickup distance/time and the passenger trip.</string>
+    <string name="required">Required</string>
+    <string name="smart_ride_field_price">price</string>
+    <string name="smart_ride_field_pickup_km">pickup km</string>
+    <string name="smart_ride_field_trip_km">trip km</string>
+    <string name="smart_ride_field_pickup_minutes">pickup minutes</string>
+    <string name="smart_ride_field_trip_minutes">trip minutes</string>
 </resources>
