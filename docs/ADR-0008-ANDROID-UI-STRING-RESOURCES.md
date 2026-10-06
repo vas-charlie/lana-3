@@ -2,7 +2,7 @@
 
 - **Status:** IN TEST
 - **Date:** 2026-10-06
-- **Target branch:** `i18n/android-ui-resources`
+- **Target branch:** `main` with incremental `i18n/*` slices
 
 ## Decision
 
@@ -21,7 +21,7 @@ The first controlled slice covers `MainActivity` and establishes:
 
 LANA 3 is multilingual by architecture. Hard-coded display text in Kotlin makes later localization slower, increases lint noise, and encourages business/UI logic to become entangled with one language.
 
-This change is deliberately incremental. Voice Lab, Notes Lab and Smart Ride Lab will migrate in separate tested slices rather than one large translation rewrite.
+This change is deliberately incremental. MainActivity is merged. Voice Lab is the second tested slice. Notes Lab and Smart Ride Lab will migrate separately rather than through one large translation rewrite.
 
 ## Important limits
 
@@ -33,12 +33,14 @@ This change is deliberately incremental. Voice Lab, Notes Lab and Smart Ride Lab
 
 ## Acceptance criteria
 
-- [ ] MainActivity no longer hard-codes its principal user-facing labels/status text.
-- [ ] Croatian resources render as the default UI copy.
-- [ ] English resources exist for the migrated strings.
-- [ ] formatted readiness/status strings avoid UI concatenation.
-- [ ] Android lint passes.
-- [ ] Android developer preview builds.
+- [x] MainActivity no longer hard-codes its principal user-facing labels/status text.
+- [x] Croatian resources are the default Android UI copy for the migrated main-screen slice.
+- [x] English resources exist for the migrated main-screen strings.
+- [x] formatted main-screen readiness/status strings avoid UI concatenation.
+- [x] MainActivity slice passes Android lint and developer-preview build.
+- [ ] Voice Lab resource migration passes Android lint and developer-preview build.
+- [ ] Notes Lab migrates in its own tested slice.
+- [ ] Smart Ride Lab migrates in its own tested slice.
 - [ ] physical locale-switch behavior remains a later device test.
 
 ## Lifecycle status
