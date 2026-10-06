@@ -21,14 +21,14 @@ The first controlled slice covers `MainActivity` and establishes:
 
 LANA 3 is multilingual by architecture. Hard-coded display text in Kotlin makes later localization slower, increases lint noise, and encourages business/UI logic to become entangled with one language.
 
-This change is deliberately incremental. MainActivity, Voice Lab, Notes Lab, Smart Ride Lab and device-readiness presentation are merged. Auto-updater status is the next slice, using typed updater events so UI text remains in resources.
+This change is deliberately incremental. MainActivity, Voice Lab, Notes Lab, Smart Ride Lab, device-readiness presentation and auto-updater status are merged. Speech error presentation is the next slice, mapping stable adapter error codes to localized UI resources.
 
 ## Important limits
 
 - This does not implement LANA's conversational language selection.
 - Android resource locale follows Android resource resolution, not the shared `LanguageContext`.
 - Some non-UI diagnostic/developer strings remain in code.
-- Speech-adapter diagnostic/error messages remain a separate boundary decision because some are machine-facing and some surface in the Voice Lab.
+- Speech adapters may keep developer-facing fallback messages, but Voice Lab must render user-facing errors from stable error codes rather than adapter prose.
 - More languages are not added until the resource boundary is stable.
 
 ## Acceptance criteria
@@ -42,7 +42,8 @@ This change is deliberately incremental. MainActivity, Voice Lab, Notes Lab, Sma
 - [x] Notes Lab resource migration passes Android lint and developer-preview build.
 - [x] Smart Ride Lab resource migration passes Android lint and developer-preview build.
 - [x] Device-readiness presentation uses resources while the probe remains presentation-neutral.
-- [ ] Auto-updater emits typed status events and UI/notification text comes from resources.
+- [x] Auto-updater emits typed status events and UI/notification text comes from resources.
+- [ ] Voice Lab maps speech error codes to localized resources without surfacing adapter prose.
 - [ ] physical locale-switch behavior remains a later device test.
 
 ## Lifecycle status
