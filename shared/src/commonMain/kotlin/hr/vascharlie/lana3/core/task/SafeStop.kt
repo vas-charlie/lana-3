@@ -9,8 +9,8 @@ data class SafeStopResult(
  * Global safety stop for Lana-managed tasks.
  *
  * ACTIVE, QUEUED and PAUSED tasks are moved to CANCELLED so the core state becomes
- * explicit and deterministic. Platform execution adapters remain responsible for
- * stopping any external operation they started.
+ * explicit and deterministic. Terminal tasks stay terminal. Platform execution adapters
+ * remain responsible for stopping any external operation they started.
  */
 class SafeStop {
     fun apply(tasks: List<LanaTask>): SafeStopResult {
@@ -23,8 +23,11 @@ class SafeStop {
                     stopped += task.id
                     task.copy(state = TaskState.CANCELLED)
                 }
+
                 TaskState.COMPLETED,
-                TaskState.CANCELLED -> task
+                TaskState.CANCELLED,
+                TaskState.FAILED,
+                TaskState.DEGRADED -> task
             }
         }
         return SafeStopResult(
