@@ -83,6 +83,11 @@
     <string name="notes_editing">Editing note %1$s</string>
     <string name="notes_deleted">Note deleted.</string>
     <string name="notes_delete_failed">The note could not be deleted.</string>
+    <string name="notes_invalid_text_blank">Note text must not be blank.</string>
+    <string name="notes_invalid_id_blank">The note does not have a valid identifier.</string>
+    <string name="notes_invalid_search_blank">Enter text to search for.</string>
+    <string name="notes_invalid_action_not_authorized">Saving the note is not authorized.</string>
+    <string name="notes_invalid_action_type">The action is not a valid note-save action.</string>
 
     <string name="smart_ride_description">Test screen. LANA does not accept a ride automatically. Enter the real offer data and your thresholds.</string>
     <string name="smart_ride_offer_section">Offer</string>
