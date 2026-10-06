@@ -99,6 +99,11 @@
     <string name="notes_invalid_search_blank">Upiši tekst za pretragu.</string>
     <string name="notes_invalid_action_not_authorized">Spremanje bilješke nije odobreno.</string>
     <string name="notes_invalid_action_type">Radnja nije valjano spremanje bilješke.</string>
+    <string name="notes_blocked_authorization">Autorizacija ne dopušta izvršenje ove radnje.</string>
+    <string name="notes_mode_observe">Način PROMATRAJ ne izvršava radnje.</string>
+    <string name="notes_mode_suggest">Način PREDLOŽI ne izvršava radnje.</string>
+    <string name="notes_mode_user_confirmation">Potrebna je tvoja potvrda.</string>
+    <string name="notes_mode_action_confirmation">Ova radnja zahtijeva izričitu potvrdu.</string>
 
     <string name="smart_ride_title" translatable="false">Smart Ride Acceptance</string>
     <string name="smart_ride_description">Testni ekran. LANA ne prihvaća vožnju automatski. Unesi stvarne podatke ponude i svoje pragove.</string>
