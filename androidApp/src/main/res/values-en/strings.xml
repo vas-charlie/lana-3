@@ -20,7 +20,6 @@
     <string name="status_offline">I’m offline. Local capabilities are still available.</string>
     <string name="status_error">Something went wrong. I won’t guess.</string>
 
-    <string name="voice_lab_title" translatable="false">LANA Voice Lab</string>
     <string name="voice_lab_description">Test Android speech through LANA’s shared ports. The language is not fixed to Croatian and can be changed with a BCP-47 tag.</string>
     <string name="voice_language_label">Speech language</string>
     <string name="voice_language_hint">e.g. hr-HR, en-US, de-DE</string>
@@ -52,7 +51,6 @@
     <string name="voice_tts_completed">Speech completed.</string>
     <string name="voice_tts_error">TTS: %1$s</string>
 
-    <string name="notes_lab_title" translatable="false">LANA Notes Lab</string>
     <string name="notes_lab_description">Local notes without cloud storage. A new note passes through the Decision Engine, authorization, the EXECUTE gate, and only then reaches storage.</string>
     <string name="notes_editor_hint">Enter a note…</string>
     <string name="notes_save_new">Save new note</string>
@@ -68,7 +66,7 @@
     <string name="notes_save_blocked">Saving blocked: %1$s</string>
     <string name="notes_awaiting_confirmation">Awaiting confirmation: %1$s</string>
     <string name="notes_save_failed">Saving failed. Task: %1$s. %2$s</string>
-    <string name="notes_save_degraded">Saving ended in DEGRADED state. %1$s</string>
+    <string name="notes_save_degraded">Saving ended in DEGRADED state. %1$s%2$s</string>
     <string name="notes_save_degraded_persisted_suffix"> The note was still saved.</string>
     <string name="notes_updated">Note updated.</string>
     <string name="notes_not_found">The note no longer exists.</string>
@@ -86,7 +84,6 @@
     <string name="notes_deleted">Note deleted.</string>
     <string name="notes_delete_failed">The note could not be deleted.</string>
 
-    <string name="smart_ride_title" translatable="false">Smart Ride Acceptance</string>
     <string name="smart_ride_description">Test screen. LANA does not accept a ride automatically. Enter the real offer data and your thresholds.</string>
     <string name="smart_ride_offer_section">Offer</string>
     <string name="smart_ride_price_label">Ride price (€)</string>
