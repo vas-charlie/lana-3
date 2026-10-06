@@ -146,6 +146,16 @@ class MainActivity : Activity() {
             }
         })
 
+        root.addView(Button(this).apply {
+            text = "LANA Notes Lab - TESTNO"
+            isAllCaps = false
+            setOnClickListener {
+                startActivity(
+                    Intent(this@MainActivity, NotesTestActivity::class.java)
+                )
+            }
+        })
+
         setContentView(root)
         renderState(LanaVisualState.IDLE)
         refreshDeviceReadiness()
