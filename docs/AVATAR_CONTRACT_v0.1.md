@@ -15,6 +15,8 @@ The Android preview currently supports:
 
 The future avatar renderer consumes these states instead of owning business logic.
 
+User-facing status text is not part of the avatar semantic contract. Text is rendered by the platform localization layer, while the avatar presenter carries only state and semantic animation cues. This prevents the avatar layer from becoming a second source of translated UI copy.
+
 ## Animation channels
 
 The renderer must support independent channels so movements can be combined naturally:
