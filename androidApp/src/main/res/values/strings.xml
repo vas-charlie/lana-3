@@ -94,4 +94,40 @@
     <string name="notes_editing">Uređuješ bilješku %1$s</string>
     <string name="notes_deleted">Bilješka obrisana.</string>
     <string name="notes_delete_failed">Bilješku nije moguće obrisati.</string>
+
+    <string name="smart_ride_title" translatable="false">Smart Ride Acceptance</string>
+    <string name="smart_ride_description">Testni ekran. LANA ne prihvaća vožnju automatski. Unesi stvarne podatke ponude i svoje pragove.</string>
+    <string name="smart_ride_offer_section">Ponuda</string>
+    <string name="smart_ride_price_label">Cijena vožnje (€)</string>
+    <string name="smart_ride_price_hint">npr. 18,50</string>
+    <string name="smart_ride_pickup_km_label">Dolazak do putnika (km)</string>
+    <string name="smart_ride_pickup_km_hint">npr. 2,4</string>
+    <string name="smart_ride_trip_km_label">Vožnja s putnikom (km)</string>
+    <string name="smart_ride_trip_km_hint">npr. 8,7</string>
+    <string name="smart_ride_pickup_minutes_label">Dolazak do putnika (min)</string>
+    <string name="smart_ride_pickup_minutes_hint">npr. 6</string>
+    <string name="smart_ride_trip_minutes_label">Vožnja s putnikom (min)</string>
+    <string name="smart_ride_trip_minutes_hint">npr. 18</string>
+    <string name="smart_ride_thresholds_section">Tvoji pragovi</string>
+    <string name="smart_ride_consider_km_label">RAZMOTRI od najmanje €/km</string>
+    <string name="smart_ride_accept_km_label">PRIHVATI od najmanje €/km</string>
+    <string name="smart_ride_consider_hour_label">RAZMOTRI od najmanje €/h</string>
+    <string name="smart_ride_accept_hour_label">PRIHVATI od najmanje €/h</string>
+    <string name="smart_ride_threshold_hint">upiši svoj prag</string>
+    <string name="smart_ride_evaluate">Procijeni vožnju</string>
+    <string name="smart_ride_missing_thresholds">Nedostaju pragovi. LANA ih neće izmišljati.</string>
+    <string name="smart_ride_missing_offer_data">Nedostaju podaci ponude: %1$s</string>
+    <string name="smart_ride_invalid_offer_header">Neispravni podaci ponude:</string>
+    <string name="smart_ride_invalid_rules_header">Neispravni pragovi:</string>
+    <string name="smart_ride_recommend_accept">PRIHVATI</string>
+    <string name="smart_ride_recommend_consider">RAZMOTRI</string>
+    <string name="smart_ride_recommend_skip">PRESKOČI</string>
+    <string name="smart_ride_metrics">%1$.2f €/km • %2$.2f €/h</string>
+    <string name="smart_ride_calculation_note">Račun uključuje dolazak do putnika i samu vožnju.</string>
+    <string name="required">Obavezno</string>
+    <string name="smart_ride_field_price">cijena</string>
+    <string name="smart_ride_field_pickup_km">km do putnika</string>
+    <string name="smart_ride_field_trip_km">km vožnje</string>
+    <string name="smart_ride_field_pickup_minutes">minute do putnika</string>
+    <string name="smart_ride_field_trip_minutes">minute vožnje</string>
 </resources>
