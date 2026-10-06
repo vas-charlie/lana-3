@@ -19,6 +19,14 @@ interface NoteRepository {
     fun listAll(): List<LanaNote>
 }
 
+enum class NoteInvalidReason {
+    NOTE_TEXT_BLANK,
+    NOTE_ID_BLANK,
+    SEARCH_QUERY_BLANK,
+    ACTION_NOT_AUTHORIZED,
+    ACTION_NOT_SAVE_NOTE,
+}
+
 sealed interface NoteResult {
     data class Saved(val note: LanaNote) : NoteResult
 
@@ -30,7 +38,7 @@ sealed interface NoteResult {
 
     data class NotFound(val id: String) : NoteResult
 
-    data class Invalid(val reason: String) : NoteResult
+    data class Invalid(val reason: NoteInvalidReason) : NoteResult
 }
 
 /**
@@ -46,7 +54,7 @@ class NoteService(
 ) {
     fun save(text: String): NoteResult {
         if (text.isBlank()) {
-            return NoteResult.Invalid("Note text must not be blank.")
+            return NoteResult.Invalid(NoteInvalidReason.NOTE_TEXT_BLANK)
         }
 
         val now = nowEpochMillis()
@@ -62,7 +70,7 @@ class NoteService(
 
     fun update(id: String, text: String): NoteResult {
         if (id.isBlank()) {
-            return NoteResult.Invalid("Note id must not be blank.")
+            return NoteResult.Invalid(NoteInvalidReason.NOTE_ID_BLANK)
         }
         if (text.isBlank()) {
             return NoteResult.Invalid("Note text must not be blank.")
@@ -105,7 +113,7 @@ class NoteService(
 
     fun search(query: String): NoteResult {
         if (query.isBlank()) {
-            return NoteResult.Invalid("Search query must not be blank.")
+            return NoteResult.Invalid(NoteInvalidReason.SEARCH_QUERY_BLANK)
         }
 
         val matches = repository.listAll()
