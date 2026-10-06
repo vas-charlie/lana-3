@@ -94,6 +94,11 @@
     <string name="notes_editing">Uređuješ bilješku %1$s</string>
     <string name="notes_deleted">Bilješka obrisana.</string>
     <string name="notes_delete_failed">Bilješku nije moguće obrisati.</string>
+    <string name="notes_invalid_text_blank">Tekst bilješke ne smije biti prazan.</string>
+    <string name="notes_invalid_id_blank">Bilješka nema valjan identifikator.</string>
+    <string name="notes_invalid_search_blank">Upiši tekst za pretragu.</string>
+    <string name="notes_invalid_action_not_authorized">Spremanje bilješke nije odobreno.</string>
+    <string name="notes_invalid_action_type">Radnja nije valjano spremanje bilješke.</string>
 
     <string name="smart_ride_title" translatable="false">Smart Ride Acceptance</string>
     <string name="smart_ride_description">Testni ekran. LANA ne prihvaća vožnju automatski. Unesi stvarne podatke ponude i svoje pragove.</string>
