@@ -11,6 +11,7 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
+import androidx.core.content.edit
 import hr.vascharlie.lana3.core.ride.RideAcceptanceRules
 import hr.vascharlie.lana3.core.ride.RideAssessmentResult
 import hr.vascharlie.lana3.core.ride.RideOffer
@@ -279,13 +280,12 @@ class SmartRideTestActivity : Activity() {
     }
 
     private fun saveRules(rules: RideAcceptanceRules) {
-        getSharedPreferences(PREFS, MODE_PRIVATE)
-            .edit()
-            .putString("accept_km", rules.acceptMinEurPerKm.toString())
-            .putString("consider_km", rules.considerMinEurPerKm.toString())
-            .putString("accept_hour", rules.acceptMinEurPerHour.toString())
-            .putString("consider_hour", rules.considerMinEurPerHour.toString())
-            .apply()
+        getSharedPreferences(PREFS, MODE_PRIVATE).edit {
+            putString("accept_km", rules.acceptMinEurPerKm.toString())
+            putString("consider_km", rules.considerMinEurPerKm.toString())
+            putString("accept_hour", rules.acceptMinEurPerHour.toString())
+            putString("consider_hour", rules.considerMinEurPerHour.toString())
+        }
     }
 
     private fun restoreSavedRules() {
