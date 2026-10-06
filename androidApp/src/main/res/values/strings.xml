@@ -77,7 +77,7 @@
     <string name="notes_save_blocked">Spremanje blokirano: %1$s</string>
     <string name="notes_awaiting_confirmation">Čeka potvrdu: %1$s</string>
     <string name="notes_save_failed">Spremanje nije uspjelo. Zadatak: %1$s. %2$s</string>
-    <string name="notes_save_degraded">Spremanje je završilo u DEGRADED stanju. %1$s</string>
+    <string name="notes_save_degraded">Spremanje je završilo u DEGRADED stanju. %1$s%2$s</string>
     <string name="notes_save_degraded_persisted_suffix"> Bilješka je ipak spremljena.</string>
     <string name="notes_updated">Bilješka ažurirana.</string>
     <string name="notes_not_found">Bilješka više ne postoji.</string>
