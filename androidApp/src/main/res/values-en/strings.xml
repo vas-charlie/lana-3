@@ -150,4 +150,23 @@
     <string name="updater_ready_to_install">The update is verified and ready to install.</string>
     <string name="updater_notification_title">LANA 3 update</string>
     <string name="updater_notification_description">Downloading version %1$s.</string>
+
+    <string name="voice_stt_error_recognizer_unavailable">Android speech recognition is unavailable.</string>
+    <string name="voice_stt_error_empty_result">Speech was processed, but no reliable transcript was returned.</string>
+    <string name="voice_stt_error_audio">Audio capture failed.</string>
+    <string name="voice_stt_error_client">Speech recognition was interrupted.</string>
+    <string name="voice_stt_error_permission">Microphone permission is required.</string>
+    <string name="voice_stt_error_network">Speech recognition network error.</string>
+    <string name="voice_stt_error_network_timeout">The speech recognition network request timed out.</string>
+    <string name="voice_stt_error_no_match">Speech was heard, but no reliable match was found.</string>
+    <string name="voice_stt_error_busy">Speech recognition is busy.</string>
+    <string name="voice_stt_error_server">Speech recognition service error.</string>
+    <string name="voice_stt_error_speech_timeout">No speech was detected in time.</string>
+    <string name="voice_stt_error_generic">Speech recognition failed.</string>
+    <string name="voice_tts_error_failed">Text-to-speech failed.</string>
+    <string name="voice_tts_error_unavailable">Text-to-speech is unavailable.</string>
+    <string name="voice_tts_error_initializing">Text-to-speech is still initializing.</string>
+    <string name="voice_tts_error_empty_text">There is no text to speak.</string>
+    <string name="voice_tts_error_language">The selected TTS language is not supported on this device.</string>
+    <string name="voice_tts_error_start_failed">Text-to-speech could not start.</string>
 </resources>
