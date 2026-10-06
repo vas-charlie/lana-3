@@ -1,0 +1,31 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="app_name" translatable="false">LANA 3</string>
+    <string name="developer_preview">Developer Preview %1$s</string>
+    <string name="checking_updates">Provjeravam ima li nove verzije…</string>
+    <string name="avatar_name" translatable="false">LANA</string>
+    <string name="avatar_content_description">Vizualna prisutnost Lane</string>
+    <string name="change_lana_state">Promijeni stanje Lane</string>
+    <string name="smart_ride_test_button">Smart Ride Acceptance · TESTNO</string>
+    <string name="voice_lab_test_button">LANA Voice Lab · TESTNO</string>
+    <string name="notes_lab_test_button">LANA Notes Lab · TESTNO</string>
+    <string name="sensor_core_ready">Jezgra senzora: spremna.</string>
+    <string name="sensor_core_waiting">Jezgra senzora čeka: %1$s</string>
+    <string name="readiness_with_core_status">%1$s\n%2$s</string>
+    <string name="sensor_permissions_ready">Dozvole za osnovne senzore su spremne</string>
+    <string name="allow_required_sensors">Dopusti potrebne senzore (%1$d)</string>
+
+    <string name="state_idle" translatable="false">IDLE</string>
+    <string name="state_listening" translatable="false">LISTENING</string>
+    <string name="state_thinking" translatable="false">THINKING</string>
+    <string name="state_speaking" translatable="false">SPEAKING</string>
+    <string name="state_offline" translatable="false">OFFLINE</string>
+    <string name="state_error" translatable="false">ERROR</string>
+
+    <string name="status_idle">Tu sam, Charlie.</string>
+    <string name="status_listening">Slušam.</string>
+    <string name="status_thinking">Razmišljam…</string>
+    <string name="status_speaking">Govorim.</string>
+    <string name="status_offline">Offline sam. Dostupne su lokalne sposobnosti.</string>
+    <string name="status_error">Nešto nije u redu. Neću pogađati.</string>
+</resources>

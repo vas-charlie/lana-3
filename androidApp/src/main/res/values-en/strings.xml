@@ -1,0 +1,22 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="developer_preview">Developer Preview %1$s</string>
+    <string name="checking_updates">Checking for a new version…</string>
+    <string name="avatar_content_description">Lana visual presence</string>
+    <string name="change_lana_state">Change Lana state</string>
+    <string name="smart_ride_test_button">Smart Ride Acceptance · TEST</string>
+    <string name="voice_lab_test_button">LANA Voice Lab · TEST</string>
+    <string name="notes_lab_test_button">LANA Notes Lab · TEST</string>
+    <string name="sensor_core_ready">Sensor core: ready.</string>
+    <string name="sensor_core_waiting">Sensor core waiting for: %1$s</string>
+    <string name="readiness_with_core_status">%1$s\n%2$s</string>
+    <string name="sensor_permissions_ready">Core sensor permissions are ready</string>
+    <string name="allow_required_sensors">Allow required sensors (%1$d)</string>
+
+    <string name="status_idle">I’m here, Charlie.</string>
+    <string name="status_listening">Listening.</string>
+    <string name="status_thinking">Thinking…</string>
+    <string name="status_speaking">Speaking.</string>
+    <string name="status_offline">I’m offline. Local capabilities are still available.</string>
+    <string name="status_error">Something went wrong. I won’t guess.</string>
+</resources>

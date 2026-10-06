@@ -44,20 +44,20 @@ class MainActivity : Activity() {
         }
 
         root.addView(TextView(this).apply {
-            text = "LANA 3"
+            text = getString(R.string.app_name)
             textSize = 30f
             setTextColor(Color.WHITE)
             typeface = Typeface.DEFAULT_BOLD
         })
 
         root.addView(TextView(this).apply {
-            text = "Developer Preview ${BuildConfig.VERSION_NAME}"
+            text = getString(R.string.developer_preview, BuildConfig.VERSION_NAME)
             textSize = 14f
             setTextColor(Color.rgb(90, 180, 255))
         })
 
         updateStatus = TextView(this).apply {
-            text = "Provjeravam ima li nove verzije..."
+            text = getString(R.string.checking_updates)
             textSize = 12f
             gravity = Gravity.CENTER
             setPadding(0, 8, 0, 0)
@@ -83,12 +83,12 @@ class MainActivity : Activity() {
             setBackgroundColor(Color.rgb(10, 27, 48))
         }
         avatar = TextView(this).apply {
-            text = "LANA"
+            text = getString(R.string.avatar_name)
             textSize = 54f
             gravity = Gravity.CENTER
             setTextColor(Color.WHITE)
             setBackgroundColor(Color.rgb(15, 39, 67))
-            contentDescription = "Lana visual presence"
+            contentDescription = getString(R.string.avatar_content_description)
         }
         avatarStage.addView(
             avatar,
@@ -120,14 +120,14 @@ class MainActivity : Activity() {
         root.addView(status)
 
         val stateButton = Button(this).apply {
-            text = "Promijeni stanje Lane"
+            text = getString(R.string.change_lana_state)
             isAllCaps = false
             setOnClickListener { cycleVisualState() }
         }
         root.addView(stateButton)
 
         root.addView(Button(this).apply {
-            text = "Smart Ride Acceptance - TESTNO"
+            text = getString(R.string.smart_ride_test_button)
             isAllCaps = false
             setOnClickListener {
                 startActivity(
@@ -137,7 +137,7 @@ class MainActivity : Activity() {
         })
 
         root.addView(Button(this).apply {
-            text = "LANA Voice Lab - TESTNO"
+            text = getString(R.string.voice_lab_test_button)
             isAllCaps = false
             setOnClickListener {
                 startActivity(
@@ -147,7 +147,7 @@ class MainActivity : Activity() {
         })
 
         root.addView(Button(this).apply {
-            text = "LANA Notes Lab - TESTNO"
+            text = getString(R.string.notes_lab_test_button)
             isAllCaps = false
             setOnClickListener {
                 startActivity(
@@ -232,20 +232,26 @@ class MainActivity : Activity() {
 
         val coreStatus = when (gateResult) {
             CapabilityGateResult.Ready ->
-                "Jezgra senzora: spremna."
+                getString(R.string.sensor_core_ready)
 
             is CapabilityGateResult.Blocked ->
-                "Jezgra senzora ceka: " +
-                    gateResult.failures.joinToString { it.capabilityId }
+                getString(
+                    R.string.sensor_core_waiting,
+                    gateResult.failures.joinToString { it.capabilityId },
+                )
         }
 
-        readinessStatus.text = snapshot.toDisplayText() + "\n" + coreStatus
+        readinessStatus.text = getString(
+            R.string.readiness_with_core_status,
+            snapshot.toDisplayText(),
+            coreStatus,
+        )
         readinessButton.isEnabled = permissions.isNotEmpty()
         readinessButton.text =
             if (permissions.isEmpty()) {
-                "Dozvole za osnovne senzore su spremne"
+                getString(R.string.sensor_permissions_ready)
             } else {
-                "Dopusti potrebne senzore (${permissions.size})"
+                getString(R.string.allow_required_sensors, permissions.size)
             }
     }
 
@@ -269,44 +275,44 @@ class MainActivity : Activity() {
 
         when (state) {
             LanaVisualState.IDLE -> {
-                stateLabel.text = "IDLE"
-                status.text = "Tu sam, Charlie."
+                stateLabel.text = getString(R.string.state_idle)
+                status.text = getString(R.string.status_idle)
                 avatar.setBackgroundColor(Color.rgb(15, 39, 67))
             }
 
             LanaVisualState.LISTENING -> {
-                stateLabel.text = "LISTENING"
-                status.text = "Slusam."
+                stateLabel.text = getString(R.string.state_listening)
+                status.text = getString(R.string.status_listening)
                 avatar.setBackgroundColor(Color.rgb(12, 55, 82))
                 avatar.scaleX = 1.025f
                 avatar.scaleY = 1.025f
             }
 
             LanaVisualState.THINKING -> {
-                stateLabel.text = "THINKING"
-                status.text = "Razmisljam..."
+                stateLabel.text = getString(R.string.state_thinking)
+                status.text = getString(R.string.status_thinking)
                 avatar.setBackgroundColor(Color.rgb(31, 43, 72))
                 avatar.alpha = 0.88f
             }
 
             LanaVisualState.SPEAKING -> {
-                stateLabel.text = "SPEAKING"
-                status.text = "Govorim."
+                stateLabel.text = getString(R.string.state_speaking)
+                status.text = getString(R.string.status_speaking)
                 avatar.setBackgroundColor(Color.rgb(18, 65, 77))
                 avatar.scaleX = 1.035f
                 avatar.scaleY = 1.035f
             }
 
             LanaVisualState.OFFLINE -> {
-                stateLabel.text = "OFFLINE"
-                status.text = "Offline sam. Dostupne su lokalne sposobnosti."
+                stateLabel.text = getString(R.string.state_offline)
+                status.text = getString(R.string.status_offline)
                 avatar.setBackgroundColor(Color.rgb(48, 52, 61))
                 avatar.alpha = 0.72f
             }
 
             LanaVisualState.ERROR -> {
-                stateLabel.text = "ERROR"
-                status.text = "Nesto nije u redu. Necu pogadjati."
+                stateLabel.text = getString(R.string.state_error)
+                status.text = getString(R.string.status_error)
                 avatar.setBackgroundColor(Color.rgb(74, 38, 45))
             }
         }
