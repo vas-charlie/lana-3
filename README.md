@@ -10,3 +10,4 @@ Projekt LANA 3.
 - `docs/SIGNING_AND_FIRST_INSTALL_RUNBOOK.md` — private signing and first signed install
 - `docs/PHYSICAL_ANDROID_TEST_CHECKLIST.md` — real-device acceptance checklist
 - `docs/MAIN_BRANCH_PROTECTION_RUNBOOK.md` — intended GitHub main-branch protection settings
+- `docs/IMPLEMENTATION_STATUS_MATRIX.md` — honest status of all 43 MASTER PLAN units
