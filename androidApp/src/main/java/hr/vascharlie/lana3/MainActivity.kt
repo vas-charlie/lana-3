@@ -13,10 +13,18 @@ import android.widget.TextView
 enum class LanaVisualState { IDLE, LISTENING, THINKING, SPEAKING, OFFLINE, ERROR }
 
 class MainActivity : Activity() {
+    companion object {
+        private const val REQUEST_LANA_PERMISSIONS = 3101
+        private const val SETUP_PREFS = "lana_device_setup"
+        private const val KEY_INITIAL_PERMISSION_REQUESTED = "initial_permission_requested"
+    }
+
     private lateinit var avatar: TextView
     private lateinit var stateLabel: TextView
     private lateinit var status: TextView
     private lateinit var updateStatus: TextView
+    private lateinit var readinessStatus: TextView
+    private lateinit var readinessButton: Button
     private lateinit var autoUpdater: AutoUpdater
     private var visualState = LanaVisualState.IDLE
 
@@ -52,6 +60,20 @@ class MainActivity : Activity() {
         }
         root.addView(updateStatus)
 
+        readinessStatus = TextView(this).apply {
+            textSize = 12f
+            gravity = Gravity.CENTER
+            setPadding(0, 14, 0, 8)
+            setTextColor(Color.rgb(180, 195, 210))
+        }
+        root.addView(readinessStatus)
+
+        readinessButton = Button(this).apply {
+            isAllCaps = false
+            setOnClickListener { requestMissingLanaPermissions() }
+        }
+        root.addView(readinessButton)
+
         val avatarStage = FrameLayout(this).apply {
             setBackgroundColor(Color.rgb(10, 27, 48))
         }
@@ -74,7 +96,7 @@ class MainActivity : Activity() {
             avatarStage,
             LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f
-            ).apply { setMargins(0, 36, 0, 20) }
+            ).apply { setMargins(0, 24, 0, 20) }
         )
 
         stateLabel = TextView(this).apply {
@@ -103,12 +125,15 @@ class MainActivity : Activity() {
             text = "Smart Ride Acceptance - TESTNO"
             isAllCaps = false
             setOnClickListener {
-                status.text = "Smart Ride Acceptance je u jezgri. Sljedece ga spajamo na ovaj ekran."
+                status.text =
+                    "Smart Ride Acceptance je u jezgri. Sljedece ga spajamo na ovaj ekran."
             }
         })
 
         setContentView(root)
         renderState(LanaVisualState.IDLE)
+        refreshDeviceReadiness()
+        maybeRequestInitialPermissions()
 
         autoUpdater = AutoUpdater(this) { message ->
             updateStatus.text = message
@@ -118,6 +143,9 @@ class MainActivity : Activity() {
 
     override fun onResume() {
         super.onResume()
+        if (::readinessStatus.isInitialized) {
+            refreshDeviceReadiness()
+        }
         if (::autoUpdater.isInitialized) {
             autoUpdater.onResume()
         }
@@ -128,6 +156,53 @@ class MainActivity : Activity() {
             autoUpdater.stop()
         }
         super.onDestroy()
+    }
+
+    override fun onRequestPermissionsResult(
+        requestCode: Int,
+        permissions: Array<out String>,
+        grantResults: IntArray,
+    ) {
+        super.onRequestPermissionsResult(requestCode, permissions, grantResults)
+        if (requestCode == REQUEST_LANA_PERMISSIONS) {
+            refreshDeviceReadiness()
+        }
+    }
+
+    private fun maybeRequestInitialPermissions() {
+        val prefs = getSharedPreferences(SETUP_PREFS, MODE_PRIVATE)
+        if (prefs.getBoolean(KEY_INITIAL_PERMISSION_REQUESTED, false)) return
+
+        val permissions = AndroidDeviceReadinessProbe.permissionsToRequest(this)
+        prefs.edit().putBoolean(KEY_INITIAL_PERMISSION_REQUESTED, true).apply()
+
+        if (permissions.isNotEmpty()) {
+            requestPermissions(permissions, REQUEST_LANA_PERMISSIONS)
+        }
+    }
+
+    private fun requestMissingLanaPermissions() {
+        val permissions = AndroidDeviceReadinessProbe.permissionsToRequest(this)
+        if (permissions.isEmpty()) {
+            refreshDeviceReadiness()
+            return
+        }
+
+        requestPermissions(permissions, REQUEST_LANA_PERMISSIONS)
+    }
+
+    private fun refreshDeviceReadiness() {
+        val snapshot = AndroidDeviceReadinessProbe.snapshot(this)
+        val permissions = AndroidDeviceReadinessProbe.permissionsToRequest(this)
+
+        readinessStatus.text = snapshot.toDisplayText()
+        readinessButton.isEnabled = permissions.isNotEmpty()
+        readinessButton.text =
+            if (permissions.isEmpty()) {
+                "Dozvole za osnovne senzore su spremne"
+            } else {
+                "Dopusti potrebne senzore (${permissions.size})"
+            }
     }
 
     private fun cycleVisualState() {
