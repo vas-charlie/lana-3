@@ -22,6 +22,10 @@ import java.util.Locale
 import java.util.UUID
 
 class NotesTestActivity : Activity() {
+    companion object {
+        const val EXTRA_PREFILL_NOTE_TEXT = "prefill_note_text"
+    }
+
     private lateinit var repository: AndroidNoteRepository
     private lateinit var service: NoteService
     private lateinit var saveFlow: SaveNoteFlow
@@ -169,6 +173,15 @@ class NotesTestActivity : Activity() {
         })
 
         setContentView(scroll)
+
+        intent.getStringExtra(EXTRA_PREFILL_NOTE_TEXT)
+            ?.takeIf { it.isNotBlank() }
+            ?.let { prefill ->
+                noteEditor.setText(prefill)
+                noteEditor.setSelection(noteEditor.text.length)
+                status.text = "Tekst iz Voice Laba je spreman za tvoju potvrdu."
+            }
+
         refreshNotes()
     }
 
