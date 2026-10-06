@@ -51,4 +51,38 @@
     <string name="voice_tts_started">LANA is speaking…</string>
     <string name="voice_tts_completed">Speech completed.</string>
     <string name="voice_tts_error">TTS: %1$s</string>
+
+    <string name="notes_lab_title" translatable="false">LANA Notes Lab</string>
+    <string name="notes_lab_description">Local notes without cloud storage. A new note passes through the Decision Engine, authorization, the EXECUTE gate, and only then reaches storage.</string>
+    <string name="notes_editor_hint">Enter a note…</string>
+    <string name="notes_save_new">Save new note</string>
+    <string name="notes_cancel_edit">Cancel editing</string>
+    <string name="notes_edit_cancelled">Editing cancelled.</string>
+    <string name="notes_search_title">Search</string>
+    <string name="notes_search_hint">Search note text…</string>
+    <string name="notes_search_button">Search</string>
+    <string name="notes_show_all">All</string>
+    <string name="notes_saved_title">Saved notes</string>
+    <string name="notes_voice_prefill_ready">Text from Voice Lab is ready for your confirmation.</string>
+    <string name="notes_saved_flow">Note saved through the full LANA flow. Task: %1$s</string>
+    <string name="notes_save_blocked">Saving blocked: %1$s</string>
+    <string name="notes_awaiting_confirmation">Awaiting confirmation: %1$s</string>
+    <string name="notes_save_failed">Saving failed. Task: %1$s. %2$s</string>
+    <string name="notes_save_degraded">Saving ended in DEGRADED state. %1$s</string>
+    <string name="notes_save_degraded_persisted_suffix"> The note was still saved.</string>
+    <string name="notes_updated">Note updated.</string>
+    <string name="notes_not_found">The note no longer exists.</string>
+    <string name="notes_update_unexpected">Unexpected edit result.</string>
+    <string name="notes_found_count">Found: %1$d</string>
+    <string name="notes_search_failed">Search failed.</string>
+    <string name="notes_local_count">Saved locally: %1$d</string>
+    <string name="notes_load_failed">Notes cannot be loaded.</string>
+    <string name="notes_empty">No notes yet.</string>
+    <string name="notes_id">ID: %1$s</string>
+    <string name="notes_edit">Edit</string>
+    <string name="notes_delete">Delete</string>
+    <string name="notes_save_changes">Save changes</string>
+    <string name="notes_editing">Editing note %1$s</string>
+    <string name="notes_deleted">Note deleted.</string>
+    <string name="notes_delete_failed">The note could not be deleted.</string>
 </resources>
