@@ -39,7 +39,10 @@ data class PlatformCapability(
             availability in setOf(
                 CapabilityAvailability.AVAILABLE,
                 CapabilityAvailability.DEGRADED,
-            ) && permissionState != CapabilityPermissionState.DENIED
+            ) && permissionState in setOf(
+                CapabilityPermissionState.GRANTED,
+                CapabilityPermissionState.NOT_REQUIRED,
+            )
 
     companion object {
         fun unknown(id: String): PlatformCapability = PlatformCapability(
