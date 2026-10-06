@@ -14,6 +14,7 @@ import android.os.Environment
 import android.os.Handler
 import android.os.Looper
 import android.provider.Settings
+import androidx.core.content.ContextCompat
 import org.json.JSONObject
 import java.io.File
 import java.net.HttpURLConnection
@@ -366,16 +367,12 @@ class AutoUpdater(
         if (receiverRegistered) return
 
         val filter = IntentFilter(DownloadManager.ACTION_DOWNLOAD_COMPLETE)
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.TIRAMISU) {
-            activity.registerReceiver(
-                downloadReceiver,
-                filter,
-                Context.RECEIVER_NOT_EXPORTED
-            )
-        } else {
-            @Suppress("DEPRECATION")
-            activity.registerReceiver(downloadReceiver, filter)
-        }
+        ContextCompat.registerReceiver(
+            activity,
+            downloadReceiver,
+            filter,
+            ContextCompat.RECEIVER_NOT_EXPORTED,
+        )
         receiverRegistered = true
     }
 
