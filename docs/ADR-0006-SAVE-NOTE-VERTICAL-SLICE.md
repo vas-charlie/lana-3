@@ -2,7 +2,7 @@
 
 - **Status:** IN TEST
 - **Date:** 2026-10-06
-- **Target branch:** `feature/save-note-vertical-slice`
+- **Target branch:** `stabilize/save-note-task-lifecycle`
 
 ## Decision
 
