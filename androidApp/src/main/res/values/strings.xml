@@ -146,4 +146,17 @@
     <string name="device_identity_line">%1$s %2$s • %3$s • Android %4$s • %5$.1f GB RAM</string>
     <string name="device_sensor_line">%1$s • %2$s • %3$s</string>
     <string name="device_readiness_block">%1$s\n%2$s</string>
+
+    <string name="updater_up_to_date">LANA je ažurna.</string>
+    <string name="updater_already_downloading">Nova verzija je već preuzeta ili se preuzima.</string>
+    <string name="updater_check_unavailable">Provjera ažuriranja trenutačno nije dostupna.</string>
+    <string name="updater_download_started">Nova verzija LANE se automatski preuzima.</string>
+    <string name="updater_downloading">Nova verzija LANE se preuzima.</string>
+    <string name="updater_download_failed">Preuzimanje ažuriranja nije uspjelo. Pokušat ću ponovno.</string>
+    <string name="updater_verification_failed">Sigurnosna provjera ažuriranja nije prošla. APK neće biti instaliran.</string>
+    <string name="updater_install_permission_required">Ažuriranje je provjereno. Dopusti LANI instaliranje novih verzija.</string>
+    <string name="updater_apk_unavailable">Preuzeti APK nije dostupan za instalaciju.</string>
+    <string name="updater_ready_to_install">Ažuriranje je provjereno i spremno za instalaciju.</string>
+    <string name="updater_notification_title">LANA 3 ažuriranje</string>
+    <string name="updater_notification_description">Preuzimam verziju %1$s.</string>
 </resources>

@@ -161,8 +161,8 @@ class MainActivity : Activity() {
         refreshDeviceReadiness()
         maybeRequestInitialPermissions()
 
-        autoUpdater = AutoUpdater(this) { message ->
-            updateStatus.text = message
+        autoUpdater = AutoUpdater(this) { status ->
+            updateStatus.text = formatAutoUpdateStatus(status)
         }
         autoUpdater.start()
     }
@@ -215,6 +215,40 @@ class MainActivity : Activity() {
         }
 
         requestPermissions(permissions, REQUEST_LANA_PERMISSIONS)
+    }
+
+    private fun formatAutoUpdateStatus(
+        status: AutoUpdateStatus,
+    ): String = when (status) {
+        AutoUpdateStatus.UpToDate ->
+            getString(R.string.updater_up_to_date)
+
+        AutoUpdateStatus.AlreadyDownloading ->
+            getString(R.string.updater_already_downloading)
+
+        AutoUpdateStatus.CheckUnavailable ->
+            getString(R.string.updater_check_unavailable)
+
+        AutoUpdateStatus.DownloadStarted ->
+            getString(R.string.updater_download_started)
+
+        AutoUpdateStatus.Downloading ->
+            getString(R.string.updater_downloading)
+
+        AutoUpdateStatus.DownloadFailed ->
+            getString(R.string.updater_download_failed)
+
+        AutoUpdateStatus.VerificationFailed ->
+            getString(R.string.updater_verification_failed)
+
+        AutoUpdateStatus.InstallPermissionRequired ->
+            getString(R.string.updater_install_permission_required)
+
+        AutoUpdateStatus.ApkUnavailable ->
+            getString(R.string.updater_apk_unavailable)
+
+        AutoUpdateStatus.ReadyToInstall ->
+            getString(R.string.updater_ready_to_install)
     }
 
     private fun refreshDeviceReadiness() {

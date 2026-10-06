@@ -21,14 +21,14 @@ The first controlled slice covers `MainActivity` and establishes:
 
 LANA 3 is multilingual by architecture. Hard-coded display text in Kotlin makes later localization slower, increases lint noise, and encourages business/UI logic to become entangled with one language.
 
-This change is deliberately incremental. MainActivity, Voice Lab, Notes Lab and Smart Ride Lab are merged. Device-readiness presentation is the next slice so the hardware probe can remain presentation-neutral.
+This change is deliberately incremental. MainActivity, Voice Lab, Notes Lab, Smart Ride Lab and device-readiness presentation are merged. Auto-updater status is the next slice, using typed updater events so UI text remains in resources.
 
 ## Important limits
 
 - This does not implement LANA's conversational language selection.
 - Android resource locale follows Android resource resolution, not the shared `LanguageContext`.
 - Some non-UI diagnostic/developer strings remain in code.
-- Auto-updater statuses remain a separate localization/refactor task.
+- Speech-adapter diagnostic/error messages remain a separate boundary decision because some are machine-facing and some surface in the Voice Lab.
 - More languages are not added until the resource boundary is stable.
 
 ## Acceptance criteria
@@ -41,7 +41,8 @@ This change is deliberately incremental. MainActivity, Voice Lab, Notes Lab and 
 - [x] Voice Lab resource migration passes Android lint and developer-preview build.
 - [x] Notes Lab resource migration passes Android lint and developer-preview build.
 - [x] Smart Ride Lab resource migration passes Android lint and developer-preview build.
-- [ ] Device-readiness presentation uses resources while the probe remains presentation-neutral.
+- [x] Device-readiness presentation uses resources while the probe remains presentation-neutral.
+- [ ] Auto-updater emits typed status events and UI/notification text comes from resources.
 - [ ] physical locale-switch behavior remains a later device test.
 
 ## Lifecycle status
