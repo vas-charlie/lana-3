@@ -1,18 +1,23 @@
 package hr.vascharlie.lana3.core.task
 
+enum class ActiveTaskStatusKind {
+    IDLE,
+    ACTIVE,
+}
+
 data class ActiveTaskStatus(
+    val kind: ActiveTaskStatusKind,
     val taskId: String?,
-    val kind: String?,
+    val taskKind: String?,
     val state: TaskState?,
     val priority: TaskPriority?,
-    val summary: String,
 )
 
 /**
- * Truthful snapshot for "What are you doing right now?".
+ * Truthful semantic snapshot for "What are you doing right now?".
  *
- * It reports only the supplied task state. It never invents progress or assumes that
- * a queued/paused task is active.
+ * The shared core reports state only. Human-readable wording belongs at the
+ * presentation boundary so the same task status can be rendered in any language.
  */
 class ActiveTaskStatusResolver {
     fun resolve(tasks: List<LanaTask>): ActiveTaskStatus {
@@ -25,19 +30,19 @@ class ActiveTaskStatusResolver {
 
         return if (active == null) {
             ActiveTaskStatus(
+                kind = ActiveTaskStatusKind.IDLE,
                 taskId = null,
-                kind = null,
+                taskKind = null,
                 state = null,
                 priority = null,
-                summary = "No active task.",
             )
         } else {
             ActiveTaskStatus(
+                kind = ActiveTaskStatusKind.ACTIVE,
                 taskId = active.id,
-                kind = active.kind,
+                taskKind = active.kind,
                 state = active.state,
                 priority = active.priority,
-                summary = "Active task: " + active.kind + ".",
             )
         }
     }
