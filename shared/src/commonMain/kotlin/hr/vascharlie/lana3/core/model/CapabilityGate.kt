@@ -44,11 +44,23 @@ class CapabilityGate {
         capability: PlatformCapability,
         requirement: CapabilityRequirement,
     ): CapabilityFailure? {
-        if (capability.permissionState == CapabilityPermissionState.DENIED) {
-            return CapabilityFailure(
-                capabilityId = capability.id,
-                reason = "Required permission is denied.",
-            )
+        when (capability.permissionState) {
+            CapabilityPermissionState.DENIED -> {
+                return CapabilityFailure(
+                    capabilityId = capability.id,
+                    reason = "Required permission is denied.",
+                )
+            }
+
+            CapabilityPermissionState.UNKNOWN -> {
+                return CapabilityFailure(
+                    capabilityId = capability.id,
+                    reason = "Permission state has not been verified.",
+                )
+            }
+
+            CapabilityPermissionState.GRANTED,
+            CapabilityPermissionState.NOT_REQUIRED -> Unit
         }
 
         return when (capability.availability) {
