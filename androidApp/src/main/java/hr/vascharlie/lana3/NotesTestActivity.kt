@@ -13,6 +13,7 @@ import android.widget.TextView
 import hr.vascharlie.lana3.application.SaveNoteFlow
 import hr.vascharlie.lana3.application.SaveNoteFlowResult
 import hr.vascharlie.lana3.core.authorization.AutomationMode
+import hr.vascharlie.lana3.core.authorization.ExecutionModeBlockReason
 import hr.vascharlie.lana3.core.context.LanaContext
 import hr.vascharlie.lana3.core.model.LanguageContext
 import hr.vascharlie.lana3.core.notes.LanaNote
@@ -220,17 +221,24 @@ class NotesTestActivity : Activity() {
                 status.text = result.reason
             }
 
-            is SaveNoteFlowResult.Blocked -> {
+            is SaveNoteFlowResult.AuthorizationBlocked -> {
                 status.text = getString(
                     R.string.notes_save_blocked,
-                    result.reason,
+                    getString(R.string.notes_blocked_authorization),
+                )
+            }
+
+            is SaveNoteFlowResult.ExecutionBlocked -> {
+                status.text = getString(
+                    R.string.notes_save_blocked,
+                    formatExecutionModeBlockReason(result.reason),
                 )
             }
 
             is SaveNoteFlowResult.AwaitingConfirmation -> {
                 status.text = getString(
                     R.string.notes_awaiting_confirmation,
-                    result.reason,
+                    formatExecutionModeBlockReason(result.reason),
                 )
             }
 
@@ -418,6 +426,22 @@ class NotesTestActivity : Activity() {
                 status.text = getString(R.string.notes_delete_failed)
             }
         }
+    }
+
+    private fun formatExecutionModeBlockReason(
+        reason: ExecutionModeBlockReason,
+    ): String = when (reason) {
+        ExecutionModeBlockReason.OBSERVE_MODE ->
+            getString(R.string.notes_mode_observe)
+
+        ExecutionModeBlockReason.SUGGEST_MODE ->
+            getString(R.string.notes_mode_suggest)
+
+        ExecutionModeBlockReason.USER_CONFIRMATION_REQUIRED ->
+            getString(R.string.notes_mode_user_confirmation)
+
+        ExecutionModeBlockReason.ACTION_CONFIRMATION_REQUIRED ->
+            getString(R.string.notes_mode_action_confirmation)
     }
 
     private fun formatNoteInvalidReason(
