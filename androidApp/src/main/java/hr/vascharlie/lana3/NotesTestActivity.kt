@@ -242,13 +242,15 @@ class NotesTestActivity : Activity() {
             }
 
             is SaveNoteFlowResult.Degraded -> {
-                status.text =
-                    getString(R.string.notes_save_degraded, result.reason) +
-                        if (result.note != null) {
-                            getString(R.string.notes_save_degraded_persisted_suffix)
-                        } else {
-                            ""
-                        }
+                status.text = getString(
+                    R.string.notes_save_degraded,
+                    result.reason,
+                    if (result.note != null) {
+                        getString(R.string.notes_save_degraded_persisted_suffix)
+                    } else {
+                        ""
+                    },
+                )
                 refreshNotes()
             }
         }
