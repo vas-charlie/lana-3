@@ -15,6 +15,7 @@ import hr.vascharlie.lana3.core.diagnostics.DiagnosticLevel
 import hr.vascharlie.lana3.core.diagnostics.DiagnosticSink
 import hr.vascharlie.lana3.core.intent.Intent
 import hr.vascharlie.lana3.core.notes.LanaNote
+import hr.vascharlie.lana3.core.notes.NoteInvalidReason
 import hr.vascharlie.lana3.core.notes.NoteResult
 import hr.vascharlie.lana3.core.notes.NoteService
 import hr.vascharlie.lana3.core.task.LanaTask
@@ -188,7 +189,7 @@ class SaveNoteFlow(
 
                 is NoteResult.Invalid -> fail(
                     activeTask,
-                    "Note service rejected the request: " + noteResult.reason,
+                    "note_invalid:" + noteResult.reason.name,
                 )
 
                 is NoteResult.NotFound,
@@ -355,11 +356,11 @@ class SaveNoteExecutor(
 ) {
     fun execute(action: AuthorizedAction): NoteResult {
         if (action.authorization != AuthorizationLevel.EXECUTE) {
-            return NoteResult.Invalid("Save note action is not authorized for execution.")
+            return NoteResult.Invalid(NoteInvalidReason.ACTION_NOT_AUTHORIZED)
         }
 
         val saveNote = action.intent as? Intent.SaveNote
-            ?: return NoteResult.Invalid("Authorized action is not a save-note intent.")
+            ?: return NoteResult.Invalid(NoteInvalidReason.ACTION_NOT_SAVE_NOTE)
 
         return noteService.save(saveNote.text)
     }
