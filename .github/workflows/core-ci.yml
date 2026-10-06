@@ -95,9 +95,67 @@ jobs:
           path: androidApp/build/outputs/apk/debug/androidApp-debug.apk
           if-no-files-found: error
 
+  android-release-smoke:
+    needs: [security-baseline, shared-core]
+    runs-on: ubuntu-latest
+    env:
+      CI_SIGNING_PASSWORD: lana3-ci-smoke-only
+      CI_SIGNING_ALIAS: lana3-ci-smoke
+    steps:
+      - name: Checkout
+        uses: actions/checkout@v5
+
+      - name: Set up Java 17
+        uses: actions/setup-java@v5
+        with:
+          distribution: temurin
+          java-version: "17"
+
+      - name: Install Android SDK 36
+        run: |
+          SDKMANAGER="$ANDROID_HOME/cmdline-tools/latest/bin/sdkmanager"
+          yes | "$SDKMANAGER" --licenses > /dev/null || true
+          "$SDKMANAGER" "platforms;android-36" "build-tools;36.0.0"
+
+      - name: Set up Gradle
+        uses: gradle/actions/setup-gradle@v5
+        with:
+          gradle-version: "8.14.4"
+
+      - name: Generate ephemeral CI signing key
+        run: |
+          keytool -genkeypair -noprompt \
+            -keystore "$RUNNER_TEMP/lana3-ci-smoke.jks" \
+            -storetype JKS \
+            -storepass "$CI_SIGNING_PASSWORD" \
+            -keypass "$CI_SIGNING_PASSWORD" \
+            -alias "$CI_SIGNING_ALIAS" \
+            -keyalg RSA \
+            -keysize 2048 \
+            -validity 1 \
+            -dname "CN=LANA 3 CI Smoke,O=VAS CHARLIE,C=HR"
+
+      - name: Build ephemeral signed release
+        run: |
+          gradle --no-daemon :androidApp:assembleRelease \
+            -PlanaVersionCode=${GITHUB_RUN_NUMBER} \
+            -PlanaVersionName="0.1.${GITHUB_RUN_NUMBER}-smoke" \
+            -PlanaSigningStoreFile="$RUNNER_TEMP/lana3-ci-smoke.jks" \
+            -PlanaSigningStorePassword="$CI_SIGNING_PASSWORD" \
+            -PlanaSigningKeyAlias="$CI_SIGNING_ALIAS" \
+            -PlanaSigningKeyPassword="$CI_SIGNING_PASSWORD"
+
+      - name: Verify ephemeral release signature
+        run: |
+          "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs \
+            androidApp/build/outputs/apk/release/androidApp-release.apk
+
+      - name: Remove ephemeral signing key
+        if: always()
+        run: rm -f "$RUNNER_TEMP/lana3-ci-smoke.jks"
   android-signed-release:
     if: github.ref == 'refs/heads/main' && (github.event_name == 'push' || github.event_name == 'workflow_dispatch')
-    needs: [security-baseline, shared-core, android-preview]
+    needs: [security-baseline, shared-core, android-preview, android-release-smoke]
     runs-on: ubuntu-latest
     permissions:
       contents: write
