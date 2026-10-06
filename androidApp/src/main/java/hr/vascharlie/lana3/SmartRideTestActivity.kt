@@ -16,7 +16,6 @@ import hr.vascharlie.lana3.core.ride.RideAssessmentResult
 import hr.vascharlie.lana3.core.ride.RideOffer
 import hr.vascharlie.lana3.core.ride.RideRecommendation
 import hr.vascharlie.lana3.core.ride.SmartRideAcceptance
-import java.util.Locale
 
 class SmartRideTestActivity : Activity() {
     companion object {
@@ -50,54 +49,72 @@ class SmartRideTestActivity : Activity() {
         scroll.addView(root)
 
         root.addView(TextView(this).apply {
-            text = "Smart Ride Acceptance"
+            text = getString(R.string.smart_ride_title)
             textSize = 28f
             typeface = Typeface.DEFAULT_BOLD
             setTextColor(Color.WHITE)
         })
 
         root.addView(TextView(this).apply {
-            text =
-                "Testni ekran. LANA ne prihvaća vožnju automatski. " +
-                    "Unesi stvarne podatke ponude i svoje pragove."
+            text = getString(R.string.smart_ride_description)
             textSize = 14f
             setPadding(0, 10, 0, 24)
             setTextColor(Color.rgb(180, 195, 210))
         })
 
-        addSectionTitle(root, "Ponuda")
-        priceEur = addNumberField(root, "Cijena vožnje (€)", "npr. 18,50")
-        pickupKm = addNumberField(root, "Dolazak do putnika (km)", "npr. 2,4")
-        tripKm = addNumberField(root, "Vožnja s putnikom (km)", "npr. 8,7")
-        pickupMinutes = addNumberField(root, "Dolazak do putnika (min)", "npr. 6")
-        tripMinutes = addNumberField(root, "Vožnja s putnikom (min)", "npr. 18")
+        addSectionTitle(root, getString(R.string.smart_ride_offer_section))
+        priceEur = addNumberField(
+            root,
+            getString(R.string.smart_ride_price_label),
+            getString(R.string.smart_ride_price_hint),
+        )
+        pickupKm = addNumberField(
+            root,
+            getString(R.string.smart_ride_pickup_km_label),
+            getString(R.string.smart_ride_pickup_km_hint),
+        )
+        tripKm = addNumberField(
+            root,
+            getString(R.string.smart_ride_trip_km_label),
+            getString(R.string.smart_ride_trip_km_hint),
+        )
+        pickupMinutes = addNumberField(
+            root,
+            getString(R.string.smart_ride_pickup_minutes_label),
+            getString(R.string.smart_ride_pickup_minutes_hint),
+        )
+        tripMinutes = addNumberField(
+            root,
+            getString(R.string.smart_ride_trip_minutes_label),
+            getString(R.string.smart_ride_trip_minutes_hint),
+        )
 
-        addSectionTitle(root, "Tvoji pragovi")
+        addSectionTitle(root, getString(R.string.smart_ride_thresholds_section))
         considerMinEurPerKm = addNumberField(
             root,
-            "RAZMOTRI od najmanje €/km",
-            "upiši svoj prag",
+            getString(R.string.smart_ride_consider_km_label),
+            getString(R.string.smart_ride_threshold_hint),
         )
         acceptMinEurPerKm = addNumberField(
             root,
-            "PRIHVATI od najmanje €/km",
-            "upiši svoj prag",
+            getString(R.string.smart_ride_accept_km_label),
+            getString(R.string.smart_ride_threshold_hint),
         )
         considerMinEurPerHour = addNumberField(
             root,
-            "RAZMOTRI od najmanje €/h",
-            "upiši svoj prag",
+            getString(R.string.smart_ride_consider_hour_label),
+            getString(R.string.smart_ride_threshold_hint),
         )
         acceptMinEurPerHour = addNumberField(
             root,
-            "PRIHVATI od najmanje €/h",
-            "upiši svoj prag",
+            getString(R.string.smart_ride_accept_hour_label),
+            getString(R.string.smart_ride_threshold_hint),
         )
 
         restoreSavedRules()
 
         root.addView(Button(this).apply {
-            text = "Procijeni vožnju"
+            text = getString(R.string.smart_ride_evaluate)
             isAllCaps = false
             setOnClickListener { evaluateRide() }
         })
@@ -111,7 +128,7 @@ class SmartRideTestActivity : Activity() {
         root.addView(resultText)
 
         root.addView(Button(this).apply {
-            text = "Natrag"
+            text = getString(R.string.back)
             isAllCaps = false
             setOnClickListener { finish() }
         })
@@ -162,7 +179,7 @@ class SmartRideTestActivity : Activity() {
         clearRuleErrors()
 
         val rules = readRulesOrNull() ?: run {
-            resultText.text = "Nedostaju pragovi. LANA ih neće izmišljati."
+            resultText.text = getString(R.string.smart_ride_missing_thresholds)
             return
         }
 
@@ -179,15 +196,19 @@ class SmartRideTestActivity : Activity() {
         resultText.text = when (val result = engine.assess(offer, rules)) {
             is RideAssessmentResult.Assessed -> formatAssessment(result)
             is RideAssessmentResult.InsufficientData ->
-                "Nedostaju podaci ponude: " +
-                    result.missingFields.joinToString { humanFieldName(it) }
+                getString(
+                    R.string.smart_ride_missing_offer_data,
+                    result.missingFields.joinToString { humanFieldName(it) },
+                )
 
             is RideAssessmentResult.InvalidOffer ->
-                "Neispravni podaci ponude:\n" +
+                getString(R.string.smart_ride_invalid_offer_header) +
+                    "\n" +
                     result.reasons.joinToString(separator = "\n") { "• $it" }
 
             is RideAssessmentResult.InvalidRules ->
-                "Neispravni pragovi:\n" +
+                getString(R.string.smart_ride_invalid_rules_header) +
+                    "\n" +
                     result.reasons.joinToString(separator = "\n") { "• $it" }
         }
     }
@@ -197,24 +218,23 @@ class SmartRideTestActivity : Activity() {
     ): String {
         val assessment = result.assessment
         val recommendation = when (assessment.recommendation) {
-            RideRecommendation.ACCEPT -> "PRIHVATI"
-            RideRecommendation.CONSIDER -> "RAZMOTRI"
-            RideRecommendation.SKIP -> "PRESKOČI"
+            RideRecommendation.ACCEPT -> getString(R.string.smart_ride_recommend_accept)
+            RideRecommendation.CONSIDER -> getString(R.string.smart_ride_recommend_consider)
+            RideRecommendation.SKIP -> getString(R.string.smart_ride_recommend_skip)
         }
 
         return buildString {
             append(recommendation)
             append("\n")
             append(
-                String.format(
-                    Locale.getDefault(),
-                    "%.2f €/km • %.2f €/h",
+                getString(
+                    R.string.smart_ride_metrics,
                     assessment.eurPerKm,
                     assessment.eurPerHour,
                 )
             )
             append("\n\n")
-            append("Račun uključuje dolazak do putnika i samu vožnju.")
+            append(getString(R.string.smart_ride_calculation_note))
         }
     }
 
@@ -244,7 +264,7 @@ class SmartRideTestActivity : Activity() {
     private fun requireRule(field: EditText): Double? {
         val value = field.decimalOrNull()
         if (value == null) {
-            field.error = "Obavezno"
+            field.error = getString(R.string.required)
         }
         return value
     }
@@ -286,11 +306,11 @@ class SmartRideTestActivity : Activity() {
             ?.toDoubleOrNull()
 
     private fun humanFieldName(id: String): String = when (id) {
-        "priceEur" -> "cijena"
-        "pickupKm" -> "km do putnika"
-        "tripKm" -> "km vožnje"
-        "pickupMinutes" -> "minute do putnika"
-        "tripMinutes" -> "minute vožnje"
+        "priceEur" -> getString(R.string.smart_ride_field_price)
+        "pickupKm" -> getString(R.string.smart_ride_field_pickup_km)
+        "tripKm" -> getString(R.string.smart_ride_field_trip_km)
+        "pickupMinutes" -> getString(R.string.smart_ride_field_pickup_minutes)
+        "tripMinutes" -> getString(R.string.smart_ride_field_trip_minutes)
         else -> id
     }
 }
