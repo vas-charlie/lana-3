@@ -1,7 +1,8 @@
 # ADR-0003 — Android device readiness and permission setup
 
-- **Status:** IN TEST
+- **Status:** CI PASSED — AWAITING PHYSICAL-DEVICE TEST
 - **Date:** 2026-10-06
+- **Verified CI run:** 37453080660
 - **Target branch:** `feature/android-device-readiness`
 
 ## Decision
@@ -36,8 +37,8 @@ This slice creates a reusable platform probe so later camera, voice, and locatio
 
 ## Acceptance criteria
 
-- [ ] Android developer preview compiles in CI.
-- [ ] Existing shared-core tests continue to pass.
+- [x] Android developer preview compiles in CI.
+- [x] Existing shared-core tests continue to pass.
 - [ ] First launch requests available camera/microphone/location permissions once.
 - [ ] Relaunch does not automatically repeat a denied permission request.
 - [ ] Manual readiness button can retry missing permissions.
@@ -46,6 +47,12 @@ This slice creates a reusable platform probe so later camera, voice, and locatio
 - [ ] Device without a capability reports it as unavailable instead of requesting a useless permission.
 - [ ] Physical-device behavior is verified on at least one phone before acceptance.
 
+## CI evidence
+
+GitHub Actions run **37453080660** completed both relevant jobs successfully:
+- `shared-core` — success
+- `android-preview` — success, including APK build and artifact upload
+
 ## Lifecycle status
 
-Specification → Architecture → Implementation → **IN TEST** → Physical-device test → Charlie acceptance
+Specification → Architecture → Implementation → **CI PASSED** → Physical-device test → Charlie acceptance
