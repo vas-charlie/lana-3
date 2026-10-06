@@ -2,7 +2,7 @@
 
 - **Status:** IN TEST
 - **Date:** 2026-10-06
-- **Target branch:** `feature/save-note-vertical-slice`
+- **Target branch:** `stabilize/save-note-task-lifecycle`
 
 ## Decision
 
@@ -10,13 +10,13 @@ Use local note creation as the first end-to-end LANA 3 action that crosses the c
 
 The flow is:
 
-`normalized SaveNote intent → Decision Engine → action authorization → automation-mode gate → task execution → NoteService → NoteRepository → diagnostics`
+`normalized SaveNote intent → Decision Engine → action authorization → automation-mode gate → task lifecycle → NoteService → NoteRepository → diagnostics`
 
 The Android Notes Lab calls this same flow for new notes.
 
 ## Why
 
-Earlier slices proved individual core components. This slice proves that they can be composed without bypassing authorization or execution-mode policy.
+Earlier slices proved individual core components. This slice proves that they can be composed without bypassing authorization, automation-mode policy, or task lifecycle rules.
 
 A local note is intentionally low risk:
 
@@ -47,13 +47,15 @@ The flow obeys the global mode gate:
 
 ## Task state
 
-A real execution creates an ACTIVE `save-note` task.
+A real execution now creates a QUEUED `save-note` task and must pass through `TaskTransitionPolicy` before it becomes ACTIVE.
 
-Successful persistence returns COMPLETED.
+Successful persistence requests the legal ACTIVE → COMPLETED transition.
 
-Storage failure returns FAILED rather than pretending completion or translating the failure into cancellation.
+Storage failure requests ACTIVE → FAILED rather than pretending completion or translating the failure into cancellation.
 
-Requests blocked before execution do not create a fake active task.
+If persistence succeeds but the task lifecycle cannot be finalized consistently, the flow reports DEGRADED and preserves the fact that the note was actually written.
+
+Requests blocked before execution do not create a fake ACTIVE task.
 
 ## Diagnostics and privacy
 
@@ -65,14 +67,15 @@ Android logging uses `DiagnosticSanitizer` before writing diagnostic metadata to
 
 ## Acceptance criteria
 
-- [ ] blank note is rejected before execution;
-- [ ] OBSERVE mode never writes;
-- [ ] CONFIRM mode waits for explicit confirmation;
-- [ ] EXECUTE mode completes the full flow;
-- [ ] storage failure becomes FAILED task state rather than an uncaught crash;
-- [ ] diagnostic events contain no note text;
-- [ ] shared-core tests pass in CI;
-- [ ] Android Notes Lab compiles using the same orchestration;
+- [x] blank note is rejected before execution;
+- [x] OBSERVE mode never writes;
+- [x] CONFIRM mode waits for explicit confirmation;
+- [x] EXECUTE mode completes the full flow in shared-core tests;
+- [x] storage failure becomes FAILED task state rather than an uncaught crash;
+- [x] diagnostic events contain no note text;
+- [x] task state changes use `TaskTransitionPolicy`;
+- [ ] shared-core tests pass in CI for the stabilization change;
+- [ ] Android Notes Lab compiles using the same orchestration after stabilization;
 - [ ] physical Android test proves note creation through the flow;
 - [ ] Charlie acceptance remains a separate gate.
 

@@ -20,6 +20,8 @@ import hr.vascharlie.lana3.core.notes.NoteService
 import hr.vascharlie.lana3.core.task.LanaTask
 import hr.vascharlie.lana3.core.task.TaskPriority
 import hr.vascharlie.lana3.core.task.TaskState
+import hr.vascharlie.lana3.core.task.TaskTransitionPolicy
+import hr.vascharlie.lana3.core.task.TaskTransitionResult
 
 sealed interface SaveNoteFlowResult {
     data class Completed(
@@ -45,6 +47,12 @@ sealed interface SaveNoteFlowResult {
         val task: LanaTask,
         val reason: String,
     ) : SaveNoteFlowResult
+
+    data class Degraded(
+        val task: LanaTask,
+        val reason: String,
+        val note: LanaNote? = null,
+    ) : SaveNoteFlowResult
 }
 
 /**
@@ -56,6 +64,7 @@ sealed interface SaveNoteFlowResult {
  * Hands:
  * AuthorizedAction -> SaveNoteExecutor -> NoteService -> NoteRepository.
  *
+ * Task state changes must pass through TaskTransitionPolicy.
  * Note text is deliberately excluded from diagnostics.
  */
 class SaveNoteFlow(
@@ -65,6 +74,7 @@ class SaveNoteFlow(
     private val decisionEngine: DecisionEngine = DecisionEngine(),
     private val actionAuthorizer: ActionAuthorizer = ActionAuthorizer(),
     private val executionModeGate: ExecutionModeGate = ExecutionModeGate(),
+    private val taskTransitionPolicy: TaskTransitionPolicy = TaskTransitionPolicy(),
 ) {
     private val executor = SaveNoteExecutor(noteService)
 
@@ -131,12 +141,35 @@ class SaveNoteFlow(
             }
         }
 
-        val activeTask = LanaTask(
+        val queuedTask = LanaTask(
             id = taskIdFactory(),
             kind = "save-note",
             priority = TaskPriority.NORMAL,
-            state = TaskState.ACTIVE,
+            state = TaskState.QUEUED,
         )
+
+        val activeTask = when (
+            val transition =
+                taskTransitionPolicy.transition(queuedTask, TaskState.ACTIVE)
+        ) {
+            is TaskTransitionResult.Applied -> transition.task
+
+            is TaskTransitionResult.Rejected -> {
+                record(
+                    code = "save_note_task_start_rejected",
+                    level = DiagnosticLevel.ERROR,
+                    message = "Save note task could not enter ACTIVE state.",
+                    attributes = mapOf(
+                        "task_id" to queuedTask.id,
+                        "requested_state" to TaskState.ACTIVE.name,
+                    ),
+                )
+                return failBeforeExecution(
+                    queuedTask,
+                    "Task lifecycle rejected execution start.",
+                )
+            }
+        }
 
         record(
             code = "save_note_execution_started",
@@ -147,25 +180,11 @@ class SaveNoteFlow(
 
         return try {
             when (val noteResult = executor.execute(authorizedAction)) {
-                is NoteResult.Saved -> {
-                    val completed = activeTask.copy(state = TaskState.COMPLETED)
-
-                    record(
-                        code = "save_note_completed",
-                        level = DiagnosticLevel.INFO,
-                        message = "Local note was saved.",
-                        attributes = mapOf(
-                            "task_id" to completed.id,
-                            "note_id" to noteResult.note.id,
-                        ),
-                    )
-
-                    SaveNoteFlowResult.Completed(
-                        note = noteResult.note,
-                        task = completed,
-                        explanation = proposed.explanation,
-                    )
-                }
+                is NoteResult.Saved -> complete(
+                    activeTask = activeTask,
+                    note = noteResult.note,
+                    explanation = proposed.explanation,
+                )
 
                 is NoteResult.Invalid -> fail(
                     activeTask,
@@ -188,22 +207,128 @@ class SaveNoteFlow(
         }
     }
 
+    private fun complete(
+        activeTask: LanaTask,
+        note: LanaNote,
+        explanation: String,
+    ): SaveNoteFlowResult {
+        return when (
+            val transition =
+                taskTransitionPolicy.transition(activeTask, TaskState.COMPLETED)
+        ) {
+            is TaskTransitionResult.Applied -> {
+                val completed = transition.task
+
+                record(
+                    code = "save_note_completed",
+                    level = DiagnosticLevel.INFO,
+                    message = "Local note was saved.",
+                    attributes = mapOf(
+                        "task_id" to completed.id,
+                        "note_id" to note.id,
+                    ),
+                )
+
+                SaveNoteFlowResult.Completed(
+                    note = note,
+                    task = completed,
+                    explanation = explanation,
+                )
+            }
+
+            is TaskTransitionResult.Rejected -> {
+                degradeAfterPersistence(
+                    activeTask = activeTask,
+                    note = note,
+                    reason = "Note was saved, but task completion state was rejected.",
+                )
+            }
+        }
+    }
+
+    private fun failBeforeExecution(
+        queuedTask: LanaTask,
+        reason: String,
+    ): SaveNoteFlowResult {
+        return when (
+            val transition =
+                taskTransitionPolicy.transition(queuedTask, TaskState.FAILED)
+        ) {
+            is TaskTransitionResult.Applied ->
+                SaveNoteFlowResult.Failed(
+                    task = transition.task,
+                    reason = reason,
+                )
+
+            is TaskTransitionResult.Rejected ->
+                SaveNoteFlowResult.Degraded(
+                    task = queuedTask,
+                    reason = reason + " Task failure state was also rejected.",
+                )
+        }
+    }
+
     private fun fail(
         activeTask: LanaTask,
         reason: String,
-    ): SaveNoteFlowResult.Failed {
-        val failed = activeTask.copy(state = TaskState.FAILED)
+    ): SaveNoteFlowResult {
+        return when (
+            val transition =
+                taskTransitionPolicy.transition(activeTask, TaskState.FAILED)
+        ) {
+            is TaskTransitionResult.Applied -> {
+                val failed = transition.task
+
+                record(
+                    code = "save_note_failed",
+                    level = DiagnosticLevel.ERROR,
+                    message = "Save note execution failed.",
+                    attributes = mapOf("task_id" to failed.id),
+                )
+
+                SaveNoteFlowResult.Failed(
+                    task = failed,
+                    reason = reason,
+                )
+            }
+
+            is TaskTransitionResult.Rejected -> {
+                degradeAfterPersistence(
+                    activeTask = activeTask,
+                    note = null,
+                    reason = reason + " Task failure state was rejected.",
+                )
+            }
+        }
+    }
+
+    private fun degradeAfterPersistence(
+        activeTask: LanaTask,
+        note: LanaNote?,
+        reason: String,
+    ): SaveNoteFlowResult.Degraded {
+        val degradedTask = when (
+            val transition =
+                taskTransitionPolicy.transition(activeTask, TaskState.DEGRADED)
+        ) {
+            is TaskTransitionResult.Applied -> transition.task
+            is TaskTransitionResult.Rejected -> activeTask
+        }
 
         record(
-            code = "save_note_failed",
+            code = "save_note_degraded",
             level = DiagnosticLevel.ERROR,
-            message = "Save note execution failed.",
-            attributes = mapOf("task_id" to failed.id),
+            message = "Save note flow entered degraded state.",
+            attributes = mapOf(
+                "task_id" to degradedTask.id,
+                "note_persisted" to (note != null).toString(),
+            ),
         )
 
-        return SaveNoteFlowResult.Failed(
-            task = failed,
+        return SaveNoteFlowResult.Degraded(
+            task = degradedTask,
             reason = reason,
+            note = note,
         )
     }
 

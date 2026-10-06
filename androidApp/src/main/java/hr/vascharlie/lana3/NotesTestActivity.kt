@@ -235,6 +235,18 @@ class NotesTestActivity : Activity() {
                         ". " +
                         result.reason
             }
+
+            is SaveNoteFlowResult.Degraded -> {
+                status.text =
+                    "Spremanje je završilo u DEGRADED stanju. " +
+                        result.reason +
+                        if (result.note != null) {
+                            " Bilješka je ipak spremljena."
+                        } else {
+                            ""
+                        }
+                refreshNotes()
+            }
         }
     }
 
