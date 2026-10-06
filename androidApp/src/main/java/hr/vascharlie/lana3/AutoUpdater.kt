@@ -272,9 +272,7 @@ class AutoUpdater(
             return
         }
 
-        if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O &&
-            !activity.packageManager.canRequestPackageInstalls()
-        ) {
+        if (!activity.packageManager.canRequestPackageInstalls()) {
             postStatus(AutoUpdateStatus.InstallPermissionRequired)
             val settingsIntent = Intent(
                 Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
