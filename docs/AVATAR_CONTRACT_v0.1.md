@@ -32,6 +32,8 @@ The renderer must support independent channels so movements can be combined natu
 
 Large gestures must be contextual and sparse. Idle life should primarily come from micro-movements such as breathing, blinking and subtle gaze/head changes.
 
+The current Android preview implements only a lightweight local IDLE breathing motion. Blink, gaze, head movement and lip-sync remain separate future renderer channels and must not be simulated before the visual asset supports them.
+
 ## Semantic events
 
 The application may emit semantic avatar cues such as:
@@ -75,4 +77,4 @@ Do not lock LANA 3 to a 2D/3D/avatar vendor until a prototype comparison checks:
 - portability beyond Samsung/Android
 - ability to preserve LANA's visual identity
 
-The final avatar asset and renderer are therefore intentionally separate from the current Android state engine.
+The final avatar asset and renderer are therefore intentionally separate from the current Android state engine. The local micro-motion controller is a preview-only renderer helper and does not move semantic state or business policy into Android presentation code.
