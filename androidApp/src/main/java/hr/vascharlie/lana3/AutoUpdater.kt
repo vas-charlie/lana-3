@@ -18,6 +18,8 @@ import androidx.core.content.edit
 import androidx.core.net.toUri
 import hr.vascharlie.lana3.core.update.UpdateDecision
 import hr.vascharlie.lana3.core.update.UpdatePolicy
+import hr.vascharlie.lana3.core.update.UpdateVerificationPolicy
+import hr.vascharlie.lana3.core.update.UpdateVerificationResult
 import org.json.JSONObject
 import java.io.File
 import java.net.HttpURLConnection
@@ -59,6 +61,7 @@ class AutoUpdater(
     private val prefs = activity.getSharedPreferences(PREFS, Context.MODE_PRIVATE)
     private val handler = Handler(Looper.getMainLooper())
     private val updatePolicy = UpdatePolicy()
+    private val updateVerificationPolicy = UpdateVerificationPolicy()
 
     @Volatile
     private var checking = false
@@ -324,7 +327,7 @@ class AutoUpdater(
 
         val packageManager = activity.packageManager
         val archiveInfo = getArchivePackageInfo(packageManager, apkFile) ?: return false
-        if (archiveInfo.packageName != activity.packageName) return false
+        val installedInfo = getInstalledPackageInfo(packageManager) ?: return false
 
         val archiveVersion = if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.P) {
             archiveInfo.longVersionCode
@@ -333,15 +336,17 @@ class AutoUpdater(
             archiveInfo.versionCode.toLong()
         }
 
-        if (archiveVersion != remoteVersion.toLong()) return false
-        if (archiveVersion <= BuildConfig.VERSION_CODE.toLong()) return false
+        val result = updateVerificationPolicy.verify(
+            expectedPackageName = activity.packageName,
+            installedVersion = BuildConfig.VERSION_CODE.toLong(),
+            remoteVersion = remoteVersion.toLong(),
+            archivePackageName = archiveInfo.packageName,
+            archiveVersion = archiveVersion,
+            installedSignerDigests = currentSignerDigests(installedInfo),
+            archiveSignerDigests = currentSignerDigests(archiveInfo),
+        )
 
-        val installedInfo = getInstalledPackageInfo(packageManager) ?: return false
-        val installedSigners = currentSignerDigests(installedInfo)
-        val archiveSigners = currentSignerDigests(archiveInfo)
-
-        return installedSigners.isNotEmpty() &&
-            installedSigners == archiveSigners
+        return result == UpdateVerificationResult.Verified
     }
 
     private fun getArchivePackageInfo(
