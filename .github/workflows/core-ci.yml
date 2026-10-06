@@ -150,6 +150,12 @@ jobs:
           "$ANDROID_HOME/build-tools/36.0.0/apksigner" verify --verbose --print-certs \
             androidApp/build/outputs/apk/release/androidApp-release.apk
 
+      - name: Verify release checksum generation
+        run: |
+          cd androidApp/build/outputs/apk/release
+          sha256sum androidApp-release.apk > androidApp-release.apk.sha256
+          sha256sum -c androidApp-release.apk.sha256
+
       - name: Remove ephemeral signing key
         if: always()
         run: rm -f "$RUNNER_TEMP/lana3-ci-smoke.jks"
@@ -233,7 +239,9 @@ jobs:
         run: |
           TAG="dev-${GITHUB_RUN_NUMBER}"
           cp androidApp/build/outputs/apk/release/androidApp-release.apk lana-3.apk
-          gh release create "$TAG" lana-3.apk \
+          sha256sum lana-3.apk > lana-3.apk.sha256
+          sha256sum -c lana-3.apk.sha256
+          gh release create "$TAG" lana-3.apk lana-3.apk.sha256 \
             --title "LANA 3 Developer Preview ${GITHUB_RUN_NUMBER}" \
             --notes "Automatic update build. versionCode=${GITHUB_RUN_NUMBER}" \
             --latest
