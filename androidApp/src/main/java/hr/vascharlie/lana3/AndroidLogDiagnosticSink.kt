@@ -10,18 +10,29 @@ class AndroidLogDiagnosticSink(
 ) : DiagnosticSink {
     override fun record(event: DiagnosticEvent) {
         val safe = sanitizer.sanitize(event)
-        val attributes = safe.attributes
-            .entries
-            .sortedBy { it.key }
-            .joinToString(separator = ", ") { (key, value) -> "$key=$value" }
+        val metadata = buildList {
+            safe.traceId?.let { add("trace=$it") }
+            if (safe.outcome.name != "UNKNOWN") {
+                add("outcome=" + safe.outcome.name)
+            }
+            safe.durationMillis?.let { add("durationMs=$it") }
+            safe.occurredAtEpochMillis?.let { add("occurredAt=$it") }
+
+            safe.attributes
+                .entries
+                .sortedBy { it.key }
+                .forEach { (key, value) ->
+                    add("$key=$value")
+                }
+        }.joinToString(separator = ", ")
 
         val message = buildString {
             append(safe.code)
             append(": ")
             append(safe.message)
-            if (attributes.isNotBlank()) {
+            if (metadata.isNotBlank()) {
                 append(" [")
-                append(attributes)
+                append(metadata)
                 append("]")
             }
         }
