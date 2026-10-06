@@ -1,6 +1,7 @@
 package hr.vascharlie.lana3
 
 import android.app.Activity
+import android.content.Intent
 import android.graphics.Color
 import android.graphics.Typeface
 import android.os.Bundle
@@ -131,6 +132,16 @@ class MainActivity : Activity() {
             setOnClickListener {
                 startActivity(
                     Intent(this@MainActivity, SmartRideTestActivity::class.java)
+                )
+            }
+        })
+
+        root.addView(Button(this).apply {
+            text = "LANA Voice Lab - TESTNO"
+            isAllCaps = false
+            setOnClickListener {
+                startActivity(
+                    Intent(this@MainActivity, VoiceTestActivity::class.java)
                 )
             }
         })
