@@ -12,6 +12,9 @@
         android:allowBackup="false"
         android:supportsRtl="true">
         <activity
+            android:name=".NotesTestActivity"
+            android:exported="false" />
+        <activity
             android:name=".VoiceTestActivity"
             android:exported="false" />
         <activity
