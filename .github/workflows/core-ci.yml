@@ -245,3 +245,7 @@ jobs:
             --title "LANA 3 Developer Preview ${GITHUB_RUN_NUMBER}" \
             --notes "Automatic update build. versionCode=${GITHUB_RUN_NUMBER}" \
             --latest
+
+      - name: Remove restored private signing key
+        if: always() && steps.signing.outputs.ready == 'true'
+        run: rm -f "$RUNNER_TEMP/lana3-release.jks"
