@@ -17,6 +17,8 @@
         android:theme="@style/Theme.Lana3"
         android:label="LANA 3"
         android:allowBackup="false"
+        android:fullBackupContent="@xml/backup_rules"
+        android:dataExtractionRules="@xml/data_extraction_rules"
         android:supportsRtl="true">
         <activity
             android:name=".NotesTestActivity"
