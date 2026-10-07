@@ -34,7 +34,12 @@
             android:exported="false" />
         <activity
             android:name=".MainActivity"
-            android:exported="true">
+            android:exported="false"
+            android:process=":diagnostic_main" />
+        <activity
+            android:name=".BootstrapActivity"
+            android:exported="true"
+            android:theme="@android:style/Theme.Material.NoActionBar">
             <intent-filter>
                 <action android:name="android.intent.action.MAIN" />
                 <category android:name="android.intent.category.LAUNCHER" />
