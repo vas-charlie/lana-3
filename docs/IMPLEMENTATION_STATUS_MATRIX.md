@@ -19,7 +19,7 @@ No unit is marked ACCEPTED solely because CI is green.
 | 1 | Razgovor i osobnost | FOUNDATION | UI/state/avatar semantics exist; no production conversational AI session yet. |
 | 2 | Glas | IN TEST | Shared STT/TTS ports, Android Voice Lab, permission/error handling; physical/Bluetooth/language matrix pending. |
 | 3 | Razumijevanje namjere | PARTIAL | Typed intents and deterministic handling exist for selected flows; natural-language normalization remains incomplete. |
-| 4 | Smart Ride Acceptance | IN TEST | Deterministic €/km and €/h rules, validation and Android test UI; real taxi acceptance testing pending. |
+| 4 | Smart Ride Acceptance | IN TEST | Deterministic €/km and €/h rules, validation, structured decision evidence/reasons and Android test UI; real taxi acceptance testing pending. |
 | 5 | Decision Engine | PARTIAL | Shared DecisionEngine and first brain→hands slice exist; broad cross-domain decision coverage remains incomplete. |
 | 6 | Navigacija | FOUNDATION | Shared navigation intent/policy contracts exist; real turn-by-turn Android/Maps execution not implemented. |
 | 7 | Lokacija | FOUNDATION | Location context/policies and Android capability readiness exist; full real location adapter/use cases remain pending. |
@@ -51,7 +51,7 @@ No unit is marked ACCEPTED solely because CI is green.
 | 33 | Safe Stop | FOUNDATION | Shared Safe Stop semantics/tests exist; interrupting real external/platform work remains unproven. |
 | 34 | “Što trenutno radiš?” | FOUNDATION | Semantic active-task resolver exists; full user-facing task status experience not integrated. |
 | 35 | Prioriteti | FOUNDATION | Deterministic task priority/arbitration exists; real concurrent platform tasks remain unproven. |
-| 36 | Objašnjenje odluke | FOUNDATION | Decision explanations exist for selected deterministic paths; normalized evidence/audit explanation model remains incomplete. |
+| 36 | Objašnjenje odluke | PARTIAL | Smart Ride now emits normalized reason codes, applied thresholds and failed profitability metrics rendered through localized UI; cross-domain explanation/audit coverage remains incomplete. |
 | 37 | Test mode | IN TEST | OBSERVE → SUGGEST → CONFIRM → EXECUTE gate is implemented/tested; more real actions must pass through it. |
 | 38 | Knowledge Center | NOT STARTED | No document knowledge/index subsystem. |
 | 39 | “Ne gnjavi me” | FOUNDATION | Background/degraded policies exist; durable delegated monitoring/notification workflow not implemented. |
