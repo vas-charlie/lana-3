@@ -9,6 +9,8 @@ The approved LANA 3 MASTER PLAN contains 43 functional units. Those 43 units rem
 ## Confirmed amendments
 1. LANA 3 is multilingual from the initial architecture. The system must be designed for all languages rather than a fixed shortlist or a later language retrofit.
 2. LANA 3 is device- and vendor-independent by architecture. Samsung devices are initial physical test devices, not a product boundary. Platform-specific capabilities must live behind adapters/interfaces, with real limitations tested and documented.
+3. Android is the first physical client, not the definition of LANA. iOS, desktop, web and future platforms must be addable through platform adapters without rewriting shared business logic.
+4. LANA follows a local-first knowledge policy: verified local knowledge should be reused before paid external reasoning, while unverified, stale, low-confidence or privacy-incompatible material must be rechecked rather than guessed.
 
 ## Engineering rules
 1. Inspect the existing state before making a change.
@@ -43,7 +45,7 @@ Fast development is allowed only inside this discipline:
 - The Kotlin Multiplatform shared core and Android developer-preview skeleton compile in CI.
 - Shared-core regression tests run automatically on pull requests and main.
 - Android lint is a CI quality gate before the developer-preview APK build.
-- The Android preview has a secure update path in code; signed release publishing remains intentionally inactive until all private signing secrets are configured.
+- The Android preview has a secure update path in code; private signing is configured and the signed-release pipeline has been verified end to end in GitHub Actions through publication of release `dev-195`.
 - The updater verifies package identity, version progression and signing identity before installation is offered.
 - Android device readiness measures phone/tablet form factor, RAM, camera, microphone and location state without Samsung model hard-coding.
 - Android runtime permission setup is implemented for camera, microphone and location; physical-device verification remains pending.
@@ -65,13 +67,12 @@ Fast development is allowed only inside this discipline:
 - Android backup/data-transfer exclusions are explicit; future multi-device sync must be a deliberate LANA feature.
 - The current Android developer surfaces have an incremental localization boundary with Croatian default and English resources.
 - Structured diagnostics redact sensitive attribute names and now support optional trace ID, outcome, duration and event time metadata.
-- Signing work is paused at a manual setup gate; signed release, first signed installation and physical S24 Ultra tests remain pending.
+- The first real signed release was built, signature-verified and published by `LANA 3 CI #195`; first physical installation, physical acceptance and later in-place signed update continuity remain pending.
+- Shared core now contains the first local-first Knowledge Core policy/contracts: external AI output begins as unverified candidate knowledge, and only verified/fresh/sufficiently-confident knowledge is eligible for local reuse.
 - Future Samsung tablet testing is a second physical target, not an architectural dependency.
 
 ## Current manual gates
 These items must not be marked complete until Charlie performs or confirms the real-world step:
-- configure all required private GitHub signing secrets;
-- produce and verify the first signed release APK;
 - install the first signed build on the S24 Ultra;
 - test runtime permissions, STT/TTS, local notes, updater behavior and Smart Ride on a physical Android device;
 - later repeat the relevant device matrix on the intended tablet.
