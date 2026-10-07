@@ -19,7 +19,7 @@ No unit is marked ACCEPTED solely because CI is green.
 | 1 | Razgovor i osobnost | FOUNDATION | UI/state/avatar semantics exist; no production conversational AI session yet. |
 | 2 | Glas | IN TEST | Shared STT/TTS ports, Android Voice Lab, permission/error handling; physical/Bluetooth/language matrix pending. |
 | 3 | Razumijevanje namjere | PARTIAL | Typed intents and deterministic handling exist for selected flows; natural-language normalization remains incomplete. |
-| 4 | Smart Ride Acceptance | IN TEST | Deterministic €/km and €/h rules now cover pickup + passenger trip and an optional explicit empty return; validation, structured decision evidence/reasons and Android test UI exist; real taxi acceptance testing pending. |
+| 4 | Smart Ride Acceptance | IN TEST | Deterministic €/km and €/h rules cover pickup + passenger trip and an optional explicit empty return; validation, structured decision evidence/reasons, Android test UI and a structured prefill handoff contract exist; automatic voice/screen extraction and real taxi acceptance testing remain pending. |
 | 5 | Decision Engine | PARTIAL | Shared DecisionEngine and first brain→hands slice exist; broad cross-domain decision coverage remains incomplete. |
 | 6 | Navigacija | FOUNDATION | Shared navigation intent/policy contracts exist; real turn-by-turn Android/Maps execution not implemented. |
 | 7 | Lokacija | FOUNDATION | Location context/policies and Android capability readiness exist; full real location adapter/use cases remain pending. |
