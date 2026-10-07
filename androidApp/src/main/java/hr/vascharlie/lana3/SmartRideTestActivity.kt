@@ -161,6 +161,7 @@ class SmartRideTestActivity : Activity() {
         })
 
         setContentView(scroll)
+        applyStructuredPrefill()
     }
 
     private fun addSectionTitle(root: LinearLayout, title: String) {
@@ -200,6 +201,28 @@ class SmartRideTestActivity : Activity() {
                 )
             )
         }
+    }
+
+    private fun applyStructuredPrefill() {
+        val prefill = SmartRidePrefillContract.read(intent) ?: return
+
+        priceEur.setKnownDecimal(prefill.offer.priceEur)
+        pickupKm.setKnownDecimal(prefill.offer.pickupKm)
+        tripKm.setKnownDecimal(prefill.offer.tripKm)
+        pickupMinutes.setKnownDecimal(prefill.offer.pickupMinutes)
+        tripMinutes.setKnownDecimal(prefill.offer.tripMinutes)
+        emptyReturnKm.setKnownDecimal(prefill.offer.emptyReturnKm)
+        emptyReturnMinutes.setKnownDecimal(prefill.offer.emptyReturnMinutes)
+
+        resultText.text =
+            if (prefill.source == null) {
+                getString(R.string.smart_ride_prefill_received)
+            } else {
+                getString(
+                    R.string.smart_ride_prefill_received_with_source,
+                    prefill.source,
+                )
+            }
     }
 
     private fun evaluateRide() {
@@ -421,6 +444,12 @@ class SmartRideTestActivity : Activity() {
             ?.replace(',', '.')
             ?.takeIf { it.isNotEmpty() }
             ?.toDoubleOrNull()
+
+    private fun EditText.setKnownDecimal(value: Double?) {
+        if (value != null) {
+            setText(value.toString())
+        }
+    }
 
     private fun humanFieldName(id: String): String = when (id) {
         "priceEur" -> getString(R.string.smart_ride_field_price)
