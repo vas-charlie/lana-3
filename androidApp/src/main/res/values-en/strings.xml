@@ -126,6 +126,12 @@
     <string name="smart_ride_recommend_consider">CONSIDER</string>
     <string name="smart_ride_recommend_skip">SKIP</string>
     <string name="smart_ride_metrics">%1$.2f €/km • %2$.2f €/h</string>
+    <string name="smart_ride_reason_accept">Why: both results meet your ACCEPT thresholds, at least %1$.2f €/km and %2$.2f €/h.</string>
+    <string name="smart_ride_reason_consider">Why: both results meet your CONSIDER thresholds, at least %1$.2f €/km and %2$.2f €/h.</string>
+    <string name="smart_ride_reason_skip_km">Why: %1$.2f €/km is below your minimum of %2$.2f €/km.</string>
+    <string name="smart_ride_reason_skip_hour">Why: %1$.2f €/h is below your minimum of %2$.2f €/h.</string>
+    <string name="smart_ride_reason_skip_both">Why: %1$.2f €/km is below %2$.2f €/km, and %3$.2f €/h is below %4$.2f €/h.</string>
+    <string name="smart_ride_reason_skip_generic">Why: the offer is below at least one CONSIDER threshold.</string>
     <string name="smart_ride_calculation_note">The calculation includes pickup distance/time and the passenger trip.</string>
     <string name="required">Required</string>
     <string name="smart_ride_field_price">price</string>
