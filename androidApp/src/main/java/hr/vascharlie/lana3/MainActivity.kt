@@ -30,10 +30,20 @@ class MainActivity : Activity() {
     private lateinit var readinessButton: Button
     private lateinit var autoUpdater: AutoUpdater
     private var visualState = LanaVisualState.IDLE
+    private var startupStage = "activity-create"
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
 
+        runCatching {
+            buildMainContent()
+        }.onFailure { error ->
+            showStartupFailure(startupStage, error)
+        }
+    }
+
+    private fun buildMainContent() {
+        startupStage = "build-ui"
         val root = LinearLayout(this).apply {
             orientation = LinearLayout.VERTICAL
             gravity = Gravity.CENTER_HORIZONTAL
@@ -154,23 +164,82 @@ class MainActivity : Activity() {
             }
         })
 
+        startupStage = "set-content-view"
         setContentView(root)
+
+        startupStage = "render-initial-state"
         renderState(LanaVisualState.IDLE)
+
+        startupStage = "device-readiness"
         refreshDeviceReadiness()
 
+        startupStage = "auto-updater-init"
         autoUpdater = AutoUpdater(this) { status ->
             updateStatus.text = formatAutoUpdateStatus(status)
         }
         autoUpdater.start()
     }
 
+    private fun showStartupFailure(stage: String, error: Throwable) {
+        val root = LinearLayout(this).apply {
+            orientation = LinearLayout.VERTICAL
+            gravity = Gravity.CENTER_HORIZONTAL
+            setPadding(40, 80, 40, 40)
+            setBackgroundColor(Color.rgb(35, 8, 12))
+        }
+
+        root.addView(TextView(this).apply {
+            text = "LANA 3 · STARTUP DIAGNOSTIC"
+            textSize = 22f
+            setTextColor(Color.WHITE)
+            typeface = Typeface.DEFAULT_BOLD
+        })
+
+        root.addView(TextView(this).apply {
+            val trace = error.stackTrace
+                .take(6)
+                .joinToString(separator = "\n") { it.toString() }
+            text = buildString {
+                append("Stage: ")
+                append(stage)
+                append("\n\n")
+                append(error::class.java.name)
+                append(": ")
+                append(error.message ?: "(no message)")
+                if (trace.isNotBlank()) {
+                    append("\n\n")
+                    append(trace)
+                }
+            }
+            textSize = 13f
+            setTextColor(Color.WHITE)
+            setPadding(0, 30, 0, 0)
+        })
+
+        setContentView(root)
+    }
+
     override fun onResume() {
         super.onResume()
+
         if (::readinessStatus.isInitialized) {
-            refreshDeviceReadiness()
+            runCatching {
+                startupStage = "resume-device-readiness"
+                refreshDeviceReadiness()
+            }.onFailure { error ->
+                showStartupFailure(startupStage, error)
+                return
+            }
         }
+
         if (::autoUpdater.isInitialized) {
-            autoUpdater.onResume()
+            runCatching {
+                startupStage = "resume-auto-updater"
+                autoUpdater.onResume()
+                startupStage = "ready"
+            }.onFailure { error ->
+                showStartupFailure(startupStage, error)
+            }
         }
     }
 
@@ -188,7 +257,13 @@ class MainActivity : Activity() {
     ) {
         super.onRequestPermissionsResult(requestCode, permissions, grantResults)
         if (requestCode == REQUEST_LANA_PERMISSIONS) {
-            refreshDeviceReadiness()
+            runCatching {
+                startupStage = "permission-result-readiness"
+                refreshDeviceReadiness()
+                startupStage = "ready"
+            }.onFailure { error ->
+                showStartupFailure(startupStage, error)
+            }
         }
     }
 
