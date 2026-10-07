@@ -57,6 +57,7 @@ Fast development is allowed only inside this discipline:
 - Smart Ride does not invent thresholds and does not automate Uber/Bolt actions.
 - The Android Smart Ride surface now has a structured prefill contract so future voice, screen-awareness or integration adapters can hand off normalized offer fields without coupling those sources to Smart Ride business logic; automatic extraction itself is still pending.
 - Shared speech input/output ports are implemented with an Android Voice Lab adapter for STT/TTS testing.
+- Voice Lab can now normalize explicitly labelled Croatian/English ride-offer transcripts through a replaceable shared-core boundary and hand recognized fields to Smart Ride for review; unsupported languages and unrecognized data fail explicitly rather than being guessed.
 - Voice-to-note handoff prefills Notes Lab but does not silently persist recognized speech.
 - Offline local notes use a shared repository/service boundary with an Android app-private SQLite implementation.
 - New note creation has a complete low-risk brain → authorization → automation gate → task lifecycle → storage → diagnostics vertical slice.
