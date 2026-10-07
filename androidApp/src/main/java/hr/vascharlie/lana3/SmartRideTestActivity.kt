@@ -14,9 +14,12 @@ import android.widget.TextView
 import androidx.core.content.edit
 import hr.vascharlie.lana3.core.ride.RideAcceptanceRules
 import hr.vascharlie.lana3.core.ride.RideAssessmentResult
+import hr.vascharlie.lana3.core.ride.RideDecisionExplanation
+import hr.vascharlie.lana3.core.ride.RideDecisionReason
 import hr.vascharlie.lana3.core.ride.RideInvalidOfferReason
 import hr.vascharlie.lana3.core.ride.RideInvalidRuleReason
 import hr.vascharlie.lana3.core.ride.RideOffer
+import hr.vascharlie.lana3.core.ride.RideProfitabilityMetric
 import hr.vascharlie.lana3.core.ride.RideRecommendation
 import hr.vascharlie.lana3.core.ride.SmartRideAcceptance
 
@@ -240,8 +243,71 @@ class SmartRideTestActivity : Activity() {
                     assessment.eurPerHour,
                 )
             )
+            append("\n")
+            append(
+                formatDecisionExplanation(
+                    explanation = assessment.explanation,
+                    eurPerKm = assessment.eurPerKm,
+                    eurPerHour = assessment.eurPerHour,
+                )
+            )
             append("\n\n")
             append(getString(R.string.smart_ride_calculation_note))
+        }
+    }
+
+    private fun formatDecisionExplanation(
+        explanation: RideDecisionExplanation,
+        eurPerKm: Double,
+        eurPerHour: Double,
+    ): String = when (explanation.reason) {
+        RideDecisionReason.MEETS_ACCEPT_THRESHOLDS ->
+            getString(
+                R.string.smart_ride_reason_accept,
+                explanation.thresholdEurPerKm,
+                explanation.thresholdEurPerHour,
+            )
+
+        RideDecisionReason.MEETS_CONSIDER_THRESHOLDS ->
+            getString(
+                R.string.smart_ride_reason_consider,
+                explanation.thresholdEurPerKm,
+                explanation.thresholdEurPerHour,
+            )
+
+        RideDecisionReason.BELOW_CONSIDER_THRESHOLDS -> {
+            val failed = explanation.failedMetrics.toSet()
+            when {
+                failed.containsAll(
+                    setOf(
+                        RideProfitabilityMetric.EUR_PER_KM,
+                        RideProfitabilityMetric.EUR_PER_HOUR,
+                    )
+                ) ->
+                    getString(
+                        R.string.smart_ride_reason_skip_both,
+                        eurPerKm,
+                        explanation.thresholdEurPerKm,
+                        eurPerHour,
+                        explanation.thresholdEurPerHour,
+                    )
+
+                RideProfitabilityMetric.EUR_PER_KM in failed ->
+                    getString(
+                        R.string.smart_ride_reason_skip_km,
+                        eurPerKm,
+                        explanation.thresholdEurPerKm,
+                    )
+
+                RideProfitabilityMetric.EUR_PER_HOUR in failed ->
+                    getString(
+                        R.string.smart_ride_reason_skip_hour,
+                        eurPerHour,
+                        explanation.thresholdEurPerHour,
+                    )
+
+                else -> getString(R.string.smart_ride_reason_skip_generic)
+            }
         }
     }
 
