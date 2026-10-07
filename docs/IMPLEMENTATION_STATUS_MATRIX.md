@@ -30,7 +30,7 @@ No unit is marked ACCEPTED solely because CI is green.
 | 12 | Lana Walk | NOT STARTED | No feature implementation. |
 | 13 | Bilješke | IN TEST | Local SQLite CRUD/search, shared service/repository, voice prefill and guarded save flow; physical test pending. |
 | 14 | Lana dnevnik | NOT STARTED | No durable diary/event flow. |
-| 15 | Memorija | FOUNDATION | Data/memory boundaries documented; no LANA product memory subsystem yet. |
+| 15 | Memorija | FOUNDATION | Data/memory boundaries plus local-first knowledge metadata/reuse policy now exist; durable product memory/storage, retrieval and migration remain pending. |
 | 16 | Poslovni podaci | NOT STARTED | MASTER PLAN boundary exists; VAŠ CHARLIE Business OS integration not implemented in LANA 3. |
 | 17 | Taxi funkcije | PARTIAL | Smart Ride is implemented as one deterministic taxi function; broader taxi toolset remains pending. |
 | 18 | Rezervacije | NOT STARTED | No reservation data model/workflow. |
@@ -53,23 +53,22 @@ No unit is marked ACCEPTED solely because CI is green.
 | 35 | Prioriteti | FOUNDATION | Deterministic task priority/arbitration exists; real concurrent platform tasks remain unproven. |
 | 36 | Objašnjenje odluke | PARTIAL | Smart Ride now emits normalized reason codes, applied thresholds and failed profitability metrics rendered through localized UI; cross-domain explanation/audit coverage remains incomplete. |
 | 37 | Test mode | IN TEST | OBSERVE → SUGGEST → CONFIRM → EXECUTE gate is implemented/tested; more real actions must pass through it. |
-| 38 | Knowledge Center | NOT STARTED | No document knowledge/index subsystem. |
+| 38 | Knowledge Center | FOUNDATION | Shared Knowledge Core contracts now define candidate/verified/stale/rejected knowledge, provenance, privacy scope, confidence, freshness and local-reuse/fallback policy; durable storage, indexing, retrieval and document ingestion remain pending. |
 | 39 | “Ne gnjavi me” | FOUNDATION | Background/degraded policies exist; durable delegated monitoring/notification workflow not implemented. |
 | 40 | Kontekst vožnje | FOUNDATION | Driving/context architecture exists; reliable Android driving-state detection and UI adaptation remain pending. |
 | 41 | Učenje navika | NOT STARTED | No habit-learning/proposal subsystem. |
 | 42 | “Lana ne pogađa” | PARTIAL | Unknown/denied capability policies and rejection paths exist; uncertainty handling is not yet universal. |
-| 43 | Samodijagnostika / samopopravak / nadogradnja | IN TEST | Structured diagnostics, lint/tests, secure updater policy, signing smoke test and update verification exist; real signed update/rollback and production approval loop pending. |
+| 43 | Samodijagnostika / samopopravak / nadogradnja | IN TEST | Structured diagnostics, lint/tests, secure updater policy and update verification exist; the real private signed-release pipeline published `dev-195`, while first-device install, later in-place signed update, rollback and production approval loop remain pending. |
 
 ## Current manual gates
 
 The largest immediate gates that code alone cannot close are:
 
-1. finish private GitHub signing secrets;
-2. run the real signed-release job and verify that signing/publishing steps actually execute;
-3. perform first signed installation on the S24 Ultra;
-4. run the physical Android acceptance checklist;
-5. publish a later signed build and prove in-place automatic update continuity;
-6. later repeat relevant device tests on the intended tablet.
+1. perform first signed installation on the S24 Ultra;
+2. run the physical Android acceptance checklist;
+3. publish a later signed build and prove in-place automatic update continuity;
+4. verify updater behavior and rollback/recovery where applicable;
+5. later repeat relevant device tests on the intended tablet and, as platform clients are added, expand the same acceptance discipline beyond Android.
 
 ## Progress interpretation
 
