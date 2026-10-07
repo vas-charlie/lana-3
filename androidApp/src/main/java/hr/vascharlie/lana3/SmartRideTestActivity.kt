@@ -220,10 +220,18 @@ class SmartRideTestActivity : Activity() {
             } else {
                 getString(
                     R.string.smart_ride_prefill_received_with_source,
-                    prefill.source,
+                    humanPrefillSource(prefill.source),
                 )
             }
     }
+
+    private fun humanPrefillSource(source: String): String =
+        when (source) {
+            SmartRidePrefillContract.SOURCE_VOICE ->
+                getString(R.string.smart_ride_source_voice)
+
+            else -> source
+        }
 
     private fun evaluateRide() {
         clearRuleErrors()
