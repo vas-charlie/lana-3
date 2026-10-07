@@ -113,6 +113,12 @@
     <string name="smart_ride_pickup_minutes_hint">npr. 6</string>
     <string name="smart_ride_trip_minutes_label">Vožnja s putnikom (min)</string>
     <string name="smart_ride_trip_minutes_hint">npr. 18</string>
+    <string name="smart_ride_return_section">Mogući prazni povratak</string>
+    <string name="smart_ride_return_description">Neobavezno. Ako očekuješ prazan povratak, unesi i kilometre i minute. Ako ne znaš, ostavi oba prazna — LANA neće pogađati.</string>
+    <string name="smart_ride_return_km_label">Prazni povratak (km)</string>
+    <string name="smart_ride_return_km_hint">npr. 10</string>
+    <string name="smart_ride_return_minutes_label">Prazni povratak (min)</string>
+    <string name="smart_ride_return_minutes_hint">npr. 15</string>
     <string name="smart_ride_thresholds_section">Tvoji pragovi</string>
     <string name="smart_ride_consider_km_label">RAZMOTRI od najmanje €/km</string>
     <string name="smart_ride_accept_km_label">PRIHVATI od najmanje €/km</string>
@@ -144,13 +150,18 @@
     <string name="smart_ride_reason_skip_hour">Zašto: %1$.2f €/h je ispod tvog minimuma %2$.2f €/h.</string>
     <string name="smart_ride_reason_skip_both">Zašto: %1$.2f €/km je ispod %2$.2f €/km, a %3$.2f €/h je ispod %4$.2f €/h.</string>
     <string name="smart_ride_reason_skip_generic">Zašto: ponuda je ispod najmanje jednog RAZMOTRI praga.</string>
-    <string name="smart_ride_calculation_note">Račun uključuje dolazak do putnika i samu vožnju.</string>
+    <string name="smart_ride_total_work">Ukupno računato: %1$.2f km • %2$.0f min</string>
+    <string name="smart_ride_scope_without_return">Prazni povratak nije uključen jer nije unesen.</string>
+    <string name="smart_ride_scope_with_return">Uključen je i prazni povratak: %1$.2f km • %2$.0f min.</string>
+    <string name="smart_ride_calculation_note">Pokazatelji računaju sav izričito uneseni rad.</string>
     <string name="required">Obavezno</string>
     <string name="smart_ride_field_price">cijena</string>
     <string name="smart_ride_field_pickup_km">km do putnika</string>
     <string name="smart_ride_field_trip_km">km vožnje</string>
     <string name="smart_ride_field_pickup_minutes">minute do putnika</string>
     <string name="smart_ride_field_trip_minutes">minute vožnje</string>
+    <string name="smart_ride_field_return_km">km praznog povratka</string>
+    <string name="smart_ride_field_return_minutes">minute praznog povratka</string>
 
     <string name="device_form_factor_phone">telefon</string>
     <string name="device_form_factor_tablet">tablet</string>

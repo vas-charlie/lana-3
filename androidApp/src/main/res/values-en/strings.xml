@@ -101,6 +101,12 @@
     <string name="smart_ride_pickup_minutes_hint">e.g. 6</string>
     <string name="smart_ride_trip_minutes_label">Passenger trip time (min)</string>
     <string name="smart_ride_trip_minutes_hint">e.g. 18</string>
+    <string name="smart_ride_return_section">Possible empty return</string>
+    <string name="smart_ride_return_description">Optional. If you expect an empty return, enter both distance and time. If you do not know, leave both blank — LANA will not guess.</string>
+    <string name="smart_ride_return_km_label">Empty return (km)</string>
+    <string name="smart_ride_return_km_hint">e.g. 10</string>
+    <string name="smart_ride_return_minutes_label">Empty return (min)</string>
+    <string name="smart_ride_return_minutes_hint">e.g. 15</string>
     <string name="smart_ride_thresholds_section">Your thresholds</string>
     <string name="smart_ride_consider_km_label">CONSIDER from at least €/km</string>
     <string name="smart_ride_accept_km_label">ACCEPT from at least €/km</string>
@@ -132,13 +138,18 @@
     <string name="smart_ride_reason_skip_hour">Why: %1$.2f €/h is below your minimum of %2$.2f €/h.</string>
     <string name="smart_ride_reason_skip_both">Why: %1$.2f €/km is below %2$.2f €/km, and %3$.2f €/h is below %4$.2f €/h.</string>
     <string name="smart_ride_reason_skip_generic">Why: the offer is below at least one CONSIDER threshold.</string>
-    <string name="smart_ride_calculation_note">The calculation includes pickup distance/time and the passenger trip.</string>
+    <string name="smart_ride_total_work">Total counted: %1$.2f km • %2$.0f min</string>
+    <string name="smart_ride_scope_without_return">The empty return is not included because it was not entered.</string>
+    <string name="smart_ride_scope_with_return">The empty return is included: %1$.2f km • %2$.0f min.</string>
+    <string name="smart_ride_calculation_note">The metrics include all explicitly entered work.</string>
     <string name="required">Required</string>
     <string name="smart_ride_field_price">price</string>
     <string name="smart_ride_field_pickup_km">pickup km</string>
     <string name="smart_ride_field_trip_km">trip km</string>
     <string name="smart_ride_field_pickup_minutes">pickup minutes</string>
     <string name="smart_ride_field_trip_minutes">trip minutes</string>
+    <string name="smart_ride_field_return_km">empty return km</string>
+    <string name="smart_ride_field_return_minutes">empty return minutes</string>
 
     <string name="device_form_factor_phone">phone</string>
     <string name="device_form_factor_tablet">tablet</string>

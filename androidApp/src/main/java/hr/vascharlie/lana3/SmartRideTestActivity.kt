@@ -14,6 +14,7 @@ import android.widget.TextView
 import androidx.core.content.edit
 import hr.vascharlie.lana3.core.ride.RideAcceptanceRules
 import hr.vascharlie.lana3.core.ride.RideAssessmentResult
+import hr.vascharlie.lana3.core.ride.RideCalculationScope
 import hr.vascharlie.lana3.core.ride.RideDecisionExplanation
 import hr.vascharlie.lana3.core.ride.RideDecisionReason
 import hr.vascharlie.lana3.core.ride.RideInvalidOfferReason
@@ -35,6 +36,8 @@ class SmartRideTestActivity : Activity() {
     private lateinit var tripKm: EditText
     private lateinit var pickupMinutes: EditText
     private lateinit var tripMinutes: EditText
+    private lateinit var emptyReturnKm: EditText
+    private lateinit var emptyReturnMinutes: EditText
 
     private lateinit var acceptMinEurPerKm: EditText
     private lateinit var considerMinEurPerKm: EditText
@@ -93,6 +96,24 @@ class SmartRideTestActivity : Activity() {
             root,
             getString(R.string.smart_ride_trip_minutes_label),
             getString(R.string.smart_ride_trip_minutes_hint),
+        )
+
+        addSectionTitle(root, getString(R.string.smart_ride_return_section))
+        root.addView(TextView(this).apply {
+            text = getString(R.string.smart_ride_return_description)
+            textSize = 13f
+            setPadding(0, 0, 0, 6)
+            setTextColor(Color.rgb(180, 195, 210))
+        })
+        emptyReturnKm = addNumberField(
+            root,
+            getString(R.string.smart_ride_return_km_label),
+            getString(R.string.smart_ride_return_km_hint),
+        )
+        emptyReturnMinutes = addNumberField(
+            root,
+            getString(R.string.smart_ride_return_minutes_label),
+            getString(R.string.smart_ride_return_minutes_hint),
         )
 
         addSectionTitle(root, getString(R.string.smart_ride_thresholds_section))
@@ -197,6 +218,8 @@ class SmartRideTestActivity : Activity() {
             tripKm = tripKm.decimalOrNull(),
             pickupMinutes = pickupMinutes.decimalOrNull(),
             tripMinutes = tripMinutes.decimalOrNull(),
+            emptyReturnKm = emptyReturnKm.decimalOrNull(),
+            emptyReturnMinutes = emptyReturnMinutes.decimalOrNull(),
         )
 
         resultText.text = when (val result = engine.assess(offer, rules)) {
@@ -250,6 +273,28 @@ class SmartRideTestActivity : Activity() {
                     eurPerKm = assessment.eurPerKm,
                     eurPerHour = assessment.eurPerHour,
                 )
+            )
+            append("\n")
+            append(
+                getString(
+                    R.string.smart_ride_total_work,
+                    assessment.totalKilometers,
+                    assessment.totalMinutes,
+                )
+            )
+            append("\n")
+            append(
+                when (assessment.calculationScope) {
+                    RideCalculationScope.PICKUP_AND_TRIP ->
+                        getString(R.string.smart_ride_scope_without_return)
+
+                    RideCalculationScope.PICKUP_TRIP_AND_EMPTY_RETURN ->
+                        getString(
+                            R.string.smart_ride_scope_with_return,
+                            assessment.emptyReturnKilometers,
+                            assessment.emptyReturnMinutes,
+                        )
+                }
             )
             append("\n\n")
             append(getString(R.string.smart_ride_calculation_note))
@@ -383,6 +428,8 @@ class SmartRideTestActivity : Activity() {
         "tripKm" -> getString(R.string.smart_ride_field_trip_km)
         "pickupMinutes" -> getString(R.string.smart_ride_field_pickup_minutes)
         "tripMinutes" -> getString(R.string.smart_ride_field_trip_minutes)
+        "emptyReturnKm" -> getString(R.string.smart_ride_field_return_km)
+        "emptyReturnMinutes" -> getString(R.string.smart_ride_field_return_minutes)
         else -> id
     }
 
