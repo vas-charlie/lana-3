@@ -55,6 +55,7 @@ Fast development is allowed only inside this discipline:
 - Active-task status in shared core is semantic and language-neutral rather than carrying English UI text.
 - Smart Ride Acceptance includes deterministic €/km and €/h calculation over pickup + passenger trip plus an optional explicitly entered empty return, validation of impossible/invalid inputs, structured language-neutral decision explanations (reason, applied thresholds, failed metrics), and an Android developer test screen.
 - Smart Ride does not invent thresholds and does not automate Uber/Bolt actions.
+- The Android Smart Ride surface now has a structured prefill contract so future voice, screen-awareness or integration adapters can hand off normalized offer fields without coupling those sources to Smart Ride business logic; automatic extraction itself is still pending.
 - Shared speech input/output ports are implemented with an Android Voice Lab adapter for STT/TTS testing.
 - Voice-to-note handoff prefills Notes Lab but does not silently persist recognized speech.
 - Offline local notes use a shared repository/service boundary with an Android app-private SQLite implementation.
