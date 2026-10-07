@@ -2,6 +2,17 @@ package hr.vascharlie.lana3.core.ride
 
 enum class RideRecommendation { ACCEPT, CONSIDER, SKIP }
 
+enum class RideDecisionReason {
+    MEETS_ACCEPT_THRESHOLDS,
+    MEETS_CONSIDER_THRESHOLDS,
+    BELOW_CONSIDER_THRESHOLDS,
+}
+
+enum class RideProfitabilityMetric {
+    EUR_PER_KM,
+    EUR_PER_HOUR,
+}
+
 data class RideOffer(
     val priceEur: Double?,
     val pickupKm: Double?,
@@ -33,6 +44,13 @@ enum class RideInvalidRuleReason {
     ACCEPT_HOUR_BELOW_CONSIDER,
 }
 
+data class RideDecisionExplanation(
+    val reason: RideDecisionReason,
+    val thresholdEurPerKm: Double,
+    val thresholdEurPerHour: Double,
+    val failedMetrics: List<RideProfitabilityMetric>,
+)
+
 data class RideAssessment(
     val recommendation: RideRecommendation,
     val priceEur: Double,
@@ -40,6 +58,7 @@ data class RideAssessment(
     val totalMinutes: Double,
     val eurPerKm: Double,
     val eurPerHour: Double,
+    val explanation: RideDecisionExplanation,
 )
 
 sealed interface RideAssessmentResult {
@@ -94,16 +113,48 @@ class SmartRideAcceptance {
         val eurPerKm = price / totalKm
         val eurPerHour = price / totalMinutes * 60.0
 
-        val recommendation = when {
+        val recommendation: RideRecommendation
+        val explanation: RideDecisionExplanation
+
+        when {
             eurPerKm >= rules.acceptMinEurPerKm &&
-                eurPerHour >= rules.acceptMinEurPerHour ->
-                RideRecommendation.ACCEPT
+                eurPerHour >= rules.acceptMinEurPerHour -> {
+                recommendation = RideRecommendation.ACCEPT
+                explanation = RideDecisionExplanation(
+                    reason = RideDecisionReason.MEETS_ACCEPT_THRESHOLDS,
+                    thresholdEurPerKm = rules.acceptMinEurPerKm,
+                    thresholdEurPerHour = rules.acceptMinEurPerHour,
+                    failedMetrics = emptyList(),
+                )
+            }
 
             eurPerKm >= rules.considerMinEurPerKm &&
-                eurPerHour >= rules.considerMinEurPerHour ->
-                RideRecommendation.CONSIDER
+                eurPerHour >= rules.considerMinEurPerHour -> {
+                recommendation = RideRecommendation.CONSIDER
+                explanation = RideDecisionExplanation(
+                    reason = RideDecisionReason.MEETS_CONSIDER_THRESHOLDS,
+                    thresholdEurPerKm = rules.considerMinEurPerKm,
+                    thresholdEurPerHour = rules.considerMinEurPerHour,
+                    failedMetrics = emptyList(),
+                )
+            }
 
-            else -> RideRecommendation.SKIP
+            else -> {
+                recommendation = RideRecommendation.SKIP
+                explanation = RideDecisionExplanation(
+                    reason = RideDecisionReason.BELOW_CONSIDER_THRESHOLDS,
+                    thresholdEurPerKm = rules.considerMinEurPerKm,
+                    thresholdEurPerHour = rules.considerMinEurPerHour,
+                    failedMetrics = buildList {
+                        if (eurPerKm < rules.considerMinEurPerKm) {
+                            add(RideProfitabilityMetric.EUR_PER_KM)
+                        }
+                        if (eurPerHour < rules.considerMinEurPerHour) {
+                            add(RideProfitabilityMetric.EUR_PER_HOUR)
+                        }
+                    },
+                )
+            }
         }
 
         return RideAssessmentResult.Assessed(
@@ -114,6 +165,7 @@ class SmartRideAcceptance {
                 totalMinutes = totalMinutes,
                 eurPerKm = eurPerKm,
                 eurPerHour = eurPerHour,
+                explanation = explanation,
             )
         )
     }
