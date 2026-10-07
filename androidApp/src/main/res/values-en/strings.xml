@@ -29,6 +29,11 @@
     <string name="voice_speak_text">LANA speaks the text</string>
     <string name="voice_stop_speaking">Stop speaking</string>
     <string name="voice_to_note">Turn text into a note</string>
+    <string name="voice_to_smart_ride">Send offer to Smart Ride</string>
+    <string name="voice_no_text_for_smart_ride">There is no text from which LANA can prepare offer data.</string>
+    <string name="voice_smart_ride_unsupported_language">Local speech-to-offer parsing is not yet supported for %1$s. LANA will not guess.</string>
+    <string name="voice_smart_ride_no_recognized_data">No clearly labelled offer data was recognized. Example: price 20 euros, pickup 3 km 5 minutes, trip 8 km 15 minutes.</string>
+    <string name="voice_sent_to_smart_ride">Recognized offer fields: %1$d. Smart Ride is open for review.</string>
     <string name="back">Back</string>
     <string name="voice_stopping_listen">Stopping listening…</string>
     <string name="voice_speaking_stopped">Speech stopped.</string>
@@ -92,6 +97,7 @@
     <string name="smart_ride_description">Test screen. LANA does not accept a ride automatically. Enter the real offer data and your thresholds.</string>
     <string name="smart_ride_prefill_received">Structured offer data was loaded. Review it before evaluation.</string>
     <string name="smart_ride_prefill_received_with_source">Structured offer data was loaded from %1$s. Review it before evaluation.</string>
+    <string name="smart_ride_source_voice">LANA Voice Lab</string>
     <string name="smart_ride_offer_section">Offer</string>
     <string name="smart_ride_price_label">Ride price (€)</string>
     <string name="smart_ride_price_hint">e.g. 18.50</string>

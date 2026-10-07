@@ -18,6 +18,8 @@ data class SmartRidePrefill(
 object SmartRidePrefillContract {
     private const val PREFIX = "hr.vascharlie.lana3.smart_ride."
 
+    const val SOURCE_VOICE = "voice"
+
     const val EXTRA_SOURCE = PREFIX + "source"
     const val EXTRA_PRICE_EUR = PREFIX + "price_eur"
     const val EXTRA_PICKUP_KM = PREFIX + "pickup_km"

@@ -39,6 +39,11 @@
     <string name="voice_speak_text">LANA izgovori tekst</string>
     <string name="voice_stop_speaking">Zaustavi govor</string>
     <string name="voice_to_note">Pretvori tekst u bilješku</string>
+    <string name="voice_to_smart_ride">Pošalji ponudu u Smart Ride</string>
+    <string name="voice_no_text_for_smart_ride">Nema teksta iz kojeg bi LANA mogla pripremiti podatke ponude.</string>
+    <string name="voice_smart_ride_unsupported_language">Lokalno čitanje ponude iz govora još nije podržano za %1$s. LANA neće pogađati.</string>
+    <string name="voice_smart_ride_no_recognized_data">Nisu prepoznati jasno označeni podaci ponude. Primjer: cijena 20 eura, dolazak 3 km 5 minuta, vožnja 8 km 15 minuta.</string>
+    <string name="voice_sent_to_smart_ride">Prepoznatih polja ponude: %1$d. Smart Ride je otvoren za pregled.</string>
     <string name="back">Natrag</string>
     <string name="voice_stopping_listen">Zaustavljam slušanje…</string>
     <string name="voice_speaking_stopped">Govor zaustavljen.</string>
@@ -104,6 +109,7 @@
     <string name="smart_ride_description">Testni ekran. LANA ne prihvaća vožnju automatski. Unesi stvarne podatke ponude i svoje pragove.</string>
     <string name="smart_ride_prefill_received">Strukturirani podaci ponude su učitani. Pregledaj ih prije procjene.</string>
     <string name="smart_ride_prefill_received_with_source">Strukturirani podaci ponude učitani su iz izvora %1$s. Pregledaj ih prije procjene.</string>
+    <string name="smart_ride_source_voice">LANA Voice Lab</string>
     <string name="smart_ride_offer_section">Ponuda</string>
     <string name="smart_ride_price_label">Cijena vožnje (€)</string>
     <string name="smart_ride_price_hint">npr. 18,50</string>

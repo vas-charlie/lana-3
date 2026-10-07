@@ -13,6 +13,9 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
+import hr.vascharlie.lana3.core.ride.LabeledRideOfferTranscriptNormalizer
+import hr.vascharlie.lana3.core.ride.RideOfferTranscriptNormalizer
+import hr.vascharlie.lana3.core.ride.RideOfferTranscriptResult
 import hr.vascharlie.lana3.ports.SpeechInputEvent
 import hr.vascharlie.lana3.ports.SpeechInputPort
 import hr.vascharlie.lana3.ports.SpeechInputRequest
@@ -28,6 +31,8 @@ class VoiceTestActivity : Activity() {
 
     private lateinit var speechInput: SpeechInputPort
     private lateinit var speechOutput: SpeechOutputPort
+    private val rideTranscriptNormalizer: RideOfferTranscriptNormalizer =
+        LabeledRideOfferTranscriptNormalizer()
     private lateinit var inputAdapter: AndroidSpeechInputAdapter
     private lateinit var outputAdapter: AndroidSpeechOutputAdapter
 
@@ -137,6 +142,12 @@ class VoiceTestActivity : Activity() {
             text = getString(R.string.voice_to_note)
             isAllCaps = false
             setOnClickListener { handOffToNotes() }
+        })
+
+        root.addView(Button(this).apply {
+            text = getString(R.string.voice_to_smart_ride)
+            isAllCaps = false
+            setOnClickListener { handOffToSmartRide() }
         })
 
         root.addView(Button(this).apply {
@@ -338,6 +349,63 @@ class VoiceTestActivity : Activity() {
             }
         )
         status.text = getString(R.string.voice_sent_to_notes)
+    }
+
+    private fun handOffToSmartRide() {
+        val text = transcript
+            .text
+            ?.toString()
+            ?.trim()
+            .orEmpty()
+
+        if (text.isBlank()) {
+            status.text = getString(R.string.voice_no_text_for_smart_ride)
+            return
+        }
+
+        val requestedLanguage = languageTag
+            .text
+            ?.toString()
+            ?.trim()
+            ?.takeIf { it.isNotEmpty() }
+            ?: Locale.getDefault().toLanguageTag()
+
+        when (
+            val parsed = rideTranscriptNormalizer.normalize(
+                transcript = text,
+                languageTag = requestedLanguage,
+            )
+        ) {
+            is RideOfferTranscriptResult.UnsupportedLanguage -> {
+                status.text = getString(
+                    R.string.voice_smart_ride_unsupported_language,
+                    parsed.languageTag ?: requestedLanguage,
+                )
+            }
+
+            RideOfferTranscriptResult.NoRecognizedData -> {
+                status.text = getString(
+                    R.string.voice_smart_ride_no_recognized_data,
+                )
+            }
+
+            is RideOfferTranscriptResult.Parsed -> {
+                val smartRideIntent =
+                    Intent(this, SmartRideTestActivity::class.java)
+
+                SmartRidePrefillContract.write(
+                    intent = smartRideIntent,
+                    offer = parsed.offer,
+                    source = SmartRidePrefillContract.SOURCE_VOICE,
+                )
+
+                startActivity(smartRideIntent)
+                status.text = getString(
+                    R.string.voice_sent_to_smart_ride,
+                    parsed.recognizedFields.size,
+                )
+            }
+        }
     }
 
     private fun speakTranscript() {
