@@ -138,6 +138,12 @@
     <string name="smart_ride_recommend_consider">RAZMOTRI</string>
     <string name="smart_ride_recommend_skip">PRESKOČI</string>
     <string name="smart_ride_metrics">%1$.2f €/km • %2$.2f €/h</string>
+    <string name="smart_ride_reason_accept">Zašto: oba rezultata zadovoljavaju tvoje PRIHVATI pragove, najmanje %1$.2f €/km i %2$.2f €/h.</string>
+    <string name="smart_ride_reason_consider">Zašto: oba rezultata zadovoljavaju tvoje RAZMOTRI pragove, najmanje %1$.2f €/km i %2$.2f €/h.</string>
+    <string name="smart_ride_reason_skip_km">Zašto: %1$.2f €/km je ispod tvog minimuma %2$.2f €/km.</string>
+    <string name="smart_ride_reason_skip_hour">Zašto: %1$.2f €/h je ispod tvog minimuma %2$.2f €/h.</string>
+    <string name="smart_ride_reason_skip_both">Zašto: %1$.2f €/km je ispod %2$.2f €/km, a %3$.2f €/h je ispod %4$.2f €/h.</string>
+    <string name="smart_ride_reason_skip_generic">Zašto: ponuda je ispod najmanje jednog RAZMOTRI praga.</string>
     <string name="smart_ride_calculation_note">Račun uključuje dolazak do putnika i samu vožnju.</string>
     <string name="required">Obavezno</string>
     <string name="smart_ride_field_price">cijena</string>
