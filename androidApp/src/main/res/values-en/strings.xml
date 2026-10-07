@@ -97,6 +97,8 @@
     <string name="smart_ride_description">Test screen. LANA does not accept a ride automatically. Enter the real offer data and your thresholds.</string>
     <string name="smart_ride_prefill_received">Structured offer data was loaded. Review it before evaluation.</string>
     <string name="smart_ride_prefill_received_with_source">Structured offer data was loaded from %1$s. Review it before evaluation.</string>
+    <string name="smart_ride_prefill_waiting_for_thresholds">The offer is ready, but your thresholds have not been saved yet. Enter them once, then evaluate the ride.</string>
+    <string name="smart_ride_auto_evaluated">Enough data and saved thresholds are available. LANA calculated the recommendation immediately.</string>
     <string name="smart_ride_source_voice">LANA Voice Lab</string>
     <string name="smart_ride_offer_section">Offer</string>
     <string name="smart_ride_price_label">Ride price (€)</string>
