@@ -177,7 +177,7 @@ class LabeledRideOfferTranscriptNormalizer : RideOfferTranscriptNormalizer {
 
     private fun extractMinutes(section: String): Double? =
         Regex(
-            "($NUMBER_PATTERN)\\s*(?:min\\.?\\b|minuta\\b|minutu\\b|" +
+            "($NUMBER_PATTERN)\\s*(?:min(?:\\.|\\b)|minuta\\b|minutu\\b|" +
                 "minute\\b|minuti\\b|minutes?\\b)",
             RegexOption.IGNORE_CASE,
         ).find(section)
