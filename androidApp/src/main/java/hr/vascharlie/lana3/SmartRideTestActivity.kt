@@ -214,7 +214,7 @@ class SmartRideTestActivity : Activity() {
         emptyReturnKm.setKnownDecimal(prefill.offer.emptyReturnKm)
         emptyReturnMinutes.setKnownDecimal(prefill.offer.emptyReturnMinutes)
 
-        resultText.text =
+        val sourceNotice =
             if (prefill.source == null) {
                 getString(R.string.smart_ride_prefill_received)
             } else {
@@ -223,6 +223,31 @@ class SmartRideTestActivity : Activity() {
                     humanPrefillSource(prefill.source),
                 )
             }
+
+        val rules = readRulesOrNull(showFieldErrors = false)
+        if (rules == null) {
+            resultText.text =
+                sourceNotice +
+                    "\n\n" +
+                    getString(R.string.smart_ride_prefill_waiting_for_thresholds)
+            return
+        }
+
+        when (val result = engine.assess(prefill.offer, rules)) {
+            is RideAssessmentResult.InsufficientData -> {
+                resultText.text =
+                    sourceNotice +
+                        "\n\n" +
+                        formatAssessmentResult(result)
+            }
+
+            else -> {
+                resultText.text =
+                    getString(R.string.smart_ride_auto_evaluated) +
+                        "\n\n" +
+                        formatAssessmentResult(result)
+            }
+        }
     }
 
     private fun humanPrefillSource(source: String): String =
@@ -242,8 +267,13 @@ class SmartRideTestActivity : Activity() {
         }
 
         saveRules(rules)
+        resultText.text = formatAssessmentResult(
+            engine.assess(currentOffer(), rules)
+        )
+    }
 
-        val offer = RideOffer(
+    private fun currentOffer(): RideOffer =
+        RideOffer(
             priceEur = priceEur.decimalOrNull(),
             pickupKm = pickupKm.decimalOrNull(),
             tripKm = tripKm.decimalOrNull(),
@@ -253,28 +283,30 @@ class SmartRideTestActivity : Activity() {
             emptyReturnMinutes = emptyReturnMinutes.decimalOrNull(),
         )
 
-        resultText.text = when (val result = engine.assess(offer, rules)) {
-            is RideAssessmentResult.Assessed -> formatAssessment(result)
-            is RideAssessmentResult.InsufficientData ->
-                getString(
-                    R.string.smart_ride_missing_offer_data,
-                    result.missingFields.joinToString { humanFieldName(it) },
-                )
+    private fun formatAssessmentResult(
+        result: RideAssessmentResult,
+    ): String = when (result) {
+        is RideAssessmentResult.Assessed -> formatAssessment(result)
 
-            is RideAssessmentResult.InvalidOffer ->
-                getString(R.string.smart_ride_invalid_offer_header) +
-                    "\n" +
-                    result.reasons.joinToString(separator = "\n") {
-                        "• " + humanOfferInvalidReason(it)
-                    }
+        is RideAssessmentResult.InsufficientData ->
+            getString(
+                R.string.smart_ride_missing_offer_data,
+                result.missingFields.joinToString { humanFieldName(it) },
+            )
 
-            is RideAssessmentResult.InvalidRules ->
-                getString(R.string.smart_ride_invalid_rules_header) +
-                    "\n" +
-                    result.reasons.joinToString(separator = "\n") {
-                        "• " + humanRuleInvalidReason(it)
-                    }
-        }
+        is RideAssessmentResult.InvalidOffer ->
+            getString(R.string.smart_ride_invalid_offer_header) +
+                "\n" +
+                result.reasons.joinToString(separator = "\n") {
+                    "• " + humanOfferInvalidReason(it)
+                }
+
+        is RideAssessmentResult.InvalidRules ->
+            getString(R.string.smart_ride_invalid_rules_header) +
+                "\n" +
+                result.reasons.joinToString(separator = "\n") {
+                    "• " + humanRuleInvalidReason(it)
+                }
     }
 
     private fun formatAssessment(
@@ -387,11 +419,13 @@ class SmartRideTestActivity : Activity() {
         }
     }
 
-    private fun readRulesOrNull(): RideAcceptanceRules? {
-        val considerKm = requireRule(considerMinEurPerKm)
-        val acceptKm = requireRule(acceptMinEurPerKm)
-        val considerHour = requireRule(considerMinEurPerHour)
-        val acceptHour = requireRule(acceptMinEurPerHour)
+    private fun readRulesOrNull(
+        showFieldErrors: Boolean = true,
+    ): RideAcceptanceRules? {
+        val considerKm = requireRule(considerMinEurPerKm, showFieldErrors)
+        val acceptKm = requireRule(acceptMinEurPerKm, showFieldErrors)
+        val considerHour = requireRule(considerMinEurPerHour, showFieldErrors)
+        val acceptHour = requireRule(acceptMinEurPerHour, showFieldErrors)
 
         if (
             considerKm == null ||
@@ -410,9 +444,12 @@ class SmartRideTestActivity : Activity() {
         )
     }
 
-    private fun requireRule(field: EditText): Double? {
+    private fun requireRule(
+        field: EditText,
+        showFieldError: Boolean,
+    ): Double? {
         val value = field.decimalOrNull()
-        if (value == null) {
+        if (value == null && showFieldError) {
             field.error = getString(R.string.required)
         }
         return value
