@@ -88,6 +88,9 @@ jobs:
             -PlanaVersionCode=${GITHUB_RUN_NUMBER} \
             -PlanaVersionName="0.1.${GITHUB_RUN_NUMBER}-dev"
 
+      - name: Verify Android application classes are packaged
+        run: python3 scripts/verify_android_apk_classes.py androidApp/build/outputs/apk/debug/androidApp-debug.apk
+
       - name: Upload developer preview APK
         uses: actions/upload-artifact@v4
         with:
@@ -144,6 +147,9 @@ jobs:
             -PlanaSigningStorePassword="$CI_SIGNING_PASSWORD" \
             -PlanaSigningKeyAlias="$CI_SIGNING_ALIAS" \
             -PlanaSigningKeyPassword="$CI_SIGNING_PASSWORD"
+
+      - name: Verify Android application classes are packaged in release
+        run: python3 scripts/verify_android_apk_classes.py androidApp/build/outputs/apk/release/androidApp-release.apk
 
       - name: Verify ephemeral release signature
         run: |

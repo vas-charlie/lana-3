@@ -1,5 +1,6 @@
 plugins {
     id("com.android.application")
+    kotlin("android")
 }
 
 val lanaVersionCode = providers.gradleProperty("lanaVersionCode")
@@ -18,6 +19,15 @@ val lanaSigningKeyPassword = providers.gradleProperty("lanaSigningKeyPassword").
 android {
     namespace = "hr.vascharlie.lana3"
     compileSdk = 36
+
+    compileOptions {
+        sourceCompatibility = JavaVersion.VERSION_17
+        targetCompatibility = JavaVersion.VERSION_17
+    }
+
+    buildFeatures {
+        buildConfig = true
+    }
 
     defaultConfig {
         applicationId = "hr.vascharlie.lana3"
