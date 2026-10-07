@@ -28,7 +28,18 @@ class SmartRideTranscriptNormalizerTest {
         assertEquals(20.0, parsed.offer.tripMinutes)
         assertEquals(10.0, parsed.offer.emptyReturnKm)
         assertEquals(15.0, parsed.offer.emptyReturnMinutes)
-        assertEquals(RideOfferField.entries.toSet(), parsed.recognizedFields)
+        assertEquals(
+            setOf(
+                RideOfferField.PRICE_EUR,
+                RideOfferField.PICKUP_KM,
+                RideOfferField.TRIP_KM,
+                RideOfferField.PICKUP_MINUTES,
+                RideOfferField.TRIP_MINUTES,
+                RideOfferField.EMPTY_RETURN_KM,
+                RideOfferField.EMPTY_RETURN_MINUTES,
+            ),
+            parsed.recognizedFields,
+        )
     }
 
     @Test
