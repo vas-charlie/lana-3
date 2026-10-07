@@ -27,6 +27,13 @@ class SmartRideAcceptanceTest {
         assertEquals(30.0, assessed.assessment.totalMinutes)
         assertEquals(2.0, assessed.assessment.eurPerKm)
         assertEquals(60.0, assessed.assessment.eurPerHour)
+        assertEquals(
+            RideDecisionReason.MEETS_ACCEPT_THRESHOLDS,
+            assessed.assessment.explanation.reason,
+        )
+        assertEquals(1.50, assessed.assessment.explanation.thresholdEurPerKm)
+        assertEquals(30.0, assessed.assessment.explanation.thresholdEurPerHour)
+        assertTrue(assessed.assessment.explanation.failedMetrics.isEmpty())
     }
 
     @Test
@@ -37,6 +44,13 @@ class SmartRideAcceptanceTest {
         )
         val assessed = assertIs<RideAssessmentResult.Assessed>(result)
         assertEquals(RideRecommendation.CONSIDER, assessed.assessment.recommendation)
+        assertEquals(
+            RideDecisionReason.MEETS_CONSIDER_THRESHOLDS,
+            assessed.assessment.explanation.reason,
+        )
+        assertEquals(1.00, assessed.assessment.explanation.thresholdEurPerKm)
+        assertEquals(20.0, assessed.assessment.explanation.thresholdEurPerHour)
+        assertTrue(assessed.assessment.explanation.failedMetrics.isEmpty())
     }
 
     @Test
@@ -47,6 +61,34 @@ class SmartRideAcceptanceTest {
         )
         val assessed = assertIs<RideAssessmentResult.Assessed>(result)
         assertEquals(RideRecommendation.SKIP, assessed.assessment.recommendation)
+        assertEquals(
+            RideDecisionReason.BELOW_CONSIDER_THRESHOLDS,
+            assessed.assessment.explanation.reason,
+        )
+        assertEquals(
+            listOf(
+                RideProfitabilityMetric.EUR_PER_KM,
+                RideProfitabilityMetric.EUR_PER_HOUR,
+            ),
+            assessed.assessment.explanation.failedMetrics,
+        )
+    }
+
+    @Test
+    fun skipExplanationNamesOnlyTheMetricThatMissedTheMinimum() {
+        val result = engine.assess(
+            RideOffer(20.0, 2.0, 8.0, 20.0, 50.0),
+            rules,
+        )
+
+        val assessed = assertIs<RideAssessmentResult.Assessed>(result)
+        assertEquals(RideRecommendation.SKIP, assessed.assessment.recommendation)
+        assertEquals(
+            listOf(RideProfitabilityMetric.EUR_PER_HOUR),
+            assessed.assessment.explanation.failedMetrics,
+        )
+        assertEquals(1.00, assessed.assessment.explanation.thresholdEurPerKm)
+        assertEquals(20.0, assessed.assessment.explanation.thresholdEurPerHour)
     }
 
     @Test
