@@ -17,24 +17,46 @@ data class RideAcceptanceRules(
     val considerMinEurPerHour: Double,
 )
 
+enum class RideInvalidOfferReason {
+    NON_FINITE_METRIC,
+    NEGATIVE_PRICE,
+    NEGATIVE_DISTANCE,
+    NEGATIVE_TIME,
+    NON_POSITIVE_TOTAL_DISTANCE,
+    NON_POSITIVE_TOTAL_TIME,
+}
+
+enum class RideInvalidRuleReason {
+    NON_FINITE_THRESHOLD,
+    NEGATIVE_THRESHOLD,
+    ACCEPT_KM_BELOW_CONSIDER,
+    ACCEPT_HOUR_BELOW_CONSIDER,
+}
+
 data class RideAssessment(
     val recommendation: RideRecommendation,
+    val priceEur: Double,
+    val totalKilometers: Double,
+    val totalMinutes: Double,
     val eurPerKm: Double,
     val eurPerHour: Double,
-    val reasons: List<String>,
 )
 
 sealed interface RideAssessmentResult {
     data class Assessed(val assessment: RideAssessment) : RideAssessmentResult
     data class InsufficientData(val missingFields: List<String>) : RideAssessmentResult
-    data class InvalidOffer(val reasons: List<String>) : RideAssessmentResult
-    data class InvalidRules(val reasons: List<String>) : RideAssessmentResult
+    data class InvalidOffer(val reasons: List<RideInvalidOfferReason>) : RideAssessmentResult
+    data class InvalidRules(val reasons: List<RideInvalidRuleReason>) : RideAssessmentResult
 }
 
 /**
  * Deterministic first slice of Smart Ride Acceptance.
  * Uses the full known work of an offer: pickup + passenger trip distance/time.
  * No threshold is invented by the engine; Charlie's configured rules are required.
+ *
+ * The shared core returns semantic result codes and numeric evidence only. Human-readable
+ * wording belongs to the presentation layer so the same decision can be rendered in any
+ * supported language.
  */
 class SmartRideAcceptance {
     fun assess(offer: RideOffer, rules: RideAcceptanceRules): RideAssessmentResult {
@@ -87,20 +109,18 @@ class SmartRideAcceptance {
         return RideAssessmentResult.Assessed(
             RideAssessment(
                 recommendation = recommendation,
+                priceEur = price,
+                totalKilometers = totalKm,
+                totalMinutes = totalMinutes,
                 eurPerKm = eurPerKm,
                 eurPerHour = eurPerHour,
-                reasons = listOf(
-                    "Price: $price EUR",
-                    "Total distance including pickup: $totalKm km",
-                    "Total time including pickup: $totalMinutes min",
-                    "EUR/km: $eurPerKm",
-                    "EUR/h: $eurPerHour",
-                ),
             )
         )
     }
 
-    private fun validateRules(rules: RideAcceptanceRules): List<String>? {
+    private fun validateRules(
+        rules: RideAcceptanceRules,
+    ): List<RideInvalidRuleReason>? {
         val reasons = buildList {
             val values = listOf(
                 rules.acceptMinEurPerKm,
@@ -110,16 +130,16 @@ class SmartRideAcceptance {
             )
 
             if (values.any { !it.isFinite() }) {
-                add("Rule thresholds must be finite numbers.")
+                add(RideInvalidRuleReason.NON_FINITE_THRESHOLD)
             }
             if (values.any { it < 0.0 }) {
-                add("Rule thresholds must not be negative.")
+                add(RideInvalidRuleReason.NEGATIVE_THRESHOLD)
             }
             if (rules.acceptMinEurPerKm < rules.considerMinEurPerKm) {
-                add("Accept EUR/km threshold must be at least the consider threshold.")
+                add(RideInvalidRuleReason.ACCEPT_KM_BELOW_CONSIDER)
             }
             if (rules.acceptMinEurPerHour < rules.considerMinEurPerHour) {
-                add("Accept EUR/h threshold must be at least the consider threshold.")
+                add(RideInvalidRuleReason.ACCEPT_HOUR_BELOW_CONSIDER)
             }
         }
 
@@ -132,7 +152,7 @@ class SmartRideAcceptance {
         tripKm: Double,
         pickupMinutes: Double,
         tripMinutes: Double,
-    ): List<String>? {
+    ): List<RideInvalidOfferReason>? {
         val reasons = buildList {
             val values = listOf(
                 price,
@@ -143,22 +163,22 @@ class SmartRideAcceptance {
             )
 
             if (values.any { !it.isFinite() }) {
-                add("Offer metrics must be finite numbers.")
+                add(RideInvalidOfferReason.NON_FINITE_METRIC)
             }
             if (price < 0.0) {
-                add("Price must not be negative.")
+                add(RideInvalidOfferReason.NEGATIVE_PRICE)
             }
             if (pickupKm < 0.0 || tripKm < 0.0) {
-                add("Pickup and trip distance must not be negative.")
+                add(RideInvalidOfferReason.NEGATIVE_DISTANCE)
             }
             if (pickupMinutes < 0.0 || tripMinutes < 0.0) {
-                add("Pickup and trip time must not be negative.")
+                add(RideInvalidOfferReason.NEGATIVE_TIME)
             }
             if (pickupKm + tripKm <= 0.0) {
-                add("Total distance must be greater than zero.")
+                add(RideInvalidOfferReason.NON_POSITIVE_TOTAL_DISTANCE)
             }
             if (pickupMinutes + tripMinutes <= 0.0) {
-                add("Total time must be greater than zero.")
+                add(RideInvalidOfferReason.NON_POSITIVE_TOTAL_TIME)
             }
         }
 

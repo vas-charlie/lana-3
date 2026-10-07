@@ -124,6 +124,16 @@
     <string name="smart_ride_missing_offer_data">Nedostaju podaci ponude: %1$s</string>
     <string name="smart_ride_invalid_offer_header">Neispravni podaci ponude:</string>
     <string name="smart_ride_invalid_rules_header">Neispravni pragovi:</string>
+    <string name="smart_ride_invalid_offer_non_finite">Podaci ponude moraju biti konačni brojevi.</string>
+    <string name="smart_ride_invalid_offer_negative_price">Cijena ne smije biti negativna.</string>
+    <string name="smart_ride_invalid_offer_negative_distance">Udaljenost do putnika i udaljenost vožnje ne smiju biti negativne.</string>
+    <string name="smart_ride_invalid_offer_negative_time">Vrijeme dolaska i vrijeme vožnje ne smiju biti negativni.</string>
+    <string name="smart_ride_invalid_offer_total_distance">Ukupna udaljenost mora biti veća od nule.</string>
+    <string name="smart_ride_invalid_offer_total_time">Ukupno vrijeme mora biti veće od nule.</string>
+    <string name="smart_ride_invalid_rule_non_finite">Pragovi moraju biti konačni brojevi.</string>
+    <string name="smart_ride_invalid_rule_negative">Pragovi ne smiju biti negativni.</string>
+    <string name="smart_ride_invalid_rule_accept_km">Prag PRIHVATI za €/km mora biti najmanje jednak pragu RAZMOTRI.</string>
+    <string name="smart_ride_invalid_rule_accept_hour">Prag PRIHVATI za €/h mora biti najmanje jednak pragu RAZMOTRI.</string>
     <string name="smart_ride_recommend_accept">PRIHVATI</string>
     <string name="smart_ride_recommend_consider">RAZMOTRI</string>
     <string name="smart_ride_recommend_skip">PRESKOČI</string>

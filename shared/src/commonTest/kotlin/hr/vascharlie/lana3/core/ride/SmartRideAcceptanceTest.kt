@@ -22,6 +22,9 @@ class SmartRideAcceptanceTest {
         )
         val assessed = assertIs<RideAssessmentResult.Assessed>(result)
         assertEquals(RideRecommendation.ACCEPT, assessed.assessment.recommendation)
+        assertEquals(30.0, assessed.assessment.priceEur)
+        assertEquals(15.0, assessed.assessment.totalKilometers)
+        assertEquals(30.0, assessed.assessment.totalMinutes)
         assertEquals(2.0, assessed.assessment.eurPerKm)
         assertEquals(60.0, assessed.assessment.eurPerHour)
     }
@@ -76,11 +79,7 @@ class SmartRideAcceptanceTest {
         )
 
         val invalid = assertIs<RideAssessmentResult.InvalidOffer>(result)
-        assertTrue(
-            invalid.reasons.any {
-                it.contains("distance", ignoreCase = true)
-            }
-        )
+        assertTrue(RideInvalidOfferReason.NEGATIVE_DISTANCE in invalid.reasons)
     }
 
     @Test
@@ -91,11 +90,7 @@ class SmartRideAcceptanceTest {
         )
 
         val invalid = assertIs<RideAssessmentResult.InvalidOffer>(result)
-        assertTrue(
-            invalid.reasons.any {
-                it.contains("time", ignoreCase = true)
-            }
-        )
+        assertTrue(RideInvalidOfferReason.NEGATIVE_TIME in invalid.reasons)
     }
 
     @Test
@@ -106,11 +101,7 @@ class SmartRideAcceptanceTest {
         )
 
         val invalid = assertIs<RideAssessmentResult.InvalidOffer>(result)
-        assertTrue(
-            invalid.reasons.any {
-                it.contains("finite", ignoreCase = true)
-            }
-        )
+        assertTrue(RideInvalidOfferReason.NON_FINITE_METRIC in invalid.reasons)
     }
 
     @Test
@@ -125,11 +116,7 @@ class SmartRideAcceptanceTest {
         )
 
         val invalid = assertIs<RideAssessmentResult.InvalidRules>(result)
-        assertTrue(
-            invalid.reasons.any {
-                it.contains("negative", ignoreCase = true)
-            }
-        )
+        assertTrue(RideInvalidRuleReason.NEGATIVE_THRESHOLD in invalid.reasons)
     }
 
     @Test
@@ -146,9 +133,7 @@ class SmartRideAcceptanceTest {
 
         val invalid = assertIs<RideAssessmentResult.InvalidRules>(result)
         assertTrue(
-            invalid.reasons.any {
-                it.contains("accept EUR/h", ignoreCase = true)
-            }
+            RideInvalidRuleReason.ACCEPT_HOUR_BELOW_CONSIDER in invalid.reasons
         )
     }
 
@@ -161,9 +146,7 @@ class SmartRideAcceptanceTest {
 
         val invalid = assertIs<RideAssessmentResult.InvalidOffer>(result)
         assertTrue(
-            invalid.reasons.any {
-                it.contains("distance", ignoreCase = true)
-            }
+            RideInvalidOfferReason.NON_POSITIVE_TOTAL_DISTANCE in invalid.reasons
         )
     }
 
@@ -176,9 +159,7 @@ class SmartRideAcceptanceTest {
 
         val invalid = assertIs<RideAssessmentResult.InvalidOffer>(result)
         assertTrue(
-            invalid.reasons.any {
-                it.contains("time", ignoreCase = true)
-            }
+            RideInvalidOfferReason.NON_POSITIVE_TOTAL_TIME in invalid.reasons
         )
     }
 }

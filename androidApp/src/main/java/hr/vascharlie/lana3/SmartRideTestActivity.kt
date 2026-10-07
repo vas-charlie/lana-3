@@ -14,6 +14,8 @@ import android.widget.TextView
 import androidx.core.content.edit
 import hr.vascharlie.lana3.core.ride.RideAcceptanceRules
 import hr.vascharlie.lana3.core.ride.RideAssessmentResult
+import hr.vascharlie.lana3.core.ride.RideInvalidOfferReason
+import hr.vascharlie.lana3.core.ride.RideInvalidRuleReason
 import hr.vascharlie.lana3.core.ride.RideOffer
 import hr.vascharlie.lana3.core.ride.RideRecommendation
 import hr.vascharlie.lana3.core.ride.SmartRideAcceptance
@@ -205,12 +207,16 @@ class SmartRideTestActivity : Activity() {
             is RideAssessmentResult.InvalidOffer ->
                 getString(R.string.smart_ride_invalid_offer_header) +
                     "\n" +
-                    result.reasons.joinToString(separator = "\n") { "• $it" }
+                    result.reasons.joinToString(separator = "\n") {
+                        "• " + humanOfferInvalidReason(it)
+                    }
 
             is RideAssessmentResult.InvalidRules ->
                 getString(R.string.smart_ride_invalid_rules_header) +
                     "\n" +
-                    result.reasons.joinToString(separator = "\n") { "• $it" }
+                    result.reasons.joinToString(separator = "\n") {
+                        "• " + humanRuleInvalidReason(it)
+                    }
         }
     }
 
@@ -312,5 +318,43 @@ class SmartRideTestActivity : Activity() {
         "pickupMinutes" -> getString(R.string.smart_ride_field_pickup_minutes)
         "tripMinutes" -> getString(R.string.smart_ride_field_trip_minutes)
         else -> id
+    }
+
+    private fun humanOfferInvalidReason(
+        reason: RideInvalidOfferReason,
+    ): String = when (reason) {
+        RideInvalidOfferReason.NON_FINITE_METRIC ->
+            getString(R.string.smart_ride_invalid_offer_non_finite)
+
+        RideInvalidOfferReason.NEGATIVE_PRICE ->
+            getString(R.string.smart_ride_invalid_offer_negative_price)
+
+        RideInvalidOfferReason.NEGATIVE_DISTANCE ->
+            getString(R.string.smart_ride_invalid_offer_negative_distance)
+
+        RideInvalidOfferReason.NEGATIVE_TIME ->
+            getString(R.string.smart_ride_invalid_offer_negative_time)
+
+        RideInvalidOfferReason.NON_POSITIVE_TOTAL_DISTANCE ->
+            getString(R.string.smart_ride_invalid_offer_total_distance)
+
+        RideInvalidOfferReason.NON_POSITIVE_TOTAL_TIME ->
+            getString(R.string.smart_ride_invalid_offer_total_time)
+    }
+
+    private fun humanRuleInvalidReason(
+        reason: RideInvalidRuleReason,
+    ): String = when (reason) {
+        RideInvalidRuleReason.NON_FINITE_THRESHOLD ->
+            getString(R.string.smart_ride_invalid_rule_non_finite)
+
+        RideInvalidRuleReason.NEGATIVE_THRESHOLD ->
+            getString(R.string.smart_ride_invalid_rule_negative)
+
+        RideInvalidRuleReason.ACCEPT_KM_BELOW_CONSIDER ->
+            getString(R.string.smart_ride_invalid_rule_accept_km)
+
+        RideInvalidRuleReason.ACCEPT_HOUR_BELOW_CONSIDER ->
+            getString(R.string.smart_ride_invalid_rule_accept_hour)
     }
 }
