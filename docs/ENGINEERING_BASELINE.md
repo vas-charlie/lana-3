@@ -55,9 +55,10 @@ Fast development is allowed only inside this discipline:
 - Active-task status in shared core is semantic and language-neutral rather than carrying English UI text.
 - Smart Ride Acceptance includes deterministic €/km and €/h calculation over pickup + passenger trip plus an optional explicitly entered empty return, validation of impossible/invalid inputs, structured language-neutral decision explanations (reason, applied thresholds, failed metrics), and an Android developer test screen.
 - Smart Ride does not invent thresholds and does not automate Uber/Bolt actions.
-- The Android Smart Ride surface now has a structured prefill contract so future voice, screen-awareness or integration adapters can hand off normalized offer fields without coupling those sources to Smart Ride business logic; automatic extraction itself is still pending.
+- The Android Smart Ride surface has a structured prefill contract so voice, future screen-awareness or integration adapters can hand off normalized offer fields without coupling those sources to Smart Ride business logic.
+- A structured prefill is automatically assessed when all required offer fields and saved Charlie thresholds are available; partial prefills remain review-only and are never completed by guessing.
 - Shared speech input/output ports are implemented with an Android Voice Lab adapter for STT/TTS testing.
-- Voice Lab can now normalize explicitly labelled Croatian/English ride-offer transcripts through a replaceable shared-core boundary and hand recognized fields to Smart Ride for review; unsupported languages and unrecognized data fail explicitly rather than being guessed.
+- Voice Lab can now normalize explicitly labelled Croatian/English ride-offer transcripts through a replaceable shared-core boundary and hand recognized fields to Smart Ride for review or immediate deterministic assessment when enough data exists; unsupported languages and unrecognized data fail explicitly rather than being guessed.
 - Voice-to-note handoff prefills Notes Lab but does not silently persist recognized speech.
 - Offline local notes use a shared repository/service boundary with an Android app-private SQLite implementation.
 - New note creation has a complete low-risk brain → authorization → automation gate → task lifecycle → storage → diagnostics vertical slice.
