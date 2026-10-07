@@ -1,5 +1,7 @@
 # LANA 3 — ENGINEERING BASELINE
 
+> **Obvezno prije ozbiljnog rada:** pročitati `docs/CHARLIE_LANA_OPERATIVNI_PROTOKOL.md` i provjeriti aktualno stanje repozitorija. Protokol je operativna memorija projekta i ima prednost nad improviziranim postupkom iz razgovora.
+
 ## Status
 This repository is the active engineering workshop for LANA 3.
 
