@@ -112,6 +112,16 @@
     <string name="smart_ride_missing_offer_data">Missing offer data: %1$s</string>
     <string name="smart_ride_invalid_offer_header">Invalid offer data:</string>
     <string name="smart_ride_invalid_rules_header">Invalid thresholds:</string>
+    <string name="smart_ride_invalid_offer_non_finite">Offer data must be finite numbers.</string>
+    <string name="smart_ride_invalid_offer_negative_price">Price must not be negative.</string>
+    <string name="smart_ride_invalid_offer_negative_distance">Pickup and trip distance must not be negative.</string>
+    <string name="smart_ride_invalid_offer_negative_time">Pickup and trip time must not be negative.</string>
+    <string name="smart_ride_invalid_offer_total_distance">Total distance must be greater than zero.</string>
+    <string name="smart_ride_invalid_offer_total_time">Total time must be greater than zero.</string>
+    <string name="smart_ride_invalid_rule_non_finite">Thresholds must be finite numbers.</string>
+    <string name="smart_ride_invalid_rule_negative">Thresholds must not be negative.</string>
+    <string name="smart_ride_invalid_rule_accept_km">The ACCEPT €/km threshold must be at least the CONSIDER threshold.</string>
+    <string name="smart_ride_invalid_rule_accept_hour">The ACCEPT €/h threshold must be at least the CONSIDER threshold.</string>
     <string name="smart_ride_recommend_accept">ACCEPT</string>
     <string name="smart_ride_recommend_consider">CONSIDER</string>
     <string name="smart_ride_recommend_skip">SKIP</string>
