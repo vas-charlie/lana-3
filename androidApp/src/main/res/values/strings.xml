@@ -43,7 +43,7 @@
     <string name="voice_no_text_for_smart_ride">Nema teksta iz kojeg bi LANA mogla pripremiti podatke ponude.</string>
     <string name="voice_smart_ride_unsupported_language">Lokalno čitanje ponude iz govora još nije podržano za %1$s. LANA neće pogađati.</string>
     <string name="voice_smart_ride_no_recognized_data">Nisu prepoznati jasno označeni podaci ponude. Primjer: cijena 20 eura, dolazak 3 km 5 minuta, vožnja 8 km 15 minuta.</string>
-    <string name="voice_sent_to_smart_ride">Prepoznato polja ponude: %1$d. Smart Ride je otvoren za pregled.</string>
+    <string name="voice_sent_to_smart_ride">Prepoznatih polja ponude: %1$d. Smart Ride je otvoren za pregled.</string>
     <string name="back">Natrag</string>
     <string name="voice_stopping_listen">Zaustavljam slušanje…</string>
     <string name="voice_speaking_stopped">Govor zaustavljen.</string>
