@@ -111,3 +111,14 @@ For each failed item, capture:
 - whether failure is reproducible.
 
 Only then move the relevant feature from **IN TEST** toward Charlie acceptance.
+
+
+---
+
+## Latest accepted baseline reference
+
+The current evidence-backed physical baseline is recorded in:
+
+- `docs/KNOWN_GOOD_PHYSICAL_BASELINES.md`
+
+Use that record before changing any component already marked physically confirmed.
