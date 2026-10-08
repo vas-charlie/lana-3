@@ -6,7 +6,7 @@ Ovaj dokument je obvezna operativna memorija za rad na LANI 3.
 
 MASTER PLAN govori **što gradimo**. Ovaj protokol govori **kako radimo**.
 
-Prije ozbiljne analize, izmjene koda, builda, releasea ili dijagnostike treba prvo pročitati ovaj dokument i provjeriti aktualno stanje repozitorija. Ne oslanjati se na spontano sjećanje razgovora.
+Prije ozbiljne analize, izmjene koda, builda, releasea ili dijagnostike treba prvo pročitati ovaj dokument, `KNOWN_GOOD_PHYSICAL_BASELINES.md` i `LANA_MIRROR_RULE.md`, pa provjeriti aktualno stanje repozitorija. Ne oslanjati se na spontano sjećanje razgovora.
 
 ---
 
@@ -143,11 +143,13 @@ Zaštita stabilnosti dolazi tek nakon dokazane stabilnosti.
 Prije prve promjene:
 
 1. pročitaj ovaj protokol;
-2. pročitaj relevantni dio MASTER PLANA / Engineering Baselinea;
-3. provjeri aktualni `main`, otvorene PR-ove i stvarno stanje;
-4. odvoji potvrđene činjenice od pretpostavki;
-5. navedi što se pokušava dokazati;
-6. tek tada mijenjaj kod.
+2. pročitaj `KNOWN_GOOD_PHYSICAL_BASELINES.md`;
+3. pročitaj `LANA_MIRROR_RULE.md`;
+4. pročitaj relevantni dio MASTER PLANA / Engineering Baselinea;
+5. provjeri aktualni `main`, otvorene PR-ove i stvarno stanje;
+6. odvoji potvrđene činjenice od pretpostavki;
+7. navedi što se pokušava dokazati;
+8. tek tada mijenjaj kod.
 
 ---
 
