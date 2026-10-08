@@ -77,6 +77,9 @@ jobs:
       - name: Verify official launcher icon
         run: python3 scripts/verify_android_icon.py
 
+      - name: Verify Lana visual presence
+        run: python3 scripts/verify_lana_presence.py
+
       - name: Run Android lint
         run: gradle --no-daemon :androidApp:lintDebug
 
@@ -136,6 +139,9 @@ jobs:
 
       - name: Verify official launcher icon
         run: python3 scripts/verify_android_icon.py
+
+      - name: Verify Lana visual presence
+        run: python3 scripts/verify_lana_presence.py
 
       - name: Generate ephemeral CI signing key
         run: |
