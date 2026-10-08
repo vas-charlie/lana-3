@@ -94,6 +94,9 @@ jobs:
       - name: Verify Android application classes are packaged
         run: python3 scripts/verify_android_apk_classes.py androidApp/build/outputs/apk/debug/androidApp-debug.apk
 
+      - name: Verify packaged launcher icon
+        run: python3 scripts/verify_android_icon.py --apk androidApp/build/outputs/apk/debug/androidApp-debug.apk
+
       - name: Upload developer preview APK
         uses: actions/upload-artifact@v4
         with:
@@ -156,6 +159,9 @@ jobs:
 
       - name: Verify Android application classes are packaged in release
         run: python3 scripts/verify_android_apk_classes.py androidApp/build/outputs/apk/release/androidApp-release.apk
+
+      - name: Verify packaged launcher icon in release
+        run: python3 scripts/verify_android_icon.py --apk androidApp/build/outputs/apk/release/androidApp-release.apk
 
       - name: Verify ephemeral release signature
         run: |
@@ -237,6 +243,10 @@ jobs:
             -PlanaSigningStorePassword="$LANA_SIGNING_STORE_PASSWORD" \
             -PlanaSigningKeyAlias="$LANA_SIGNING_KEY_ALIAS" \
             -PlanaSigningKeyPassword="$LANA_SIGNING_KEY_PASSWORD"
+
+      - name: Verify packaged launcher icon in signed update
+        if: steps.signing.outputs.ready == 'true'
+        run: python3 scripts/verify_android_icon.py --apk androidApp/build/outputs/apk/release/androidApp-release.apk
 
       - name: Verify APK signature
         if: steps.signing.outputs.ready == 'true'
