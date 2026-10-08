@@ -16,6 +16,9 @@ jobs:
       - name: Checkout
         uses: actions/checkout@v5
 
+      - name: Verify dev-215 known-good foundation
+        run: python3 scripts/verify_dev215_foundation.py
+
       - name: Reject tracked private signing material
         shell: bash
         run: |
