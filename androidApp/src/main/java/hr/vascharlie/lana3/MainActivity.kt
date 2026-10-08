@@ -8,6 +8,7 @@ import android.os.Bundle
 import android.view.Gravity
 import android.widget.Button
 import android.widget.FrameLayout
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.TextView
 import hr.vascharlie.lana3.core.model.CapabilityGate
@@ -22,7 +23,8 @@ class MainActivity : Activity() {
         private const val REQUEST_LANA_PERMISSIONS = 3101
     }
 
-    private lateinit var avatar: TextView
+    private lateinit var avatar: ImageView
+    private lateinit var avatarStage: FrameLayout
     private lateinit var stateLabel: TextView
     private lateinit var status: TextView
     private lateinit var updateStatus: TextView
@@ -87,15 +89,12 @@ class MainActivity : Activity() {
         }
         root.addView(readinessButton)
 
-        val avatarStage = FrameLayout(this).apply {
+        avatarStage = FrameLayout(this).apply {
             setBackgroundColor(Color.rgb(10, 27, 48))
         }
-        avatar = TextView(this).apply {
-            text = getString(R.string.avatar_name)
-            textSize = 54f
-            gravity = Gravity.CENTER
-            setTextColor(Color.WHITE)
-            setBackgroundColor(Color.rgb(15, 39, 67))
+        avatar = ImageView(this).apply {
+            setImageResource(R.drawable.lana_presence)
+            scaleType = ImageView.ScaleType.CENTER_CROP
             contentDescription = getString(R.string.avatar_content_description)
         }
         avatarStage.addView(
@@ -103,7 +102,7 @@ class MainActivity : Activity() {
             FrameLayout.LayoutParams(
                 FrameLayout.LayoutParams.MATCH_PARENT,
                 FrameLayout.LayoutParams.MATCH_PARENT
-            ).apply { setMargins(22, 22, 22, 22) }
+            ).apply { setMargins(8, 8, 8, 8) }
         )
         root.addView(
             avatarStage,
@@ -440,13 +439,13 @@ class MainActivity : Activity() {
             LanaVisualState.IDLE -> {
                 stateLabel.text = getString(R.string.state_idle)
                 status.text = getString(R.string.status_idle)
-                avatar.setBackgroundColor(Color.rgb(15, 39, 67))
+                avatarStage.setBackgroundColor(Color.rgb(15, 39, 67))
             }
 
             LanaVisualState.LISTENING -> {
                 stateLabel.text = getString(R.string.state_listening)
                 status.text = getString(R.string.status_listening)
-                avatar.setBackgroundColor(Color.rgb(12, 55, 82))
+                avatarStage.setBackgroundColor(Color.rgb(12, 55, 82))
                 avatar.scaleX = 1.025f
                 avatar.scaleY = 1.025f
             }
@@ -454,14 +453,14 @@ class MainActivity : Activity() {
             LanaVisualState.THINKING -> {
                 stateLabel.text = getString(R.string.state_thinking)
                 status.text = getString(R.string.status_thinking)
-                avatar.setBackgroundColor(Color.rgb(31, 43, 72))
+                avatarStage.setBackgroundColor(Color.rgb(31, 43, 72))
                 avatar.alpha = 0.88f
             }
 
             LanaVisualState.SPEAKING -> {
                 stateLabel.text = getString(R.string.state_speaking)
                 status.text = getString(R.string.status_speaking)
-                avatar.setBackgroundColor(Color.rgb(18, 65, 77))
+                avatarStage.setBackgroundColor(Color.rgb(18, 65, 77))
                 avatar.scaleX = 1.035f
                 avatar.scaleY = 1.035f
             }
@@ -469,14 +468,14 @@ class MainActivity : Activity() {
             LanaVisualState.OFFLINE -> {
                 stateLabel.text = getString(R.string.state_offline)
                 status.text = getString(R.string.status_offline)
-                avatar.setBackgroundColor(Color.rgb(48, 52, 61))
+                avatarStage.setBackgroundColor(Color.rgb(48, 52, 61))
                 avatar.alpha = 0.72f
             }
 
             LanaVisualState.ERROR -> {
                 stateLabel.text = getString(R.string.state_error)
                 status.text = getString(R.string.status_error)
-                avatar.setBackgroundColor(Color.rgb(74, 38, 45))
+                avatarStage.setBackgroundColor(Color.rgb(74, 38, 45))
             }
         }
 
