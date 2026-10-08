@@ -174,6 +174,14 @@ jobs:
           sha256sum androidApp-release.apk > androidApp-release.apk.sha256
           sha256sum -c androidApp-release.apk.sha256
 
+      - name: Upload release-smoke APK for artifact inspection
+        if: always()
+        uses: actions/upload-artifact@v4
+        with:
+          name: lana-3-release-smoke
+          path: androidApp/build/outputs/apk/release/androidApp-release.apk
+          if-no-files-found: ignore
+
       - name: Remove ephemeral signing key
         if: always()
         run: rm -f "$RUNNER_TEMP/lana3-ci-smoke.jks"
