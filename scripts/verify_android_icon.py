@@ -141,7 +141,7 @@ def verify_apk(apk_path: Path) -> None:
         candidates = [
             name
             for name in apk.namelist()
-            if "ic_launcher" in name and "mipmap" in name
+            if name.startswith("res/") and name.endswith(".webp")
         ]
         exact_matches = []
         diagnostics = []
@@ -159,7 +159,8 @@ def verify_apk(apk_path: Path) -> None:
             detail = "; ".join(diagnostics) if diagnostics else "none"
             raise ValueError(
                 "expected exactly one byte-identical known-good packaged "
-                f"launcher icon; candidates: {detail}"
+                f"launcher icon (release resource names may be obfuscated); "
+                f"WebP candidates: {detail}"
             )
 
         name = exact_matches[0]
