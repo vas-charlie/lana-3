@@ -141,16 +141,28 @@ def verify_apk(apk_path: Path) -> None:
         candidates = [
             name
             for name in apk.namelist()
-            if name.endswith("/ic_launcher.webp")
-            and "mipmap-xxxhdpi" in name
+            if "ic_launcher" in name and "mipmap" in name
         ]
-        if len(candidates) != 1:
+        exact_matches = []
+        diagnostics = []
+
+        for name in candidates:
+            data = apk.read(name)
+            digest = sha256(data)
+            diagnostics.append(
+                f"{name} size={len(data)} sha256={digest}"
+            )
+            if digest == EXPECTED_SHA256:
+                exact_matches.append(name)
+
+        if len(exact_matches) != 1:
+            detail = "; ".join(diagnostics) if diagnostics else "none"
             raise ValueError(
-                f"expected exactly one packaged xxxhdpi launcher icon, "
-                f"found {candidates}"
+                "expected exactly one byte-identical known-good packaged "
+                f"launcher icon; candidates: {detail}"
             )
 
-        name = candidates[0]
+        name = exact_matches[0]
         verify_known_good(apk.read(name), f"{apk_path}:{name}")
 
 
