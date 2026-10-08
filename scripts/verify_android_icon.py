@@ -1,16 +1,20 @@
 #!/usr/bin/env python3
-"""Verify the official Android launcher icon source before building the APK."""
+"""Verify the known-good LANA 3 launcher icon in source and built APKs."""
 
 from __future__ import annotations
 
+import argparse
+import hashlib
 import struct
 import sys
+import zipfile
 from pathlib import Path
 
 
 ICON = Path("androidApp/src/main/res/mipmap-xxxhdpi/ic_launcher.webp")
 STALE_PNG = Path("androidApp/src/main/res/mipmap-xxxhdpi/ic_launcher.png")
 MANIFEST = Path("androidApp/src/main/AndroidManifest.xml")
+EXPECTED_SHA256 = "874d4db62be6f945b24cee7f1350debbc1d77a25a45897d1c08e4bcc1a112a24"
 
 
 def fail(message: str) -> int:
@@ -18,18 +22,20 @@ def fail(message: str) -> int:
     return 1
 
 
-def verify_webp(path: Path) -> tuple[int, int]:
-    data = path.read_bytes()
+def sha256(data: bytes) -> str:
+    return hashlib.sha256(data).hexdigest()
 
+
+def verify_webp_bytes(data: bytes, label: str) -> tuple[int, int]:
     if len(data) < 20:
-        raise ValueError("WebP is too small/truncated")
+        raise ValueError(f"{label}: WebP is too small/truncated")
     if data[0:4] != b"RIFF" or data[8:12] != b"WEBP":
-        raise ValueError("invalid RIFF/WEBP signature")
+        raise ValueError(f"{label}: invalid RIFF/WEBP signature")
 
     declared_size = struct.unpack("<I", data[4:8])[0] + 8
     if declared_size != len(data):
         raise ValueError(
-            f"RIFF size mismatch: header expects {declared_size} bytes, "
+            f"{label}: RIFF size mismatch: header expects {declared_size} bytes, "
             f"file contains {len(data)}"
         )
 
@@ -39,7 +45,7 @@ def verify_webp(path: Path) -> tuple[int, int]:
 
     while offset < len(data):
         if offset + 8 > len(data):
-            raise ValueError("truncated WebP chunk header")
+            raise ValueError(f"{label}: truncated WebP chunk header")
 
         chunk_type = data[offset:offset + 4]
         chunk_size = struct.unpack("<I", data[offset + 4:offset + 8])[0]
@@ -48,21 +54,22 @@ def verify_webp(path: Path) -> tuple[int, int]:
 
         if payload_end > len(data):
             raise ValueError(
-                f"truncated WebP chunk {chunk_type.decode('ascii', 'replace')}"
+                f"{label}: truncated WebP chunk "
+                f"{chunk_type.decode('ascii', 'replace')}"
             )
 
         payload = data[payload_start:payload_end]
 
         if chunk_type == b"VP8 ":
             if len(payload) < 10 or payload[3:6] != b"\x9d\x01\x2a":
-                raise ValueError("invalid VP8 frame header")
+                raise ValueError(f"{label}: invalid VP8 frame header")
             width = struct.unpack("<H", payload[6:8])[0] & 0x3FFF
             height = struct.unpack("<H", payload[8:10])[0] & 0x3FFF
             saw_image_chunk = True
 
         elif chunk_type == b"VP8L":
             if len(payload) < 5 or payload[0] != 0x2F:
-                raise ValueError("invalid VP8L frame header")
+                raise ValueError(f"{label}: invalid VP8L frame header")
             bits = int.from_bytes(payload[1:5], "little")
             width = (bits & 0x3FFF) + 1
             height = ((bits >> 14) & 0x3FFF) + 1
@@ -70,7 +77,7 @@ def verify_webp(path: Path) -> tuple[int, int]:
 
         elif chunk_type == b"VP8X":
             if len(payload) < 10:
-                raise ValueError("invalid VP8X frame header")
+                raise ValueError(f"{label}: invalid VP8X frame header")
             width = int.from_bytes(payload[4:7], "little") + 1
             height = int.from_bytes(payload[7:10], "little") + 1
             saw_image_chunk = True
@@ -78,31 +85,44 @@ def verify_webp(path: Path) -> tuple[int, int]:
         offset = payload_end + (chunk_size & 1)
 
     if offset != len(data):
-        raise ValueError("invalid WebP padding/end offset")
+        raise ValueError(f"{label}: invalid WebP padding/end offset")
     if not saw_image_chunk or width is None or height is None:
-        raise ValueError("missing WebP image chunk")
+        raise ValueError(f"{label}: missing WebP image chunk")
 
     return width, height
 
 
-def main() -> int:
-    if STALE_PNG.exists():
-        return fail("stale launcher PNG exists; clean rebuild must use one source asset")
-    if not ICON.exists():
-        return fail("official launcher WebP is missing")
-
-    try:
-        width, height = verify_webp(ICON)
-    except (OSError, ValueError) as error:
-        return fail(f"launcher WebP failed integrity check: {error}")
+def verify_known_good(data: bytes, label: str) -> tuple[int, int]:
+    width, height = verify_webp_bytes(data, label)
 
     if (width, height) != (192, 192):
-        return fail(
-            f"launcher WebP must be 192x192 for xxxhdpi, got {width}x{height}"
+        raise ValueError(
+            f"{label}: expected 192x192, got {width}x{height}"
         )
 
-    if ICON.stat().st_size < 3_000:
-        return fail("launcher WebP is suspiciously small")
+    digest = sha256(data)
+    if digest != EXPECTED_SHA256:
+        raise ValueError(
+            f"{label}: SHA-256 mismatch; expected known-good "
+            f"{EXPECTED_SHA256}, got {digest}"
+        )
+
+    return width, height
+
+
+def verify_source() -> None:
+    if STALE_PNG.exists():
+        raise ValueError(
+            "stale launcher PNG exists; clean rebuild must use one source asset"
+        )
+    if not ICON.exists():
+        raise ValueError("official launcher WebP is missing")
+
+    data = ICON.read_bytes()
+    if len(data) < 3_000:
+        raise ValueError("launcher WebP is suspiciously small")
+
+    verify_known_good(data, str(ICON))
 
     manifest = MANIFEST.read_text(encoding="utf-8")
     for attr in (
@@ -110,12 +130,48 @@ def main() -> int:
         'android:roundIcon="@mipmap/ic_launcher"',
     ):
         if attr not in manifest:
-            return fail(f"manifest is missing {attr}")
+            raise ValueError(f"manifest is missing {attr}")
 
-    print(
-        f"Verified official launcher icon: {ICON} "
-        f"({width}x{height}, {ICON.stat().st_size} bytes)"
+
+def verify_apk(apk_path: Path) -> None:
+    if not apk_path.exists():
+        raise ValueError(f"APK does not exist: {apk_path}")
+
+    with zipfile.ZipFile(apk_path) as apk:
+        candidates = [
+            name
+            for name in apk.namelist()
+            if name.endswith("/ic_launcher.webp")
+            and "mipmap-xxxhdpi" in name
+        ]
+        if len(candidates) != 1:
+            raise ValueError(
+                f"expected exactly one packaged xxxhdpi launcher icon, "
+                f"found {candidates}"
+            )
+
+        name = candidates[0]
+        verify_known_good(apk.read(name), f"{apk_path}:{name}")
+
+
+def main() -> int:
+    parser = argparse.ArgumentParser()
+    parser.add_argument(
+        "--apk",
+        type=Path,
+        help="also verify the exact known-good launcher bytes inside this APK",
     )
+    args = parser.parse_args()
+
+    try:
+        verify_source()
+        if args.apk is not None:
+            verify_apk(args.apk)
+    except (OSError, ValueError, zipfile.BadZipFile) as error:
+        return fail(str(error))
+
+    suffix = f" and packaged APK {args.apk}" if args.apk else ""
+    print(f"Verified known-good official launcher icon{suffix}.")
     return 0
 
 
