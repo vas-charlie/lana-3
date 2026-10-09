@@ -2,9 +2,12 @@ package hr.vascharlie.lana3
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.Typeface
+import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
+import android.util.Base64
 import android.view.Gravity
 import android.widget.Button
 import android.widget.FrameLayout
@@ -25,6 +28,8 @@ class MainActivity : Activity() {
 
     private lateinit var avatar: ImageView
     private lateinit var avatarStage: FrameLayout
+    private lateinit var avatarMotionController: LanaAvatarMotionController
+    private lateinit var brooch: TextView
     private lateinit var stateLabel: TextView
     private lateinit var status: TextView
     private lateinit var updateStatus: TextView
@@ -93,9 +98,9 @@ class MainActivity : Activity() {
             setBackgroundColor(Color.rgb(10, 27, 48))
         }
         avatar = ImageView(this).apply {
-            setImageResource(R.drawable.lana_presence)
             scaleType = ImageView.ScaleType.CENTER_CROP
             contentDescription = getString(R.string.avatar_content_description)
+            loadLanaPresence()
         }
         avatarStage.addView(
             avatar,
@@ -104,6 +109,27 @@ class MainActivity : Activity() {
                 FrameLayout.LayoutParams.MATCH_PARENT
             ).apply { setMargins(8, 8, 8, 8) }
         )
+
+        brooch = TextView(this).apply {
+            text = "C"
+            gravity = Gravity.CENTER
+            textSize = 15f
+            typeface = Typeface.DEFAULT_BOLD
+            setTextColor(Color.WHITE)
+            contentDescription = "Charlie broš"
+            background = GradientDrawable().apply {
+                shape = GradientDrawable.OVAL
+                setColor(Color.rgb(20, 42, 68))
+                setStroke(dp(2), Color.rgb(90, 180, 255))
+            }
+        }
+        avatarStage.addView(
+            brooch,
+            FrameLayout.LayoutParams(dp(36), dp(36), Gravity.END or Gravity.BOTTOM).apply {
+                setMargins(0, 0, dp(96), dp(72))
+            }
+        )
+
         root.addView(
             avatarStage,
             LinearLayout.LayoutParams(
@@ -125,13 +151,6 @@ class MainActivity : Activity() {
             setPadding(0, 8, 0, 18)
         }
         root.addView(status)
-
-        val stateButton = Button(this).apply {
-            text = getString(R.string.change_lana_state)
-            isAllCaps = false
-            setOnClickListener { cycleVisualState() }
-        }
-        root.addView(stateButton)
 
         root.addView(Button(this).apply {
             text = getString(R.string.smart_ride_test_button)
@@ -166,6 +185,8 @@ class MainActivity : Activity() {
         startupStage = "set-content-view"
         setContentView(root)
 
+        avatarMotionController = LanaAvatarMotionController(avatar)
+
         startupStage = "render-initial-state"
         renderState(LanaVisualState.IDLE)
 
@@ -175,6 +196,7 @@ class MainActivity : Activity() {
         startupStage = "auto-updater-init"
         autoUpdater = AutoUpdater(this) { status ->
             updateStatus.text = formatAutoUpdateStatus(status)
+            applyAutomaticUpdaterState(status)
         }
         autoUpdater.start()
     }
@@ -243,6 +265,9 @@ class MainActivity : Activity() {
     }
 
     override fun onDestroy() {
+        if (::avatarMotionController.isInitialized) {
+            avatarMotionController.stop()
+        }
         if (::autoUpdater.isInitialized) {
             autoUpdater.stop()
         }
@@ -417,18 +442,6 @@ class MainActivity : Activity() {
         )
     }
 
-    private fun cycleVisualState() {
-        val next = when (visualState) {
-            LanaVisualState.IDLE -> LanaVisualState.LISTENING
-            LanaVisualState.LISTENING -> LanaVisualState.THINKING
-            LanaVisualState.THINKING -> LanaVisualState.SPEAKING
-            LanaVisualState.SPEAKING -> LanaVisualState.OFFLINE
-            LanaVisualState.OFFLINE -> LanaVisualState.ERROR
-            LanaVisualState.ERROR -> LanaVisualState.IDLE
-        }
-        renderState(next)
-    }
-
     private fun renderState(state: LanaVisualState) {
         visualState = state
         avatar.alpha = 1f
@@ -479,5 +492,49 @@ class MainActivity : Activity() {
             }
         }
 
+        if (::avatarMotionController.isInitialized) {
+            avatarMotionController.applyState(state)
+        }
     }
+
+    private fun applyAutomaticUpdaterState(status: AutoUpdateStatus) {
+        if (!::avatarMotionController.isInitialized) return
+
+        when (status) {
+            AutoUpdateStatus.AlreadyDownloading,
+            AutoUpdateStatus.DownloadStarted,
+            AutoUpdateStatus.Downloading ->
+                renderState(LanaVisualState.THINKING)
+
+            AutoUpdateStatus.CheckUnavailable ->
+                renderState(LanaVisualState.OFFLINE)
+
+            AutoUpdateStatus.DownloadFailed,
+            AutoUpdateStatus.VerificationFailed,
+            AutoUpdateStatus.ApkUnavailable ->
+                renderState(LanaVisualState.ERROR)
+
+            AutoUpdateStatus.UpToDate,
+            AutoUpdateStatus.InstallPermissionRequired,
+            AutoUpdateStatus.ReadyToInstall ->
+                renderState(LanaVisualState.IDLE)
+        }
+    }
+
+    private fun ImageView.loadLanaPresence() {
+        runCatching {
+            val encoded = assets.open("lana_presence_v2.webp.b64")
+                .bufferedReader()
+                .use { it.readText() }
+            val bytes = Base64.decode(encoded, Base64.DEFAULT)
+            val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+                ?: error("Could not decode Lana presence image")
+            setImageBitmap(bitmap)
+        }.onFailure {
+            setImageResource(R.drawable.lana_presence)
+        }
+    }
+
+    private fun dp(value: Int): Int =
+        (value * resources.displayMetrics.density).toInt()
 }

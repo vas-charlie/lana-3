@@ -78,3 +78,18 @@ Do not lock LANA 3 to a 2D/3D/avatar vendor until a prototype comparison checks:
 - ability to preserve LANA's visual identity
 
 The final avatar asset and renderer are therefore intentionally separate from the current Android state engine. The local micro-motion controller is a preview-only renderer helper and does not move semantic state or business policy into Android presentation code.
+
+
+## Charlie acceptance target — living presence v1
+
+The immediate phone avatar target is now explicit:
+
+- Lana is visible immediately on the main screen.
+- Composition shows the upper body rather than a face-only crop.
+- Visual identity: elegant professional blazer, glasses, pen, and a visible Charlie "C" brooch.
+- IDLE remains alive through restrained breathing, occasional blink-like micro-motion, gentle gaze/head shifts, and a glasses-adjustment cue.
+- OFFLINE and ERROR do not freeze the avatar; Lana remains subtly alive with a downward/writing-style posture cue.
+- Visual state is application-driven. The manual state-cycling button is not part of the normal main-screen interaction.
+- Semantic state must still be truthful. LISTENING / THINKING / SPEAKING are not to be faked merely to make the avatar look busy.
+
+The current 2D preview can animate the full portrait and stage. Literal glasses removal/return, true eye-only blinking, gaze redirection, and genuine writing hand motion require dedicated alternate frames or a richer renderer and remain renderer work rather than business-state logic.
