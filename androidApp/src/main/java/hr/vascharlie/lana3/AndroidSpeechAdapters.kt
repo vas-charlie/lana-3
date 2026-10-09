@@ -232,6 +232,15 @@ class AndroidSpeechOutputAdapter(
                     emit(SpeechOutputEvent.Completed)
                 }
 
+                override fun onRangeStart(
+                    utteranceId: String?,
+                    start: Int,
+                    end: Int,
+                    frame: Int,
+                ) {
+                    emit(SpeechOutputEvent.RangeStarted(start = start, end = end))
+                }
+
                 @Deprecated("Deprecated in Android API")
                 override fun onError(utteranceId: String?) {
                     emit(

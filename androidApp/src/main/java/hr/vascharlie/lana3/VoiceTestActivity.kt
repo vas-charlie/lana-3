@@ -451,6 +451,16 @@ class VoiceTestActivity : Activity() {
                         avatarView.render(avatarController.frame)
                         getString(R.string.voice_tts_started)
                     }
+                    is SpeechOutputEvent.RangeStarted -> {
+                        // Android TTS exposes timed text ranges, not phoneme/viseme
+                        // amplitudes. Use the cue to animate speech rhythm without
+                        // claiming true lip sync yet.
+                        val span = (event.end - event.start).coerceAtLeast(1)
+                        val level = (0.30f + span.coerceAtMost(8) * 0.08f).coerceAtMost(0.94f)
+                        avatarController.onLanaSpeechLevel(level)
+                        avatarView.render(avatarController.frame)
+                        getString(R.string.voice_tts_started)
+                    }
                     SpeechOutputEvent.Completed -> {
                         avatarController.onLanaSpeechEnded()
                         avatarView.render(avatarController.frame)
