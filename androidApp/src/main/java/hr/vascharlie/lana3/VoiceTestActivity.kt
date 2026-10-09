@@ -137,6 +137,8 @@ class VoiceTestActivity : Activity() {
             isAllCaps = false
             setOnClickListener {
                 speechOutput.stop()
+                avatarController.onLanaSpeechEnded()
+                avatarView.render(avatarController.frame)
                 status.text = getString(R.string.voice_speaking_stopped)
             }
         })
@@ -242,6 +244,8 @@ class VoiceTestActivity : Activity() {
             runOnUiThread {
                 when (event) {
                     SpeechInputEvent.ListeningStarted -> {
+                        avatarController.onUserSpeechStarted()
+                        avatarView.render(avatarController.frame)
                         status.text = getString(R.string.voice_listening)
                     }
 
@@ -252,12 +256,16 @@ class VoiceTestActivity : Activity() {
                     }
 
                     is SpeechInputEvent.FinalTranscript -> {
+                        avatarController.onUserSpeechEnded()
+                        avatarView.render(avatarController.frame)
                         transcript.setText(event.text)
                         transcript.setSelection(transcript.text.length)
                         status.text = getString(R.string.voice_recognized)
                     }
 
                     is SpeechInputEvent.Error -> {
+                        avatarController.onError()
+                        avatarView.render(avatarController.frame)
                         status.text = getString(
                             R.string.voice_stt_error,
                             localizedSpeechInputError(event.code),
@@ -448,11 +456,14 @@ class VoiceTestActivity : Activity() {
                         avatarView.render(avatarController.frame)
                         getString(R.string.voice_tts_completed)
                     }
-                    is SpeechOutputEvent.Error ->
+                    is SpeechOutputEvent.Error -> {
+                        avatarController.onError()
+                        avatarView.render(avatarController.frame)
                         getString(
                             R.string.voice_tts_error,
                             localizedSpeechOutputError(event.code),
                         )
+                    }
                 }
             }
         }
