@@ -434,8 +434,17 @@ class VoiceTestActivity : Activity() {
         ) { event ->
             runOnUiThread {
                 status.text = when (event) {
-                    SpeechOutputEvent.Started -> {\n                        avatarController.onLanaSpeechStarted()\n                        avatarController.onLanaSpeechLevel(0.65f)\n                        avatarView.render(avatarController.frame)\n                        getString(R.string.voice_tts_started)\n                    }
-                    SpeechOutputEvent.Completed -> {\n                        avatarController.onLanaSpeechEnded()\n                        avatarView.render(avatarController.frame)\n                        getString(R.string.voice_tts_completed)\n                    }
+                    SpeechOutputEvent.Started -> {
+                        avatarController.onLanaSpeechStarted()
+                        avatarController.onLanaSpeechLevel(0.65f)
+                        avatarView.render(avatarController.frame)
+                        getString(R.string.voice_tts_started)
+                    }
+                    SpeechOutputEvent.Completed -> {
+                        avatarController.onLanaSpeechEnded()
+                        avatarView.render(avatarController.frame)
+                        getString(R.string.voice_tts_completed)
+                    }
                     is SpeechOutputEvent.Error ->
                         getString(
                             R.string.voice_tts_error,
