@@ -74,6 +74,18 @@ class VoiceTestActivity : Activity() {
             setTextColor(Color.rgb(180, 195, 210))
         })
 
+        avatarView = LanaConversationAvatarView(this).apply {
+            contentDescription = getString(R.string.avatar_content_description)
+            render(avatarController.frame)
+        }
+        root.addView(
+            avatarView,
+            LinearLayout.LayoutParams(
+                LinearLayout.LayoutParams.MATCH_PARENT,
+                dp(420),
+            ).apply { setMargins(0, 0, 0, dp(20)) }
+        )
+
         root.addView(TextView(this).apply {
             text = getString(R.string.voice_language_label)
             textSize = 14f
@@ -478,4 +490,8 @@ class VoiceTestActivity : Activity() {
             }
         }
     }
+
+    private fun dp(value: Int): Int =
+        (value * resources.displayMetrics.density).toInt()
+
 }
