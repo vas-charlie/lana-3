@@ -4,6 +4,7 @@ import struct
 import sys
 
 ASSET = Path("androidApp/src/main/res/drawable-nodpi/lana_presence.webp")
+V2_ASSET = Path("androidApp/src/main/assets/lana_presence_v2.webp.b64")
 MAIN = Path("androidApp/src/main/java/hr/vascharlie/lana3/MainActivity.kt")
 
 def fail(message: str) -> None:
@@ -56,9 +57,25 @@ if width is None or height is None:
 if width < 200 or height < 250:
     fail(f"Lana presence asset is too small: {width}x{height}")
 
+import base64
+
+if not V2_ASSET.is_file():
+    fail(f"Missing Lana v2 presence asset: {V2_ASSET}")
+
+try:
+    v2_data = base64.b64decode(V2_ASSET.read_text(encoding="ascii"), validate=True)
+except Exception as exc:
+    fail(f"Lana v2 presence asset is not valid base64: {exc}")
+
+if len(v2_data) < 4096:
+    fail("Lana v2 presence asset is unexpectedly small.")
+if v2_data[:4] != b"RIFF" or v2_data[8:12] != b"WEBP":
+    fail("Lana v2 decoded presence asset is not a RIFF/WEBP file.")
+
 main = MAIN.read_text(encoding="utf-8")
 required = [
     "private lateinit var avatar: ImageView",
+    "lana_presence_v2.webp.b64",
     "R.drawable.lana_presence",
     "ImageView.ScaleType.CENTER_CROP",
     "avatar_content_description",
@@ -70,4 +87,7 @@ for token in required:
 if "text = getString(R.string.avatar_name)" in main:
     fail("Legacy text-only LANA placeholder returned to the avatar stage.")
 
-print(f"Lana presence verified: {width}x{height}, {len(data)} bytes")
+print(
+    f"Lana presence verified: fallback={width}x{height}/{len(data)} bytes, "
+    f"v2={len(v2_data)} decoded bytes"
+)
