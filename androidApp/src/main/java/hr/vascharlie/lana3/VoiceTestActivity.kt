@@ -13,6 +13,7 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
+import hr.vascharlie.lana3.avatar.AvatarController
 import hr.vascharlie.lana3.core.ride.LabeledRideOfferTranscriptNormalizer
 import hr.vascharlie.lana3.core.ride.RideOfferTranscriptNormalizer
 import hr.vascharlie.lana3.core.ride.RideOfferTranscriptResult
@@ -40,6 +41,8 @@ class VoiceTestActivity : Activity() {
     private lateinit var transcript: EditText
     private lateinit var status: TextView
     private lateinit var listenButton: Button
+    private val avatarController = AvatarController()
+    private lateinit var avatarView: LanaConversationAvatarView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -434,8 +437,17 @@ class VoiceTestActivity : Activity() {
         ) { event ->
             runOnUiThread {
                 status.text = when (event) {
-                    SpeechOutputEvent.Started -> getString(R.string.voice_tts_started)
-                    SpeechOutputEvent.Completed -> getString(R.string.voice_tts_completed)
+                    SpeechOutputEvent.Started -> {
+                        avatarController.onLanaSpeechStarted()
+                        avatarController.onLanaSpeechLevel(0.65f)
+                        avatarView.render(avatarController.frame)
+                        getString(R.string.voice_tts_started)
+                    }
+                    SpeechOutputEvent.Completed -> {
+                        avatarController.onLanaSpeechEnded()
+                        avatarView.render(avatarController.frame)
+                        getString(R.string.voice_tts_completed)
+                    }
                     is SpeechOutputEvent.Error ->
                         getString(
                             R.string.voice_tts_error,
