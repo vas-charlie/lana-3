@@ -25,15 +25,26 @@ def read_glb_json(path):
     except (UnicodeDecodeError, json.JSONDecodeError) as exc:
         fail(f"invalid JSON chunk: {exc}")
 
+def collect_real_morph_names(document):
+    names = set()
+    for mesh in document.get("meshes", []):
+        target_names = [str(name) for name in (mesh.get("extras") or {}).get("targetNames", [])]
+        primitives = mesh.get("primitives") or []
+        target_count = max((len(primitive.get("targets") or []) for primitive in primitives), default=0)
+        if target_names and target_count == 0:
+            fail("mesh advertises morph names but contains no morph targets")
+        if target_count and len(target_names) != target_count:
+            fail(f"mesh morph-name count ({len(target_names)}) does not match target count ({target_count})")
+        names.update(target_names)
+    return names
+
 def main():
     if len(sys.argv) != 2:
         raise SystemExit("usage: validate_avatar_glb.py <candidate.glb>")
     path = Path(sys.argv[1])
     if not path.is_file(): fail(f"missing candidate file: {path}")
     document = read_glb_json(path)
-    names = set()
-    for mesh in document.get("meshes", []):
-        names.update(str(name) for name in (mesh.get("extras") or {}).get("targetNames", []))
+    names = collect_real_morph_names(document)
     missing = sorted(REQUIRED_MORPHS - names)
     if missing: fail("missing required independent facial morphs: " + ", ".join(missing))
     print("Avatar GLB structural gate: OK")
