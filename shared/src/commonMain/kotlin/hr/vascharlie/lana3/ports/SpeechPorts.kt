@@ -47,6 +47,17 @@ sealed interface SpeechOutputEvent {
     data object Started : SpeechOutputEvent
     data object Completed : SpeechOutputEvent
 
+    /**
+     * Timing cue emitted by speech engines that expose progress inside the
+     * utterance. This is not audio amplitude or a viseme. It gives the avatar
+     * a truthful text-range timing signal without pretending to have phoneme
+     * data that the engine did not provide.
+     */
+    data class RangeStarted(
+        val start: Int,
+        val end: Int,
+    ) : SpeechOutputEvent
+
     data class Error(
         val code: String,
         val message: String,
