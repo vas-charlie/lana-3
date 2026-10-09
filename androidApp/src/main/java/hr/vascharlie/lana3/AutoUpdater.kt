@@ -67,6 +67,7 @@ class AutoUpdater(
     private var checking = false
     private var receiverRegistered = false
     private var openingInstaller = false
+    private var openingInstallPermissionSettings = false
 
     private val periodicCheck = object : Runnable {
         override fun run() {
@@ -108,8 +109,14 @@ class AutoUpdater(
     fun onResume() {
         if (openingInstaller) {
             openingInstaller = false
+            // Returning from Android's package installer does not prove that the
+            // user accepted the update. Keep the pending state unless the newly
+            // installed version code actually confirms success.
             clearCompletedUpdateState()
-            return
+        }
+
+        if (openingInstallPermissionSettings) {
+            openingInstallPermissionSettings = false
         }
 
         resumePendingInstall()
@@ -299,6 +306,7 @@ class AutoUpdater(
                 Settings.ACTION_MANAGE_UNKNOWN_APP_SOURCES,
                 "package:${activity.packageName}".toUri()
             )
+            openingInstallPermissionSettings = true
             activity.startActivity(settingsIntent)
             return
         }
