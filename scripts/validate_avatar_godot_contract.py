@@ -25,6 +25,10 @@ if 'res://assets/lana_rigged.glb' not in text:
     raise SystemExit("production GLB contract path changed unexpectedly")
 if "func is_production_model_ready()" not in text:
     raise SystemExit("renderer must expose truthful model readiness")
+if "REQUIRED_MORPHS" not in text or "_has_required_rig_channels()" not in text:
+    raise SystemExit("renderer must validate real independent facial blend shapes")
+if "_ready_for_pose = _has_required_rig_channels()" not in text:
+    raise SystemExit("renderer readiness must not rely on mesh presence alone")
 if "push_warning" not in text:
     raise SystemExit("missing-asset state must be explicit")
 
