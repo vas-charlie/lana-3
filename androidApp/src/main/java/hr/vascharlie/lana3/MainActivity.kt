@@ -2,10 +2,12 @@ package hr.vascharlie.lana3
 
 import android.app.Activity
 import android.content.Intent
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.Typeface
 import android.graphics.drawable.GradientDrawable
 import android.os.Bundle
+import android.util.Base64
 import android.view.Gravity
 import android.widget.Button
 import android.widget.FrameLayout
@@ -96,9 +98,9 @@ class MainActivity : Activity() {
             setBackgroundColor(Color.rgb(10, 27, 48))
         }
         avatar = ImageView(this).apply {
-            setImageResource(R.drawable.lana_presence)
             scaleType = ImageView.ScaleType.CENTER_CROP
             contentDescription = getString(R.string.avatar_content_description)
+            loadLanaPresence()
         }
         avatarStage.addView(
             avatar,
@@ -516,6 +518,20 @@ class MainActivity : Activity() {
             AutoUpdateStatus.InstallPermissionRequired,
             AutoUpdateStatus.ReadyToInstall ->
                 renderState(LanaVisualState.IDLE)
+        }
+    }
+
+    private fun ImageView.loadLanaPresence() {
+        runCatching {
+            val encoded = assets.open("lana_presence_v2.webp.b64")
+                .bufferedReader()
+                .use { it.readText() }
+            val bytes = Base64.decode(encoded, Base64.DEFAULT)
+            val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+                ?: error("Could not decode Lana presence image")
+            setImageBitmap(bitmap)
+        }.onFailure {
+            setImageResource(R.drawable.lana_presence)
         }
     }
 
