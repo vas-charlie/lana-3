@@ -115,7 +115,9 @@ class AndroidSpeechInputAdapter(
 
         override fun onBufferReceived(buffer: ByteArray?) = Unit
 
-        override fun onEndOfSpeech() {\n            emit(SpeechInputEvent.SpeechEnded)\n        }
+        override fun onEndOfSpeech() {
+            emit(SpeechInputEvent.SpeechEnded)
+        }
 
         override fun onError(error: Int) {
             emit(
