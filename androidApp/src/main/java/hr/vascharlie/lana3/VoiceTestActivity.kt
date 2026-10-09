@@ -13,7 +13,8 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
-import hr.vascharlie.lana3.avatar.AvatarController\nimport hr.vascharlie.lana3.core.ride.LabeledRideOfferTranscriptNormalizer
+import hr.vascharlie.lana3.avatar.AvatarController
+import hr.vascharlie.lana3.core.ride.LabeledRideOfferTranscriptNormalizer
 import hr.vascharlie.lana3.core.ride.RideOfferTranscriptNormalizer
 import hr.vascharlie.lana3.core.ride.RideOfferTranscriptResult
 import hr.vascharlie.lana3.ports.SpeechInputEvent
@@ -39,7 +40,9 @@ class VoiceTestActivity : Activity() {
     private lateinit var languageTag: EditText
     private lateinit var transcript: EditText
     private lateinit var status: TextView
-    private lateinit var listenButton: Button\n    private val avatarController = AvatarController()\n    private lateinit var avatarView: LanaConversationAvatarView
+    private lateinit var listenButton: Button
+    private val avatarController = AvatarController()
+    private lateinit var avatarView: LanaConversationAvatarView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
