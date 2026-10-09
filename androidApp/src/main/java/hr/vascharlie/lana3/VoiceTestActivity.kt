@@ -13,7 +13,7 @@ import android.widget.EditText
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
-import hr.vascharlie.lana3.core.ride.LabeledRideOfferTranscriptNormalizer
+import hr.vascharlie.lana3.avatar.AvatarController\nimport hr.vascharlie.lana3.core.ride.LabeledRideOfferTranscriptNormalizer
 import hr.vascharlie.lana3.core.ride.RideOfferTranscriptNormalizer
 import hr.vascharlie.lana3.core.ride.RideOfferTranscriptResult
 import hr.vascharlie.lana3.ports.SpeechInputEvent
@@ -39,7 +39,7 @@ class VoiceTestActivity : Activity() {
     private lateinit var languageTag: EditText
     private lateinit var transcript: EditText
     private lateinit var status: TextView
-    private lateinit var listenButton: Button
+    private lateinit var listenButton: Button\n    private val avatarController = AvatarController()\n    private lateinit var avatarView: LanaConversationAvatarView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -434,8 +434,8 @@ class VoiceTestActivity : Activity() {
         ) { event ->
             runOnUiThread {
                 status.text = when (event) {
-                    SpeechOutputEvent.Started -> getString(R.string.voice_tts_started)
-                    SpeechOutputEvent.Completed -> getString(R.string.voice_tts_completed)
+                    SpeechOutputEvent.Started -> {\n                        avatarController.onLanaSpeechStarted()\n                        avatarController.onLanaSpeechLevel(0.65f)\n                        avatarView.render(avatarController.frame)\n                        getString(R.string.voice_tts_started)\n                    }
+                    SpeechOutputEvent.Completed -> {\n                        avatarController.onLanaSpeechEnded()\n                        avatarView.render(avatarController.frame)\n                        getString(R.string.voice_tts_completed)\n                    }
                     is SpeechOutputEvent.Error ->
                         getString(
                             R.string.voice_tts_error,
