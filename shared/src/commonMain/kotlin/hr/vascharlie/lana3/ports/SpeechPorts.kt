@@ -7,6 +7,7 @@ data class SpeechInputRequest(
 
 sealed interface SpeechInputEvent {
     data object ListeningStarted : SpeechInputEvent
+    data object SpeechEnded : SpeechInputEvent
 
     data class PartialTranscript(
         val text: String,
