@@ -261,7 +261,7 @@ class VoiceTestActivity : Activity() {
                         status.text = getString(R.string.voice_listening)
                     }
 
-                    is SpeechInputEvent.PartialTranscript -> {
+                    SpeechInputEvent.SpeechEnded -> {\n                        avatarController.onUserSpeechEnded()\n                        avatarView.render(avatarController.frame)\n                        status.text = getString(R.string.voice_recognizing)\n                    }\n\n                    is SpeechInputEvent.PartialTranscript -> {
                         transcript.setText(event.text)
                         transcript.setSelection(transcript.text.length)
                         status.text = getString(R.string.voice_recognizing)
