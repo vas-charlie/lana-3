@@ -13,6 +13,12 @@ var _model: Node3D
 var _meshes: Array[MeshInstance3D] = []
 var _ready_for_pose := false
 
+# Minimum independently controllable features before claiming rig readiness.
+const REQUIRED_MORPHS := [
+    "eyeBlinkLeft", "eyeBlinkRight", "jawOpen", "mouthClose",
+    "mouthPucker", "mouthStretchLeft", "browInnerUp"
+]
+
 const MORPH_NAMES := {
     "EYE_BLINK_LEFT": "eyeBlinkLeft",
     "EYE_BLINK_RIGHT": "eyeBlinkRight",
@@ -38,9 +44,21 @@ func _ready() -> void:
         return
     model_root.add_child(_model)
     _collect_meshes(_model)
-    _ready_for_pose = not _meshes.is_empty()
+    _ready_for_pose = _has_required_rig_channels()
     if not _ready_for_pose:
-        push_warning("LANA: model has no MeshInstance3D; cannot animate facial rig")
+        push_warning("LANA: rig missing required independent facial blend shapes; avatar unavailable")
+
+func _has_required_rig_channels() -> bool:
+    var available := {}
+    for mesh_instance in _meshes:
+        if mesh_instance.mesh == null:
+            continue
+        for index in mesh_instance.mesh.get_blend_shape_count():
+            available[String(mesh_instance.mesh.get_blend_shape_name(index))] = true
+    for morph_name in REQUIRED_MORPHS:
+        if not available.has(morph_name):
+            return false
+    return true
 
 func _collect_meshes(node: Node) -> void:
     if node is MeshInstance3D:
