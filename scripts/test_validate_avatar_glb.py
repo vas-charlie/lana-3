@@ -5,7 +5,7 @@ from pathlib import Path
 
 ROOT = Path(__file__).resolve().parents[1]
 VALIDATOR = ROOT / "scripts" / "validate_avatar_glb.py"
-REQUIRED = ["eyeBlinkLeft","eyeBlinkRight","jawOpen","mouthClose","mouthPucker","mouthStretchLeft","browInnerUp"]
+REQUIRED = ["eyeBlinkLeft","eyeBlinkRight","jawOpen","mouthClose","mouthPucker","mouthStretchLeft","browInnerUp","mouthRollLower","mouthSmileLeft","mouthSmileRight"]
 
 def write_glb(path, names, target_count):
     doc={"asset":{"version":"2.0"},"meshes":[{"extras":{"targetNames":names},"primitives":[{"attributes":{"POSITION":0},"targets":[{} for _ in range(target_count)]}]}]}
@@ -30,5 +30,14 @@ with tempfile.TemporaryDirectory() as d:
     missing=d/"missing-wink.glb"; names=[n for n in REQUIRED if n!="eyeBlinkRight"]; write_glb(missing,names,len(names))
     result=run(missing)
     assert result.returncode!=0 and "eyeBlinkRight" in (result.stderr+result.stdout), "missing independent right-eye blink must be rejected"
+
+    for optional_before in ("mouthRollLower", "mouthSmileLeft", "mouthSmileRight"):
+        names=[n for n in REQUIRED if n != optional_before]
+        incomplete=d/("missing-"+optional_before+".glb")
+        write_glb(incomplete,names,len(names))
+        result=run(incomplete)
+        assert result.returncode != 0 and optional_before in (result.stderr+result.stdout), (
+            "authoring-required facial morph must be rejected: "+optional_before
+        )
 
 print("Avatar GLB validator self-test: OK")
