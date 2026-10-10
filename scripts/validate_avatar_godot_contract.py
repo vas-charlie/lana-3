@@ -21,6 +21,19 @@ missing = sorted(c for c in required_channels if f'"{c}"' not in text)
 if missing:
     raise SystemExit("missing rig channels: " + ", ".join(missing))
 
+required_morphs = {
+    "eyeBlinkLeft", "eyeBlinkRight", "jawOpen", "mouthClose",
+    "mouthPucker", "mouthStretchLeft", "browInnerUp",
+    "mouthRollLower", "mouthSmileLeft", "mouthSmileRight",
+}
+match = re.search(r"const REQUIRED_MORPHS := \[(.*?)\]", text, re.S)
+if match is None:
+    raise SystemExit("renderer must declare REQUIRED_MORPHS readiness gate")
+declared = set(re.findall(r'"([^"]+)"', match.group(1)))
+missing_morphs = sorted(required_morphs - declared)
+if missing_morphs:
+    raise SystemExit("Godot readiness gate missing required facial morphs: " + ", ".join(missing_morphs))
+
 if 'res://assets/lana_rigged.glb' not in text:
     raise SystemExit("production GLB contract path changed unexpectedly")
 if "func is_production_model_ready()" not in text:

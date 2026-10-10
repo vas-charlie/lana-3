@@ -16,7 +16,8 @@ var _ready_for_pose := false
 # Minimum independently controllable features before claiming rig readiness.
 const REQUIRED_MORPHS := [
     "eyeBlinkLeft", "eyeBlinkRight", "jawOpen", "mouthClose",
-    "mouthPucker", "mouthStretchLeft", "browInnerUp"
+    "mouthPucker", "mouthStretchLeft", "browInnerUp",
+    "mouthRollLower", "mouthSmileLeft", "mouthSmileRight"
 ]
 
 const MORPH_NAMES := {
