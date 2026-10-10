@@ -3,8 +3,7 @@
 import json, struct, sys
 from pathlib import Path
 
-REQUIRED_MORPHS = {"eyeBlinkLeft","eyeBlinkRight","jawOpen","mouthClose","mouthPucker","mouthStretchLeft","browInnerUp"}
-OPTIONAL_MORPHS = {"mouthRollLower","mouthSmileLeft","mouthSmileRight"}
+REQUIRED_MORPHS = {"eyeBlinkLeft","eyeBlinkRight","jawOpen","mouthClose","mouthPucker","mouthStretchLeft","browInnerUp","mouthRollLower","mouthSmileLeft","mouthSmileRight"}
 
 def fail(message):
     raise SystemExit("avatar GLB rejected: " + message)
@@ -49,7 +48,6 @@ def main():
     if missing: fail("missing required independent facial morphs: " + ", ".join(missing))
     print("Avatar GLB structural gate: OK")
     print("Required facial morphs:", ", ".join(sorted(REQUIRED_MORPHS)))
-    print("Optional facial morphs present:", ", ".join(sorted(OPTIONAL_MORPHS & names)) or "none")
     print("Note: this does not prove visual identity, licensing, materials, runtime performance, or physical-device acceptance.")
 
 if __name__ == "__main__":
