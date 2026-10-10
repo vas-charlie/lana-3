@@ -93,6 +93,11 @@
     <string name="notes_invalid_search_blank">Enter text to search for.</string>
     <string name="notes_invalid_action_not_authorized">Saving the note is not authorized.</string>
     <string name="notes_invalid_action_type">The action is not a valid note-save action.</string>
+    <string name="notes_blocked_authorization">Authorization does not permit this action to execute.</string>
+    <string name="notes_mode_observe">OBSERVE mode does not execute actions.</string>
+    <string name="notes_mode_suggest">SUGGEST mode does not execute actions.</string>
+    <string name="notes_mode_user_confirmation">Your confirmation is required.</string>
+    <string name="notes_mode_action_confirmation">This action requires explicit confirmation.</string>
 
     <string name="smart_ride_description">Test screen. LANA does not accept a ride automatically. Enter the real offer data and your thresholds.</string>
     <string name="smart_ride_prefill_received">Structured offer data was loaded. Review it before evaluation.</string>

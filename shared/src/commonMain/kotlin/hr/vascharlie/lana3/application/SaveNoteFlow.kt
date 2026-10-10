@@ -5,6 +5,7 @@ import hr.vascharlie.lana3.core.authorization.ActionAuthorizer
 import hr.vascharlie.lana3.core.authorization.AuthorizationLevel
 import hr.vascharlie.lana3.core.authorization.AuthorizedAction
 import hr.vascharlie.lana3.core.authorization.AutomationMode
+import hr.vascharlie.lana3.core.authorization.ExecutionModeBlockReason
 import hr.vascharlie.lana3.core.authorization.ExecutionModeGate
 import hr.vascharlie.lana3.core.authorization.ExecutionModeGateResult
 import hr.vascharlie.lana3.core.context.LanaContext
@@ -32,12 +33,16 @@ sealed interface SaveNoteFlowResult {
     ) : SaveNoteFlowResult
 
     data class AwaitingConfirmation(
-        val reason: String,
+        val reason: ExecutionModeBlockReason,
         val explanation: String,
     ) : SaveNoteFlowResult
 
-    data class Blocked(
+    data class AuthorizationBlocked(
         val reason: String,
+    ) : SaveNoteFlowResult
+
+    data class ExecutionBlocked(
+        val reason: ExecutionModeBlockReason,
     ) : SaveNoteFlowResult
 
     data class Rejected(
@@ -106,7 +111,7 @@ class SaveNoteFlow(
                 level = DiagnosticLevel.WARNING,
                 message = "Save note request did not reach executable authorization.",
             )
-            return SaveNoteFlowResult.Blocked(authorization.reason)
+            return SaveNoteFlowResult.AuthorizationBlocked(authorization.reason)
         }
 
         val authorizedAction =
@@ -137,7 +142,7 @@ class SaveNoteFlow(
                         explanation = proposed.explanation,
                     )
                 } else {
-                    SaveNoteFlowResult.Blocked(modeResult.reason)
+                    SaveNoteFlowResult.ExecutionBlocked(modeResult.reason)
                 }
             }
         }
