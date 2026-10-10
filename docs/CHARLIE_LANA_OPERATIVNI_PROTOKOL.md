@@ -153,6 +153,29 @@ Prije prve promjene:
 
 ---
 
+## 10A. Temeljni standard izvršenja: 8 načela
+
+Prije pokretanja bilo kojeg ozbiljnog rada na LANI 3, ova načela moraju se ponovno pročitati zajedno s ovim protokolom. Redoslijed izražava prioritet sigurnosti i kvalitete; brzina nikada ne poništava prethodna načela.
+
+1. **OPREZ** — prvo zaštititi poznato dobro stanje, podatke, kompatibilnost i mogućnost sigurnog povratka.
+2. **PAMETNO** — raditi prema dokazima, ovisnostima i najjeftinijoj pouzdanoj provjeri; ne trošiti vrijeme na rad koji ne smanjuje neizvjesnost ili ne donosi vrijednost.
+3. **OZBILJNO** — svaku promjenu tretirati kao dio stvarnog proizvoda, s jasnim ciljem, granicom i kriterijem prihvata.
+4. **PROFESIONALNO** — koristiti kontrolirane grane/PR-ove, pregledive promjene, testove, dokumentirane ugovore i sljedivost odluka.
+5. **MAX PARALELNO** — neovisne tokove izvršavati istodobno kad imaju jasne granice i ne povećavaju nekontrolirano integracijski rizik. Zajedničke ugovore i ista područja koda ne mijenjati konkurentno bez koordinacije.
+6. **MAX BRZO** — uklanjati nepotrebno čekanje i serijski rad, ali nikada preskakanjem dokaza, testova, sigurnosnih granica ili potrebne fizičke potvrde.
+7. **ODGOVORNO** — ne skrivati neizvjesnost, kvar, trošak ni rizik. Za nepovratne, financijske, sigurnosno osjetljive ili fizički rizične korake tražiti odgovarajuću potvrdu.
+8. **POUZDANO** — rezultat vrijedi tek kada je potvrđen na razini koju zahtijeva njegova priroda: kod/test, integracija, stvarni artefakt i, kada je potrebno, fizički uređaj.
+
+### Pravilo paralelizacije
+
+**Paralelizacija je ubrzanje samo dok ne smanjuje dokazivost, sigurnost ili pouzdanost.** Ako dva toka dijele isti nestabilni ugovor, isti kritični kod ili ne mogu biti neovisno verificirana, privremeno ih sekvencijalizirati. `main` ostaje jedina integrirana istina projekta.
+
+### Obvezni pre-flight
+
+Prije pokretanja bilo čega što mijenja projekt: pročitaj 8 načela, izvrši korake iz odjeljka 10, odredi ovisnosti i vlasništvo promjene, provjeri može li se sigurno paralelizirati te definiraj dokaz kojim će se rezultat potvrditi. Tek tada pokreni izvedbu.
+
+---
+
 ## 11. Kratka arhiva važnih lekcija
 
 ### 864 / B64
