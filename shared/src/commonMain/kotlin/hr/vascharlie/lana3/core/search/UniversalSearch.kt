@@ -57,13 +57,14 @@ class UniversalSearch(
     }
 
     fun search(query: String): UniversalSearchResult {
-        if (query.isBlank()) {
+        val normalizedQuery = query.trim()
+        if (normalizedQuery.isBlank()) {
             return UniversalSearchResult.Invalid(SearchInvalidReason.QUERY_BLANK)
         }
 
         val hits = SearchDomain.entries
             .mapNotNull(providersByDomain::get)
-            .flatMap { provider -> provider.search(query) }
+            .flatMap { provider -> provider.search(normalizedQuery) }
             .sortedWith(
                 compareByDescending<SearchHit> { it.updatedAtEpochMillis ?: Long.MIN_VALUE }
                     .thenBy { it.domain.ordinal }
