@@ -153,6 +153,14 @@ class MainActivity : Activity() {
         root.addView(status)
 
         root.addView(Button(this).apply {
+            text = "Taxi · Tarife i kriteriji"
+            isAllCaps = false
+            setOnClickListener {
+                startActivity(Intent(this@MainActivity, TaxiTariffsActivity::class.java))
+            }
+        })
+
+        root.addView(Button(this).apply {
             text = getString(R.string.smart_ride_test_button)
             isAllCaps = false
             setOnClickListener {
