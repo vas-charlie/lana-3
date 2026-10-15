@@ -49,11 +49,13 @@ class AutoUpdater(
             "https://api.github.com/repos/vas-charlie/lana-3/releases/latest"
         private const val APK_ASSET_NAME = "lana-3.apk"
         private const val CHECK_INTERVAL_MS = 6L * 60L * 60L * 1000L
+        private const val DOWNLOAD_STALL_TIMEOUT_MS = 5L * 60L * 1000L
 
         private const val PREFS = "lana_auto_updater"
         private const val KEY_LAST_CHECK = "last_check"
         private const val KEY_DOWNLOAD_ID = "download_id"
         private const val KEY_REMOTE_VERSION = "remote_version"
+        private const val KEY_DOWNLOAD_STARTED_AT = "download_started_at"
     }
 
     private val downloadManager =
@@ -252,6 +254,7 @@ class AutoUpdater(
         prefs.edit {
             putLong(KEY_DOWNLOAD_ID, downloadId)
             putInt(KEY_REMOTE_VERSION, release.versionCode)
+            putLong(KEY_DOWNLOAD_STARTED_AT, System.currentTimeMillis())
         }
 
         postStatus(AutoUpdateStatus.DownloadStarted)
@@ -278,7 +281,18 @@ class AutoUpdater(
                 DownloadManager.STATUS_PENDING,
                 DownloadManager.STATUS_RUNNING,
                 DownloadManager.STATUS_PAUSED -> {
-                    postStatus(AutoUpdateStatus.Downloading)
+                    val startedAt = prefs.getLong(KEY_DOWNLOAD_STARTED_AT, 0L)
+                    val stalled = startedAt > 0L &&
+                        System.currentTimeMillis() - startedAt >= DOWNLOAD_STALL_TIMEOUT_MS
+
+                    if (stalled) {
+                        downloadManager.remove(downloadId)
+                        clearPendingUpdate()
+                        postStatus(AutoUpdateStatus.DownloadFailed)
+                        checkNow(force = true)
+                    } else {
+                        postStatus(AutoUpdateStatus.Downloading)
+                    }
                 }
 
                 DownloadManager.STATUS_SUCCESSFUL -> {
@@ -434,6 +448,7 @@ class AutoUpdater(
         prefs.edit {
             remove(KEY_DOWNLOAD_ID)
             remove(KEY_REMOTE_VERSION)
+            remove(KEY_DOWNLOAD_STARTED_AT)
         }
     }
 
