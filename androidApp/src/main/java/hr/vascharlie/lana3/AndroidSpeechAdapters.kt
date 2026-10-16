@@ -5,6 +5,7 @@ import android.content.Intent
 import android.os.Bundle
 import android.os.Handler
 import android.os.Looper
+import android.os.Build
 import android.speech.RecognitionListener
 import android.speech.RecognizerIntent
 import android.speech.SpeechRecognizer
@@ -65,6 +66,13 @@ class AndroidSpeechInputAdapter(
                     RecognizerIntent.EXTRA_PARTIAL_RESULTS,
                     request.enablePartialResults,
                 )
+
+                if (
+                    request.enableLanguageDetection &&
+                    Build.VERSION.SDK_INT >= Build.VERSION_CODES.UPSIDE_DOWN_CAKE
+                ) {
+                    putExtra(RecognizerIntent.EXTRA_ENABLE_LANGUAGE_DETECTION, true)
+                }
 
                 request.languageTag
                     ?.takeIf { it.isNotBlank() }
@@ -156,6 +164,30 @@ class AndroidSpeechInputAdapter(
 
             recognizer?.destroy()
             recognizer = null
+        }
+
+        override fun onLanguageDetection(results: Bundle) {
+            if (Build.VERSION.SDK_INT < Build.VERSION_CODES.UPSIDE_DOWN_CAKE) return
+
+            val detectedLanguage = results
+                .getString(SpeechRecognizer.DETECTED_LANGUAGE)
+                ?.takeIf { it.isNotBlank() }
+                ?: return
+            val confidenceLevel = if (
+                results.containsKey(SpeechRecognizer.LANGUAGE_DETECTION_CONFIDENCE_LEVEL)
+            ) {
+                results.getInt(SpeechRecognizer.LANGUAGE_DETECTION_CONFIDENCE_LEVEL)
+            } else {
+                null
+            }
+
+            activeLanguageTag = detectedLanguage
+            emit(
+                SpeechInputEvent.LanguageDetected(
+                    languageTag = detectedLanguage,
+                    confidenceLevel = confidenceLevel,
+                )
+            )
         }
 
         override fun onPartialResults(partialResults: Bundle?) {
