@@ -144,6 +144,10 @@ class AndroidSpeechInputAdapter(
                 ?.getStringArrayList(SpeechRecognizer.RESULTS_RECOGNITION)
                 ?.firstOrNull()
                 .orEmpty()
+            val confidence = results
+                ?.getFloatArray(SpeechRecognizer.CONFIDENCE_SCORES)
+                ?.firstOrNull()
+                ?.takeIf { it in 0.0f..1.0f }
 
             if (text.isBlank()) {
                 emit(
@@ -158,6 +162,7 @@ class AndroidSpeechInputAdapter(
                     SpeechInputEvent.FinalTranscript(
                         text = text,
                         languageTag = activeLanguageTag,
+                        confidence = confidence,
                     )
                 )
             }
