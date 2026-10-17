@@ -44,6 +44,7 @@ class VoiceTestActivity : Activity() {
     private lateinit var transcript: EditText
     private lateinit var status: TextView
     private lateinit var recognitionEvidence: TextView
+    private lateinit var ttsEvidence: TextView
     private lateinit var listenButton: Button
     private val avatarController = AvatarController()
     private lateinit var avatarView: LanaConversationAvatarView
@@ -128,6 +129,14 @@ class VoiceTestActivity : Activity() {
             setTextColor(Color.rgb(180, 195, 210))
         }
         root.addView(recognitionEvidence)
+
+        ttsEvidence = TextView(this).apply {
+            text = "TTS dokaz: čeka provjeru."
+            textSize = 13f
+            setPadding(0, 0, 0, 12)
+            setTextColor(Color.rgb(180, 195, 210))
+        }
+        root.addView(ttsEvidence)
 
         transcript = EditText(this).apply {
             hint = getString(R.string.voice_transcript_hint)
@@ -244,6 +253,10 @@ class VoiceTestActivity : Activity() {
         }
         status.text = getString(R.string.voice_availability_status, stt, tts)
         listenButton.isEnabled = speechInput.isAvailable
+        if (::ttsEvidence.isInitialized) {
+            val requestedLanguage = languageTag.text?.toString()?.trim()
+            ttsEvidence.text = outputAdapter.diagnosticSummary(requestedLanguage)
+        }
     }
 
     private fun startListening() {
@@ -496,6 +509,8 @@ class VoiceTestActivity : Activity() {
             ?.toString()
             ?.trim()
             ?.takeIf { it.isNotEmpty() }
+
+        ttsEvidence.text = outputAdapter.diagnosticSummary(requestedLanguage)
 
         speechOutput.speak(
             SpeechOutputRequest(

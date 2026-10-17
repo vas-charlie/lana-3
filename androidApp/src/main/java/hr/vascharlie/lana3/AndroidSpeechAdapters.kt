@@ -305,6 +305,35 @@ class AndroidSpeechOutputAdapter(
     override val isAvailable: Boolean
         get() = initialized && !initFailed
 
+    /**
+     * Physical-device diagnostic only. Reports what Android actually selected
+     * after applying the requested language, without changing the spoken text.
+     */
+    fun diagnosticSummary(languageTag: String?): String {
+        if (!isAvailable) return "TTS nije spreman"
+
+        val requestedLocale = languageTag
+            ?.takeIf { it.isNotBlank() }
+            ?.let(Locale::forLanguageTag)
+            ?: Locale.getDefault()
+
+        val languageResult = tts.setLanguage(requestedLocale)
+        if (
+            languageResult == TextToSpeech.LANG_MISSING_DATA ||
+            languageResult == TextToSpeech.LANG_NOT_SUPPORTED
+        ) {
+            return "TTS jezik nije podržan: ${requestedLocale.toLanguageTag()}"
+        }
+
+        val engine = tts.defaultEngine ?: "nepoznat engine"
+        val selectedVoice = tts.voice
+        val voiceName = selectedVoice?.name ?: "nepoznat glas"
+        val voiceLocale = selectedVoice?.locale?.toLanguageTag() ?: "nepoznat locale"
+        val network = selectedVoice?.isNetworkConnectionRequired?.toString() ?: "nepoznato"
+
+        return "TTS: engine=$engine · glas=$voiceName · locale=$voiceLocale · mreža=$network"
+    }
+
     override fun speak(
         request: SpeechOutputRequest,
         onEvent: (SpeechOutputEvent) -> Unit,
