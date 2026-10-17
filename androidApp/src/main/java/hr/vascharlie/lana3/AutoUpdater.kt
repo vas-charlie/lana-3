@@ -95,7 +95,10 @@ class AutoUpdater(
         registerReceiver()
         clearCompletedUpdateState()
         resumePendingInstall()
-        checkNow(force = false)
+        // A fresh Activity starts with a visible "checking" status. Always perform
+        // one real check for that launch so the UI cannot remain stuck merely
+        // because a previous Activity checked within the periodic interval.
+        checkNow(force = true)
         handler.removeCallbacks(periodicCheck)
         handler.postDelayed(periodicCheck, CHECK_INTERVAL_MS)
     }
