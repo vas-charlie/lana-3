@@ -43,6 +43,7 @@ class VoiceTestActivity : Activity() {
     private lateinit var languageTag: EditText
     private lateinit var transcript: EditText
     private lateinit var status: TextView
+    private lateinit var recognitionEvidence: TextView
     private lateinit var listenButton: Button
     private val avatarController = AvatarController()
     private lateinit var avatarView: LanaConversationAvatarView
@@ -119,6 +120,14 @@ class VoiceTestActivity : Activity() {
             setTextColor(Color.rgb(90, 180, 255))
         }
         root.addView(status)
+
+        recognitionEvidence = TextView(this).apply {
+            text = getString(R.string.voice_evidence_waiting)
+            textSize = 13f
+            setPadding(0, 0, 0, 12)
+            setTextColor(Color.rgb(180, 195, 210))
+        }
+        root.addView(recognitionEvidence)
 
         transcript = EditText(this).apply {
             hint = getString(R.string.voice_transcript_hint)
@@ -289,6 +298,12 @@ class VoiceTestActivity : Activity() {
 
                     is SpeechInputEvent.LanguageDetected -> {
                         languageTag.setText(event.languageTag)
+                        recognitionEvidence.text = getString(
+                            R.string.voice_evidence_language,
+                            event.languageTag,
+                            event.confidenceLevel?.toString()
+                                ?: getString(R.string.voice_evidence_unavailable),
+                        )
                         status.text = getString(R.string.voice_recognizing)
                     }
 
@@ -297,6 +312,14 @@ class VoiceTestActivity : Activity() {
                         avatarView.render(avatarController.frame)
                         transcript.setText(event.text)
                         transcript.setSelection(transcript.text.length)
+                        recognitionEvidence.text = getString(
+                            R.string.voice_evidence_final,
+                            event.languageTag
+                                ?: getString(R.string.voice_evidence_unavailable),
+                            event.confidence
+                                ?.let { String.format(Locale.ROOT, "%.0f%%", it * 100f) }
+                                ?: getString(R.string.voice_evidence_unavailable),
+                        )
                         status.text = getString(R.string.voice_recognized)
                     }
 
