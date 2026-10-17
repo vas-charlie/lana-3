@@ -3,6 +3,12 @@ package hr.vascharlie.lana3.ports
 data class SpeechInputRequest(
     val languageTag: String? = null,
     val enablePartialResults: Boolean = true,
+    /**
+     * Requests language detection when the platform supports it. This is a
+     * capability request, not a promise that every recognizer can detect every
+     * language. Callers must still handle a missing detection result.
+     */
+    val enableLanguageDetection: Boolean = false,
 )
 
 sealed interface SpeechInputEvent {
@@ -17,6 +23,22 @@ sealed interface SpeechInputEvent {
     data class FinalTranscript(
         val text: String,
         val languageTag: String? = null,
+        /**
+         * Recognition confidence reported by the speech engine for this exact
+         * transcript, normalized by Android to 0.0..1.0. Null means the engine
+         * did not provide usable confidence evidence. LANA must not invent it.
+         */
+        val confidence: Float? = null,
+    ) : SpeechInputEvent
+
+    /**
+     * Emitted only when the speech engine explicitly reports a detected
+     * language. LANA must not infer or invent a language tag when this event is
+     * absent.
+     */
+    data class LanguageDetected(
+        val languageTag: String,
+        val confidenceLevel: Int? = null,
     ) : SpeechInputEvent
 
     data class Error(

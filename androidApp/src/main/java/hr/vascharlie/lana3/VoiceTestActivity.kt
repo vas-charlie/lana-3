@@ -251,6 +251,7 @@ class VoiceTestActivity : Activity() {
             SpeechInputRequest(
                 languageTag = requestedLanguage,
                 enablePartialResults = true,
+                enableLanguageDetection = true,
             )
         ) { event ->
             runOnUiThread {
@@ -270,6 +271,11 @@ class VoiceTestActivity : Activity() {
                     is SpeechInputEvent.PartialTranscript -> {
                         transcript.setText(event.text)
                         transcript.setSelection(transcript.text.length)
+                        status.text = getString(R.string.voice_recognizing)
+                    }
+
+                    is SpeechInputEvent.LanguageDetected -> {
+                        languageTag.setText(event.languageTag)
                         status.text = getString(R.string.voice_recognizing)
                     }
 
