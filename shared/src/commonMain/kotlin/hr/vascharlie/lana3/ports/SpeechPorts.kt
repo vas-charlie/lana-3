@@ -23,6 +23,12 @@ sealed interface SpeechInputEvent {
     data class FinalTranscript(
         val text: String,
         val languageTag: String? = null,
+        /**
+         * Recognition confidence reported by the speech engine for this exact
+         * transcript, normalized by Android to 0.0..1.0. Null means the engine
+         * did not provide usable confidence evidence. LANA must not invent it.
+         */
+        val confidence: Float? = null,
     ) : SpeechInputEvent
 
     /**
