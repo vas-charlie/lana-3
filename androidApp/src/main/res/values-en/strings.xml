@@ -47,6 +47,10 @@
     <string name="voice_listening">Listening…</string>
     <string name="voice_recognizing">Recognizing speech…</string>
     <string name="voice_recognized">Speech recognized.</string>
+    <string name="voice_evidence_waiting">Recognition evidence: waiting for speech.</string>
+    <string name="voice_evidence_language">Detected language: %1$s · language confidence level: %2$s</string>
+    <string name="voice_evidence_final">Final evidence · language: %1$s · transcript confidence: %2$s</string>
+    <string name="voice_evidence_unavailable">not reported</string>
     <string name="voice_stt_error">STT: %1$s%2$s</string>
     <string name="voice_retry_suffix"> You can try again.</string>
     <string name="voice_no_text_for_note">There is no text to save as a note.</string>

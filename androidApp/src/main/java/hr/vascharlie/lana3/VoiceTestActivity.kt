@@ -4,12 +4,15 @@ import android.Manifest
 import android.app.Activity
 import android.content.Intent
 import android.content.pm.PackageManager
+import android.graphics.BitmapFactory
 import android.graphics.Color
 import android.graphics.Typeface
+import android.util.Base64
 import android.os.Bundle
 import android.view.Gravity
 import android.widget.Button
 import android.widget.EditText
+import android.widget.ImageView
 import android.widget.LinearLayout
 import android.widget.ScrollView
 import android.widget.TextView
@@ -40,9 +43,11 @@ class VoiceTestActivity : Activity() {
     private lateinit var languageTag: EditText
     private lateinit var transcript: EditText
     private lateinit var status: TextView
+    private lateinit var recognitionEvidence: TextView
     private lateinit var listenButton: Button
     private val avatarController = AvatarController()
     private lateinit var avatarView: LanaConversationAvatarView
+    private lateinit var presenceView: ImageView
 
     override fun onCreate(savedInstanceState: Bundle?) {
         super.onCreate(savedInstanceState)
@@ -74,17 +79,26 @@ class VoiceTestActivity : Activity() {
             setTextColor(Color.rgb(180, 195, 210))
         })
 
-        avatarView = LanaConversationAvatarView(this).apply {
+        presenceView = ImageView(this).apply {
+            scaleType = ImageView.ScaleType.CENTER_CROP
             contentDescription = getString(R.string.avatar_content_description)
-            render(avatarController.frame)
+            loadLanaPresence()
         }
         root.addView(
-            avatarView,
+            presenceView,
             LinearLayout.LayoutParams(
                 LinearLayout.LayoutParams.MATCH_PARENT,
                 dp(420),
             ).apply { setMargins(0, 0, 0, dp(20)) }
         )
+
+        // Keep the state renderer alive for the existing Voice Lab state contract,
+        // but do not present its developer scaffold as Lana's visual identity.
+        avatarView = LanaConversationAvatarView(this).apply {
+            visibility = android.view.View.GONE
+            render(avatarController.frame)
+        }
+        root.addView(avatarView, LinearLayout.LayoutParams(1, 1))
 
         root.addView(TextView(this).apply {
             text = getString(R.string.voice_language_label)
@@ -106,6 +120,14 @@ class VoiceTestActivity : Activity() {
             setTextColor(Color.rgb(90, 180, 255))
         }
         root.addView(status)
+
+        recognitionEvidence = TextView(this).apply {
+            text = getString(R.string.voice_evidence_waiting)
+            textSize = 13f
+            setPadding(0, 0, 0, 12)
+            setTextColor(Color.rgb(180, 195, 210))
+        }
+        root.addView(recognitionEvidence)
 
         transcript = EditText(this).apply {
             hint = getString(R.string.voice_transcript_hint)
@@ -276,6 +298,12 @@ class VoiceTestActivity : Activity() {
 
                     is SpeechInputEvent.LanguageDetected -> {
                         languageTag.setText(event.languageTag)
+                        recognitionEvidence.text = getString(
+                            R.string.voice_evidence_language,
+                            event.languageTag,
+                            event.confidenceLevel?.toString()
+                                ?: getString(R.string.voice_evidence_unavailable),
+                        )
                         status.text = getString(R.string.voice_recognizing)
                     }
 
@@ -284,6 +312,14 @@ class VoiceTestActivity : Activity() {
                         avatarView.render(avatarController.frame)
                         transcript.setText(event.text)
                         transcript.setSelection(transcript.text.length)
+                        recognitionEvidence.text = getString(
+                            R.string.voice_evidence_final,
+                            event.languageTag
+                                ?: getString(R.string.voice_evidence_unavailable),
+                            event.confidence
+                                ?.let { String.format(Locale.ROOT, "%.0f%%", it * 100f) }
+                                ?: getString(R.string.voice_evidence_unavailable),
+                        )
                         status.text = getString(R.string.voice_recognized)
                     }
 
@@ -500,6 +536,20 @@ class VoiceTestActivity : Activity() {
                     }
                 }
             }
+        }
+    }
+
+    private fun ImageView.loadLanaPresence() {
+        runCatching {
+            val encoded = assets.open("lana_presence_v2.webp.b64")
+                .bufferedReader()
+                .use { it.readText() }
+            val bytes = Base64.decode(encoded, Base64.DEFAULT)
+            val bitmap = BitmapFactory.decodeByteArray(bytes, 0, bytes.size)
+                ?: error("Could not decode Lana presence image")
+            setImageBitmap(bitmap)
+        }.onFailure {
+            setImageResource(R.drawable.lana_presence)
         }
     }
 
