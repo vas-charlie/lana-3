@@ -57,6 +57,10 @@
     <string name="voice_listening">Slušam…</string>
     <string name="voice_recognizing">Prepoznajem govor…</string>
     <string name="voice_recognized">Govor prepoznat.</string>
+    <string name="voice_evidence_waiting">Dokaz prepoznavanja: čeka govor.</string>
+    <string name="voice_evidence_language">Detektirani jezik: %1$s · razina sigurnosti jezika: %2$s</string>
+    <string name="voice_evidence_final">Završni dokaz · jezik: %1$s · sigurnost prijepisa: %2$s</string>
+    <string name="voice_evidence_unavailable">nije prijavljeno</string>
     <string name="voice_stt_error">STT: %1$s%2$s</string>
     <string name="voice_retry_suffix"> Možeš pokušati ponovno.</string>
     <string name="voice_no_text_for_note">Nema teksta za bilješku.</string>
