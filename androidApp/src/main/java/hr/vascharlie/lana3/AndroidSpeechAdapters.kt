@@ -305,6 +305,33 @@ class AndroidSpeechOutputAdapter(
     override val isAvailable: Boolean
         get() = initialized && !initFailed
 
+    private fun selectBestVoice(locale: Locale) {
+        val matchingVoices = tts.voices
+            ?.filter { voice ->
+                voice.locale.language.equals(locale.language, ignoreCase = true) &&
+                    (
+                        locale.country.isBlank() ||
+                            voice.locale.country.isBlank() ||
+                            voice.locale.country.equals(locale.country, ignoreCase = true)
+                    )
+            }
+            .orEmpty()
+
+        val selectedVoice = matchingVoices
+            .sortedWith(
+                compareBy<android.speech.tts.Voice>(
+                    { it.isNetworkConnectionRequired },
+                    { it.name.endsWith("-language", ignoreCase = true) },
+                    { it.name },
+                )
+            )
+            .firstOrNull()
+
+        if (selectedVoice != null) {
+            tts.voice = selectedVoice
+        }
+    }
+
     /**
      * Physical-device diagnostic only. Reports what Android actually selected
      * after applying the requested language, without changing the spoken text.
@@ -324,6 +351,8 @@ class AndroidSpeechOutputAdapter(
         ) {
             return "TTS jezik nije podržan: ${requestedLocale.toLanguageTag()}"
         }
+
+        selectBestVoice(requestedLocale)
 
         val engine = tts.defaultEngine ?: "nepoznat engine"
         val selectedVoice = tts.voice
@@ -383,6 +412,8 @@ class AndroidSpeechOutputAdapter(
                     return@post
                 }
             }
+
+            selectBestVoice(locale)
 
             val utteranceId = "lana-" + UUID.randomUUID().toString()
             val result = tts.speak(
