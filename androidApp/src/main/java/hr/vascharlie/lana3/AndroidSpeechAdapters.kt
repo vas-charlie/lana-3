@@ -256,6 +256,7 @@ class AndroidSpeechOutputAdapter(
     private var initialized = false
     private var initFailed = false
     private var currentCallback: ((SpeechOutputEvent) -> Unit)? = null
+    private var preferredVoiceName: String? = null
 
     private val tts = TextToSpeech(context.applicationContext) { status ->
         initialized = status == TextToSpeech.SUCCESS
@@ -317,19 +318,57 @@ class AndroidSpeechOutputAdapter(
             }
             .orEmpty()
 
-        val selectedVoice = matchingVoices
-            .sortedWith(
+        val sortedVoices = matchingVoices.sortedWith(
+            compareBy<android.speech.tts.Voice>(
+                { it.isNetworkConnectionRequired },
+                { it.name.endsWith("-language", ignoreCase = true) },
+                { it.name },
+            )
+        )
+        val selectedVoice = preferredVoiceName
+            ?.let { preferred -> sortedVoices.firstOrNull { it.name == preferred } }
+            ?: sortedVoices.firstOrNull()
+
+        if (selectedVoice != null) {
+            tts.voice = selectedVoice
+        }
+    }
+
+    fun selectNextVoice(languageTag: String?): String {
+        if (!isAvailable) return "TTS nije spreman"
+
+        val locale = languageTag
+            ?.takeIf { it.isNotBlank() }
+            ?.let(Locale::forLanguageTag)
+            ?: Locale.getDefault()
+
+        val matchingVoices = tts.voices
+            ?.filter { voice ->
+                voice.locale.language.equals(locale.language, ignoreCase = true) &&
+                    (
+                        locale.country.isBlank() ||
+                            voice.locale.country.isBlank() ||
+                            voice.locale.country.equals(locale.country, ignoreCase = true)
+                    )
+            }
+            ?.sortedWith(
                 compareBy<android.speech.tts.Voice>(
                     { it.isNetworkConnectionRequired },
                     { it.name.endsWith("-language", ignoreCase = true) },
                     { it.name },
                 )
             )
-            .firstOrNull()
+            .orEmpty()
 
-        if (selectedVoice != null) {
-            tts.voice = selectedVoice
+        if (matchingVoices.isEmpty()) {
+            return "Nema dostupnih TTS glasova za ${locale.toLanguageTag()}"
         }
+
+        val currentIndex = matchingVoices.indexOfFirst { it.name == tts.voice?.name }
+        val nextVoice = matchingVoices[(currentIndex + 1).mod(matchingVoices.size)]
+        preferredVoiceName = nextVoice.name
+        tts.voice = nextVoice
+        return diagnosticSummary(languageTag)
     }
 
     /**

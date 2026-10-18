@@ -176,6 +176,15 @@ class VoiceTestActivity : Activity() {
         })
 
         root.addView(Button(this).apply {
+            text = "Sljedeći hrvatski TTS glas"
+            isAllCaps = false
+            setOnClickListener {
+                val requestedLanguage = languageTag.text?.toString()?.trim()
+                ttsEvidence.text = outputAdapter.selectNextVoice(requestedLanguage)
+            }
+        })
+
+        root.addView(Button(this).apply {
             text = getString(R.string.voice_stop_speaking)
             isAllCaps = false
             setOnClickListener {
