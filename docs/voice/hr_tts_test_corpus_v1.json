@@ -1,0 +1,85 @@
+{
+  "schema_version": 1,
+  "locale": "hr-HR",
+  "purpose": "Standardizirani ručni test sinteze govora; bez tvrdnji o ispravnom rezultatu",
+  "test_cases": [
+    {
+      "id": "TTS-HR-01-ME-MI",
+      "text": "Čekaj me ispred ulaza. Reci mi kada stižeš.",
+      "targets": [
+        "me",
+        "mi"
+      ],
+      "checks": [
+        "Zamjenica 'me' se ne izgovara 'mi'",
+        "'me' i 'mi' akustički se razlikuju"
+      ]
+    },
+    {
+      "id": "TTS-HR-02-ME-REPEATED",
+      "text": "Pogledaj me. Čuješ li me? Poslušaj me.",
+      "targets": [
+        "me"
+      ],
+      "checks": [
+        "Sve tri pojave 'me' zvuče pravilno"
+      ]
+    },
+    {
+      "id": "TTS-HR-03-TVRDJA",
+      "text": "Ova je daska tvrđa od one. Treća je najtvrđa.",
+      "targets": [
+        "tvrđa",
+        "najtvrđa"
+      ],
+      "checks": [
+        "Glas 'đ' nije izgovoren kao 'd'",
+        "Oba oblika su razumljiva"
+      ]
+    },
+    {
+      "id": "TTS-HR-04-TVRDJA-PLACE",
+      "text": "Čekam te kod Tvrđe. Tvrđavica je odmah iza ugla.",
+      "targets": [
+        "Tvrđe",
+        "Tvrđavica"
+      ],
+      "checks": [
+        "Glas 'đ' je očuvan u oba oblika"
+      ]
+    },
+    {
+      "id": "TTS-HR-05-CONTEXT",
+      "text": "Molim te, pogledaj me i reci mi razumiješ li me. Čekam te kod Tvrđe. Ova je daska tvrđa, ali treća je najtvrđa. Tvrđavica je odmah iza ugla.",
+      "targets": [
+        "me",
+        "mi",
+        "Tvrđe",
+        "tvrđa",
+        "najtvrđa",
+        "Tvrđavica"
+      ],
+      "checks": [
+        "Cjelovit govor je razumljiv",
+        "Kontrasti ostaju točni u duljem tekstu"
+      ]
+    }
+  ],
+  "result_fields": [
+    "date",
+    "provider",
+    "engine_or_model",
+    "voice_id",
+    "app_or_demo",
+    "device",
+    "case_id",
+    "pronunciation_me_mi_pass_fail_unknown",
+    "pronunciation_dj_pass_fail_unknown",
+    "naturalness_1_to_5_or_null",
+    "first_audio_ms_or_null",
+    "overall_notes",
+    "accepted_by_charlie"
+  ],
+  "policy": "Ne označavati test prihvaćenim bez stvarnog slušanja. Ne slati osobne ili tajne sadržaje.",
+  "reference_document": "docs/VOICE_HR_TTS_EVALUATION_2026-10-20.md"
+}
