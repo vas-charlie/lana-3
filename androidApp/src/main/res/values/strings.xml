@@ -37,6 +37,7 @@
     <string name="voice_start_listening">Počni slušati</string>
     <string name="voice_stop_listening">Zaustavi slušanje</string>
     <string name="voice_speak_text">LANA izgovori tekst</string>
+    <string name="voice_croatian_pronunciation_test">Testiraj hrvatski izgovor (me/mi, đ)</string>
     <string name="voice_stop_speaking">Zaustavi govor</string>
     <string name="voice_to_note">Pretvori tekst u bilješku</string>
     <string name="voice_to_smart_ride">Pošalji ponudu u Smart Ride</string>
