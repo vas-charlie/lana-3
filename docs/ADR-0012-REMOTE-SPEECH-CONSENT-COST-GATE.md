@@ -25,13 +25,14 @@ Prije nego što postane podoban za backend rezervaciju, svaki zahtjev mora imati
 - spreman sigurni backend i dostupnog pružatelja usluge;
 - važeću, provjerenu procjenu troška, vezanu uz tog dobavljača i glas;
 - poznato, nenegativno ograničenje po zahtjevu i preostali mjesečni budžet;
-- cijenu koja ne prelazi niti jedno od dva ograničenja.
+- cijenu koja ne prelazi niti jedno od dva ograničenja;
+- provjerenu troslovnu oznaku obračunske valute koja se mora podudarati između ponude i oba limita, inače je odgovor **BLOCKED**.
 
 Nedostatak dokaza znači **BLOCKED**, ne pretpostavljeni uspjeh. Ne postoji hard-kodirana valuta, dobavljač, jedinična cijena ili besplatna kvota.
 
 ### Što znači cijena u `micros`
 
-`Long` vrijednost označava milijuntinu obračunske valute odabrane na backendu (npr. 1 EUR = 1.000.000 micros). Svi limiti i quote moraju biti izraženi u **istoj valuti**; međovalutna konverzija, porezi, naknade i zaokruživanje moraju biti obrađeni i provjereni prije ovog koraka. Ne slati povjerljive iznose ili račune u logove.
+`Long` vrijednost označava milijuntinu obračunske valute odabrane na backendu (npr. 1 EUR = 1.000.000 micros). Svi limiti i quote moraju biti izraženi u **istoj valuti**; preflight sada eksplicitno uspoređuje valutu ponude s valutom limita, odbijajući nepoznate ili neusklađene valute. Format su tri velika slova, ali postojanje i zakonitost valute mora potvrditi backend. Međovalutna konverzija, porezi, naknade i zaokruživanje moraju biti obrađeni i provjereni prije ovog koraka. Ne slati povjerljive iznose ili račune u logove.
 
 ## Što ovaj PR namjerno NE radi
 
