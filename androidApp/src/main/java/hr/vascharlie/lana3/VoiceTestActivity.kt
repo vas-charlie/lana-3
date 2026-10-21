@@ -26,6 +26,7 @@ import hr.vascharlie.lana3.ports.SpeechInputRequest
 import hr.vascharlie.lana3.ports.SpeechOutputEvent
 import hr.vascharlie.lana3.ports.SpeechOutputPort
 import hr.vascharlie.lana3.ports.SpeechOutputRequest
+import hr.vascharlie.lana3.ports.SpeechDiagnosticSamples
 import java.util.Locale
 
 class VoiceTestActivity : Activity() {
@@ -166,6 +167,19 @@ class VoiceTestActivity : Activity() {
             setOnClickListener {
                 speechInput.stop()
                 status.text = getString(R.string.voice_stopping_listen)
+            }
+        })
+
+        // One tap loads the same Croatian reference text and plays it using
+        // the installed Android TTS engine, never a paid/cloud provider.
+        root.addView(Button(this).apply {
+            text = getString(R.string.voice_croatian_pronunciation_test)
+            isAllCaps = false
+            setOnClickListener {
+                languageTag.setText(SpeechDiagnosticSamples.CROATIAN_LANGUAGE_TAG)
+                transcript.setText(SpeechDiagnosticSamples.CROATIAN_PRONUNCIATION)
+                transcript.setSelection(transcript.text.length)
+                speakTranscript()
             }
         })
 

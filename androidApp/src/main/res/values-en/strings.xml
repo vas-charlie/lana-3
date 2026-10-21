@@ -27,6 +27,7 @@
     <string name="voice_start_listening">Start listening</string>
     <string name="voice_stop_listening">Stop listening</string>
     <string name="voice_speak_text">LANA speaks the text</string>
+    <string name="voice_croatian_pronunciation_test">Test Croatian pronunciation (me/mi, đ)</string>
     <string name="voice_stop_speaking">Stop speaking</string>
     <string name="voice_to_note">Turn text into a note</string>
     <string name="voice_to_smart_ride">Send offer to Smart Ride</string>
