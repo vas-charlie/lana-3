@@ -23,9 +23,9 @@ class SpeechOutputSessionGateTest {
         assertTrue(gate.dispatch("second", SpeechOutputEvent.Started))
         assertTrue(gate.dispatch("second", SpeechOutputEvent.Completed))
 
-        assertEquals(listOf(SpeechOutputEvent.Started), first)
+        assertEquals(listOf<SpeechOutputEvent>(SpeechOutputEvent.Started), first)
         assertEquals(
-            listOf(SpeechOutputEvent.Started, SpeechOutputEvent.Completed),
+            listOf<SpeechOutputEvent>(SpeechOutputEvent.Started, SpeechOutputEvent.Completed),
             second,
         )
     }
@@ -46,7 +46,7 @@ class SpeechOutputSessionGateTest {
         )
         gate.begin("new", received::add)
         assertTrue(gate.dispatch("new", SpeechOutputEvent.Started))
-        assertEquals(listOf(SpeechOutputEvent.Started), received)
+        assertEquals(listOf<SpeechOutputEvent>(SpeechOutputEvent.Started), received)
     }
 
     @Test
@@ -58,7 +58,7 @@ class SpeechOutputSessionGateTest {
         assertTrue(gate.dispatch("1", SpeechOutputEvent.Completed))
         assertFalse(gate.dispatch("1", SpeechOutputEvent.Completed))
         assertFalse(gate.dispatch("1", SpeechOutputEvent.Started))
-        assertEquals(listOf(SpeechOutputEvent.Completed), received)
+        assertEquals(listOf<SpeechOutputEvent>(SpeechOutputEvent.Completed), received)
     }
 
     @Test
@@ -70,7 +70,7 @@ class SpeechOutputSessionGateTest {
 
         assertTrue(gate.dispatch("1", error))
         assertFalse(gate.dispatch("1", SpeechOutputEvent.Completed))
-        assertEquals(listOf(error), received)
+        assertEquals(listOf<SpeechOutputEvent>(error), received)
     }
 
     @Test
@@ -83,7 +83,7 @@ class SpeechOutputSessionGateTest {
         assertFalse(gate.dispatch(null, progress))
         assertFalse(gate.dispatch("old", progress))
         assertTrue(gate.dispatch("new", progress))
-        assertEquals(listOf(progress), received)
+        assertEquals(listOf<SpeechOutputEvent>(progress), received)
     }
 
     @Test
