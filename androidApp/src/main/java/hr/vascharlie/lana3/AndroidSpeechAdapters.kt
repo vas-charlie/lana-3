@@ -17,6 +17,7 @@ import hr.vascharlie.lana3.ports.SpeechInputRequest
 import hr.vascharlie.lana3.ports.SpeechOutputEvent
 import hr.vascharlie.lana3.ports.SpeechOutputPort
 import hr.vascharlie.lana3.ports.SpeechOutputRequest
+import hr.vascharlie.lana3.ports.SpeechOutputSessionGate
 import java.util.Locale
 import java.util.UUID
 
@@ -255,7 +256,7 @@ class AndroidSpeechOutputAdapter(
 
     private var initialized = false
     private var initFailed = false
-    private var currentCallback: ((SpeechOutputEvent) -> Unit)? = null
+    private val outputSessions = SpeechOutputSessionGate()
     private var preferredVoiceName: String? = null
 
     private val tts = TextToSpeech(context.applicationContext) { status ->
@@ -265,11 +266,11 @@ class AndroidSpeechOutputAdapter(
         setOnUtteranceProgressListener(
             object : UtteranceProgressListener() {
                 override fun onStart(utteranceId: String?) {
-                    emit(SpeechOutputEvent.Started)
+                    emit(utteranceId, SpeechOutputEvent.Started)
                 }
 
                 override fun onDone(utteranceId: String?) {
-                    emit(SpeechOutputEvent.Completed)
+                    emit(utteranceId, SpeechOutputEvent.Completed)
                 }
 
                 override fun onRangeStart(
@@ -278,12 +279,13 @@ class AndroidSpeechOutputAdapter(
                     end: Int,
                     frame: Int,
                 ) {
-                    emit(SpeechOutputEvent.RangeStarted(start = start, end = end))
+                    emit(utteranceId, SpeechOutputEvent.RangeStarted(start = start, end = end))
                 }
 
                 @Deprecated("Deprecated in Android API")
                 override fun onError(utteranceId: String?) {
                     emit(
+                        utteranceId,
                         SpeechOutputEvent.Error(
                             code = "tts_error",
                             message = "Text-to-speech failed.",
@@ -293,6 +295,7 @@ class AndroidSpeechOutputAdapter(
 
                 override fun onError(utteranceId: String?, errorCode: Int) {
                     emit(
+                        utteranceId,
                         SpeechOutputEvent.Error(
                             code = "tts_error_$errorCode",
                             message = "Text-to-speech failed.",
@@ -407,10 +410,12 @@ class AndroidSpeechOutputAdapter(
         onEvent: (SpeechOutputEvent) -> Unit,
     ) {
         mainHandler.post {
-            currentCallback = onEvent
+            // A new request invalidates callbacks for the old one.
+            outputSessions.cancel()
+            tts.stop()
 
             if (!isAvailable) {
-                emit(
+                onEvent(
                     SpeechOutputEvent.Error(
                         code = if (initFailed) "tts_init_failed" else "tts_not_ready",
                         message =
@@ -425,7 +430,7 @@ class AndroidSpeechOutputAdapter(
             }
 
             if (request.text.isBlank()) {
-                emit(
+                onEvent(
                     SpeechOutputEvent.Error(
                         code = "empty_text",
                         message = "There is no text to speak.",
@@ -442,7 +447,7 @@ class AndroidSpeechOutputAdapter(
             when (tts.setLanguage(locale)) {
                 TextToSpeech.LANG_MISSING_DATA,
                 TextToSpeech.LANG_NOT_SUPPORTED -> {
-                    emit(
+                    onEvent(
                         SpeechOutputEvent.Error(
                             code = "language_not_supported",
                             message = "The selected TTS language is not supported on this device.",
@@ -455,6 +460,7 @@ class AndroidSpeechOutputAdapter(
             selectBestVoice(locale)
 
             val utteranceId = "lana-" + UUID.randomUUID().toString()
+            outputSessions.begin(utteranceId, onEvent)
             val result = tts.speak(
                 request.text,
                 TextToSpeech.QUEUE_FLUSH,
@@ -463,11 +469,12 @@ class AndroidSpeechOutputAdapter(
             )
 
             if (result == TextToSpeech.ERROR) {
-                emit(
+                outputSessions.dispatch(
+                    utteranceId,
                     SpeechOutputEvent.Error(
                         code = "tts_start_failed",
                         message = "Text-to-speech could not start.",
-                    )
+                    ),
                 )
             }
         }
@@ -475,21 +482,22 @@ class AndroidSpeechOutputAdapter(
 
     override fun stop() {
         mainHandler.post {
+            outputSessions.cancel()
             tts.stop()
         }
     }
 
     fun release() {
         mainHandler.post {
+            outputSessions.cancel()
             tts.stop()
             tts.shutdown()
-            currentCallback = null
         }
     }
 
-    private fun emit(event: SpeechOutputEvent) {
+    private fun emit(utteranceId: String?, event: SpeechOutputEvent) {
         mainHandler.post {
-            currentCallback?.invoke(event)
+            outputSessions.dispatch(utteranceId, event)
         }
     }
 }
