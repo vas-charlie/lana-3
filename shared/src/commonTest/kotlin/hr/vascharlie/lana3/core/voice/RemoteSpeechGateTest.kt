@@ -26,8 +26,10 @@ class RemoteSpeechGateTest {
             providerId = "approved-provider",
             voiceId = "verified-voice",
             estimatedCostMicros = 400L,
+            currencyCode = "EUR",
             verifiedForCurrentTariff = true,
         ),
+        budgetCurrencyCode = "EUR",
         maxPerRequestMicros = 1000L,
         remainingMonthlyBudgetMicros = 900L,
     )
@@ -50,6 +52,7 @@ class RemoteSpeechGateTest {
                 providerId = "approved-provider",
                 voiceId = "verified-voice",
                 estimatedCostMicros = 400L,
+                currencyCode = "EUR",
             ),
             gate.evaluate(request, approvedContext()),
         )
@@ -156,6 +159,30 @@ class RemoteSpeechGateTest {
         expectBlocked(
             RemoteSpeechBlockReason.INVALID_BUDGET,
             approvedContext().copy(remainingMonthlyBudgetMicros = -1L),
+        )
+    }
+
+    @Test
+    fun unknownCurrencyOrBadCodeCannotUseBudget() {
+        expectBlocked(
+            RemoteSpeechBlockReason.INVALID_BUDGET,
+            approvedContext().copy(budgetCurrencyCode = null),
+        )
+        expectBlocked(
+            RemoteSpeechBlockReason.INVALID_BUDGET,
+            approvedContext().copy(budgetCurrencyCode = "eur"),
+        )
+        expectBlocked(
+            RemoteSpeechBlockReason.PRICE_UNVERIFIED,
+            approvedContext().copy(quote = approvedContext().quote?.copy(currencyCode = "??")),
+        )
+    }
+
+    @Test
+    fun crossCurrencyQuoteCannotReuseBudgetDespiteMatchingNumericValues() {
+        expectBlocked(
+            RemoteSpeechBlockReason.CURRENCY_MISMATCH,
+            approvedContext().copy(quote = approvedContext().quote?.copy(currencyCode = "USD")),
         )
     }
 
