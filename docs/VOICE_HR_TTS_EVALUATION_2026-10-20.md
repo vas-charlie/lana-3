@@ -1,6 +1,6 @@
 # LANA 3 — Govor: hrvatski TTS, evaluacija i priprema integracije
 
-**Status: ISTRAŽIVANJE / ČEKA FIZIČKI TEST. Nije prihvaćeno.**  
+**Status: Google Android TTS fizički isproban i NE ZADOVOLJAVA hrvatske izgovorne kriterije; vanjski kandidati još čekaju test. Nije prihvaćeno.**  
 **Datum provjere javne dokumentacije:** 2026-10-20.  
 **Ne mijenja aplikacijski kod, ne odabire dobavljača, ne naručuje plaćenu uslugu, ne dira postojeći Android TTS.**
 
@@ -11,6 +11,12 @@
 - Samsungova instalirana TTS ponuda nije imala hrvatski. ElevenLabs web-demo vratio je generičku pogrešku; iz toga **ne zaključivati** da cijela usluga ne radi. U Microsoftovoj galeriji pronađen je hrvatski ženski glas Gabrijela, ali **još nije reproduciran naš referentni tekst**.
 - **Osobna Lana nije komercijalni avatar.** Javna platforma može kasnije koristiti zajedničku tehnologiju govora kroz odvojene konfiguracije, račune i prava pristupa. Nema dijeljenja privatne memorije ili osobnog identiteta.
 - Ime, izgled i kvaliteta budućih javnih avatara nisu razlog da sada kupujemo TTS ili mijenjamo sigurnu Android bazu.
+
+## Fizički rezultat, 21.10.2026.
+
+Na uređaju Samsung SM-S928B (Android 16) i LANA 3 `0.1.329-dev`, Charlie je isprobao Googleove hrvatske glasove `hr-hr-x-hra-local`, `hr-hr-x-hrb-local` i `hr-hr-x-hrb-network`. Za sva tri prijavio je pogrešan izgovor **„me”** i **„tvrđa”**. Zadnji glas zahtijeva mrežnu vezu (`mreža=true`); lokalni glasovi ne. To je zabilježena ljudska slušna procjena, ne snimljena fonetska analiza. **Nijedan od ova tri glasa nije prihvaćen kao Lanin hrvatski produkcijski glas.**
+
+Detalji, ograničenja dokaza i testni tekst: [Fizički test triju Googleovih glasova](voice/physical_test_2026-10-21_google_android_tts.md).
 
 ## 2. Neovisna provjera dobavljača (javne službene stranice)
 
@@ -100,4 +106,4 @@ Kada test da rezultat:
 3. provjeriti stvarni API trošak i uvjete nakon izbora jednog glasa;
 4. tek tada odrediti mali integracijski PR i fizičku potvrdu.
 
-**Projektni status: istraživanje gotovo; izgovor Gabrijele još NIJE potvrđen.** Ne kupovati, ne mijenjati Googleov zadani TTS, ne dovršavati cloud integraciju bez tog rezultata.
+**Projektni status: tri Googleova Android glasa fizički isprobana i odbačena za finalni hrvatski glas; izgovor Gabrijele još NIJE potvrđen.** Ne kupovati, ne mijenjati Googleov zadani TTS, ne dovršavati cloud integraciju bez tog rezultata.
