@@ -13,6 +13,7 @@ data class RemoteSpeechPriceQuote(
     val providerId: String,
     val voiceId: String,
     val estimatedCostMicros: Long,
+    val currencyCode: String,
     val verifiedForCurrentTariff: Boolean,
 )
 
@@ -31,6 +32,7 @@ data class RemoteSpeechGateContext(
     val secureBackendReady: Boolean,
     val providerReachable: Boolean,
     val quote: RemoteSpeechPriceQuote?,
+    val budgetCurrencyCode: String?,
     val maxPerRequestMicros: Long?,
     val remainingMonthlyBudgetMicros: Long?,
 )
@@ -47,6 +49,7 @@ enum class RemoteSpeechBlockReason {
     PROVIDER_UNAVAILABLE,
     PRICE_UNVERIFIED,
     INVALID_BUDGET,
+    CURRENCY_MISMATCH,
     OVER_PER_REQUEST_LIMIT,
     OVER_MONTHLY_BUDGET,
 }
@@ -57,6 +60,7 @@ sealed interface RemoteSpeechGateDecision {
         val providerId: String,
         val voiceId: String,
         val estimatedCostMicros: Long,
+        val currencyCode: String,
     ) : RemoteSpeechGateDecision
 
     data class Blocked(val reason: RemoteSpeechBlockReason) : RemoteSpeechGateDecision
@@ -108,9 +112,18 @@ class RemoteSpeechGate {
         if (!quote.verifiedForCurrentTariff ||
             quote.providerId != providerId ||
             quote.voiceId != voiceId ||
-            quote.estimatedCostMicros < 0L
+            quote.estimatedCostMicros < 0L ||
+            !quote.currencyCode.matches(Regex("[A-Z]{3}"))
         ) {
             return block(RemoteSpeechBlockReason.PRICE_UNVERIFIED)
+        }
+
+        val budgetCurrency = context.budgetCurrencyCode
+        if (budgetCurrency == null || !budgetCurrency.matches(Regex("[A-Z]{3}"))) {
+            return block(RemoteSpeechBlockReason.INVALID_BUDGET)
+        }
+        if (budgetCurrency != quote.currencyCode) {
+            return block(RemoteSpeechBlockReason.CURRENCY_MISMATCH)
         }
 
         val perRequestLimit = context.maxPerRequestMicros
@@ -133,6 +146,7 @@ class RemoteSpeechGate {
             providerId = providerId,
             voiceId = voiceId,
             estimatedCostMicros = quote.estimatedCostMicros,
+            currencyCode = quote.currencyCode,
         )
     }
 }
