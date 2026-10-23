@@ -72,7 +72,7 @@ object AndroidReminderAlarm {
                 PendingIntent.FLAG_UPDATE_CURRENT or PendingIntent.FLAG_IMMUTABLE
             )
             val notification = Notification.Builder(context, CHANNEL)
-                .setSmallIcon(android.R.drawable.ic_popup_reminder)
+                .setSmallIcon(android.R.drawable.ic_dialog_info)
                 .setContentTitle(context.getString(R.string.reminders_notification_title))
                 .setContentText(reminder.title)
                 .setContentIntent(open)
