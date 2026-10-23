@@ -181,6 +181,14 @@ class MainActivity : Activity() {
         })
 
         root.addView(Button(this).apply {
+            text = getString(R.string.reminders_launch)
+            isAllCaps = false
+            setOnClickListener {
+                startActivity(Intent(this@MainActivity, RemindersActivity::class.java))
+            }
+        })
+
+        root.addView(Button(this).apply {
             text = getString(R.string.notes_lab_test_button)
             isAllCaps = false
             setOnClickListener {

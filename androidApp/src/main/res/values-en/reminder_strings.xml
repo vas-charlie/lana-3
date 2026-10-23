@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="reminders_launch">Reminders · Today and this week</string>
+    <string name="reminders_title">LANA 3 · Reminders</string>
+    <string name="reminders_description">Local tasks on this device. Android battery saving may delay alerts. No ChatGPT or multi-device synchronization.</string>
+    <string name="reminders_title_hint">What needs doing?</string>
+    <string name="reminders_category_label">Category</string>
+    <string name="reminders_due_date">Due: %1$s (09:00)</string>
+    <string name="reminders_advance_label">Notify in advance</string>
+    <string name="reminders_add">Save reminder</string>
+    <string name="reminders_saved">Reminder saved.</string>
+    <string name="reminders_saved_notice_elapsed">Saved. Alert time has already passed; no notification scheduled.</string>
+    <string name="reminders_invalid">Enter a title and valid due date.</string>
+    <string name="reminders_today_overdue">Today and overdue</string>
+    <string name="reminders_this_week">This week</string>
+    <string name="reminders_later">Later</string>
+    <string name="reminders_completed">Completed</string>
+    <string name="reminders_none">No tasks.</string>
+    <string name="reminders_mark_done">Done</string>
+    <string name="reminders_delete">Delete</string>
+    <string name="reminders_confirm_delete">Delete reminder “%1$s”?</string>
+    <string name="reminders_notification_channel">LANA 3 reminders</string>
+    <string name="reminders_notification_title">LANA 3 · Reminder</string>
+    <string-array name="reminder_categories">
+        <item>Business</item>
+        <item>Vehicle</item>
+        <item>Banking and finance</item>
+        <item>Administration</item>
+        <item>Personal</item>
+        <item>Project</item>
+    </string-array>
+    <string-array name="reminder_advance_options">
+        <item>7 days before</item>
+        <item>1 day before</item>
+        <item>On the due date</item>
+        <item>No notification</item>
+    </string-array>
+</resources>
