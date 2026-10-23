@@ -1,0 +1,38 @@
+<?xml version="1.0" encoding="utf-8"?>
+<resources>
+    <string name="reminders_launch">Podsjetnici · Danas i ovaj tjedan</string>
+    <string name="reminders_title">LANA 3 · Podsjetnici</string>
+    <string name="reminders_description">Lokalna evidencija rokova na ovom uređaju. Obavijesti mogu kasniti zbog Androidove štednje baterije. Nema sinkronizacije s ChatGPT-om ni drugim uređajima.</string>
+    <string name="reminders_title_hint">Što trebam napraviti?</string>
+    <string name="reminders_category_label">Kategorija</string>
+    <string name="reminders_due_date">Rok: %1$s (09:00)</string>
+    <string name="reminders_advance_label">Obavijest unaprijed</string>
+    <string name="reminders_add">Spremi podsjetnik</string>
+    <string name="reminders_saved">Podsjetnik spremljen.</string>
+    <string name="reminders_saved_notice_elapsed">Spremljeno. Vrijeme najave već je prošlo pa obavijest nije zakazana.</string>
+    <string name="reminders_invalid">Upiši naziv i ispravan rok.</string>
+    <string name="reminders_today_overdue">Danas i propušteni rokovi</string>
+    <string name="reminders_this_week">Ovaj tjedan</string>
+    <string name="reminders_later">Kasnije</string>
+    <string name="reminders_completed">Dovršeno</string>
+    <string name="reminders_none">Nema zadataka.</string>
+    <string name="reminders_mark_done">Riješeno</string>
+    <string name="reminders_delete">Obriši</string>
+    <string name="reminders_confirm_delete">Obrisati podsjetnik „%1$s”?</string>
+    <string name="reminders_notification_channel">LANA 3 podsjetnici</string>
+    <string name="reminders_notification_title">LANA 3 · Podsjetnik</string>
+    <string-array name="reminder_categories">
+        <item>Poslovanje</item>
+        <item>Vozilo</item>
+        <item>Banka i financije</item>
+        <item>Administracija</item>
+        <item>Osobno</item>
+        <item>Projekt</item>
+    </string-array>
+    <string-array name="reminder_advance_options">
+        <item>7 dana prije</item>
+        <item>1 dan prije</item>
+        <item>Na dan roka</item>
+        <item>Bez obavijesti</item>
+    </string-array>
+</resources>
