@@ -24,6 +24,9 @@
         android:usesCleartextTraffic="false"
         android:supportsRtl="true">
         <activity
+            android:name=".TasksActivity"
+            android:exported="false" />
+        <activity
             android:name=".TaxiTariffsActivity"
             android:exported="false" />
         <activity
