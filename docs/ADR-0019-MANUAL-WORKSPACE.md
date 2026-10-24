@@ -35,3 +35,10 @@ Taksi i klijenti; BUSINESS OS; MASTER Excel; Marketing i web; LANA 3; Platforma 
 - [ ] Zapisi ostaju nakon zatvaranja i ponovnog otvaranja aplikacije.
 - [ ] Testovi pokrivaju nevaljane unose i očuvanje podataka.
 - [ ] Charlie potvrdi rad na fizičkom Android uređaju.
+
+## Obvezno vizualno pravilo: Lana je primarni prikaz (odluka 24.10.2026.)
+- Lana ostaje preko cijelog zaslona kao glavno iskustvo. Ne smanjivati avatar u trajni mali prozor radi izbornika.
+- Tablice, zadaci, podsjetnici i druge funkcije su sekundarni paneli koji se otvaraju na zahtjev iznad ili umjesto vidljivog dijela pozadine, uz jasan povratak na Lanu.
+- Paneli ne smiju trajno zauzimati dio početnog zaslona. Prilagoditi telefonu i tabletu.
+- Postojeći samostalni TasksActivity je razvojni prototip, a ne odobren konačni način navigacije. Prije produkcije integrirati ga kao zatvorivi panel u Lana-first sučelje.
+- Pri otvaranju panela ne smije doći do gubitka upisanih podataka; povratak mora biti jednostavan.
