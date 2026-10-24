@@ -23,6 +23,7 @@
         android:dataExtractionRules="@xml/data_extraction_rules"
         android:usesCleartextTraffic="false"
         android:supportsRtl="true">
+        <activity android:name=".TaskDashboardActivity" android:exported="false" />
         <activity
             android:name=".TasksActivity"
             android:exported="false" />
