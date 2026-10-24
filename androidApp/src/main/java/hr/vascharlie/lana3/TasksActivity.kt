@@ -7,6 +7,7 @@ import android.database.sqlite.SQLiteDatabase
 import android.database.sqlite.SQLiteOpenHelper
 import android.graphics.Color
 import android.os.Bundle
+import android.os.Build
 import android.view.WindowInsets
 import android.view.Gravity
 import android.widget.*
@@ -65,10 +66,9 @@ class TasksActivity : Activity() {
         root.addView(Button(this).apply { text = "Natrag"; setOnClickListener { finish() } })
         // Respect system bars on edge-to-edge Android 15/16.
         root.setOnApplyWindowInsetsListener { view, insets ->
-            val bars = insets.getInsets(
-                WindowInsets.Type.statusBars() or WindowInsets.Type.navigationBars()
-            )
-            view.setPadding(24, bars.top + 30, 24, bars.bottom + 24)
+            val top = if (Build.VERSION.SDK_INT >= 30) insets.getInsets(WindowInsets.Type.statusBars()).top else insets.systemWindowInsetTop
+            val bottom = if (Build.VERSION.SDK_INT >= 30) insets.getInsets(WindowInsets.Type.navigationBars()).bottom else insets.systemWindowInsetBottom
+            view.setPadding(24, top + 30, 24, bottom + 24)
             insets
         }
         setContentView(root)
