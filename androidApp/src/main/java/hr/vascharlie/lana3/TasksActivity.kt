@@ -20,6 +20,7 @@ class TasksActivity : Activity() {
     private lateinit var titleInput: EditText
     private lateinit var projectInput: Spinner
     private lateinit var statusInput: Spinner
+    private lateinit var dashboard: LinearLayout
     private lateinit var filter: Spinner
     private val projects = arrayOf("Općenito", "Taksi i klijenti", "BUSINESS OS", "MASTER Excel", "Marketing i web", "LANA 3", "Platforma za vozače", "Online zarada", "Strip i brend", "Administracija i financije")
     private val states = arrayOf("Otvoreno", "Čeka se", "Dovršeno")
@@ -59,6 +60,16 @@ class TasksActivity : Activity() {
             }
         }
         root.addView(filter)
+        root.addView(Button(this).apply {
+            text = "Statistika i grafikoni · prikaži / sakrij"
+            setOnClickListener {
+                dashboard.visibility = if (dashboard.visibility == android.view.View.VISIBLE) android.view.View.GONE else android.view.View.VISIBLE
+                if (dashboard.visibility == android.view.View.VISIBLE) renderDashboard()
+            }
+        })
+        dashboard = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; visibility = android.view.View.GONE }
+        val statsScroll = ScrollView(this).apply { addView(dashboard) }
+        root.addView(statsScroll, LinearLayout.LayoutParams(-1, 0, 0.85f))
         val scroll = ScrollView(this)
         list = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL }
         scroll.addView(list)
@@ -82,6 +93,7 @@ class TasksActivity : Activity() {
         val selected = filter.selectedItemPosition
         val entries = store.all(if (selected == 0) null else projects[selected - 1])
         if (entries.isEmpty()) list.addView(TextView(this).apply { text = "Nema zadataka u ovom prikazu."; setTextColor(Color.LTGRAY) })
+        renderDashboard()
         entries.forEach { task ->
             val card = LinearLayout(this).apply { orientation = LinearLayout.VERTICAL; setPadding(12, 14, 12, 14); setBackgroundColor(Color.rgb(19, 40, 65)) }
             card.addView(TextView(this).apply { text = task.title; textSize = 17f; setTextColor(Color.WHITE) })
@@ -111,6 +123,66 @@ class TasksActivity : Activity() {
             card.addView(row)
             list.addView(card, LinearLayout.LayoutParams(-1, -2).apply { bottomMargin = 12 })
         }
+    }
+
+    private fun renderDashboard() {
+        if (!::dashboard.isInitialized) return
+        dashboard.removeAllViews()
+        val all = store.all(null)
+        val total = all.size
+        val completed = all.count { it.state == "Dovršeno" }
+        val waiting = all.count { it.state == "Čeka se" }
+        val open = all.count { it.state == "Otvoreno" }
+        dashboard.addView(TextView(this).apply {
+            text = "PREGLED SVIH PROJEKATA"
+            textSize = 19f
+            setTextColor(Color.WHITE)
+        })
+        dashboard.addView(TextView(this).apply {
+            text = "Ukupno: $total   Otvoreno: $open   Čeka se: $waiting   Dovršeno: $completed"
+            setTextColor(Color.WHITE)
+        })
+        dashboard.addView(TextView(this).apply {
+            text = "Dovršenost: " + if (total == 0) "0%" else "${completed * 100 / total}%"
+            setTextColor(Color.LTGRAY)
+        })
+        fun bar(label: String, value: Int, maximum: Int, color: Int) {
+            dashboard.addView(TextView(this).apply { text = "$label: $value"; setTextColor(Color.WHITE) })
+            dashboard.addView(ProgressBar(this, null, android.R.attr.progressBarStyleHorizontal).apply {
+                max = maximum.coerceAtLeast(1)
+                progress = value
+                progressTintList = android.content.res.ColorStateList.valueOf(color)
+                progressBackgroundTintList = android.content.res.ColorStateList.valueOf(Color.DKGRAY)
+            }, LinearLayout.LayoutParams(-1, 20).apply { bottomMargin = 12 })
+        }
+        bar("Otvoreno", open, total, Color.rgb(86, 169, 231))
+        bar("Čeka se", waiting, total, Color.rgb(245, 191, 83))
+        bar("Dovršeno", completed, total, Color.rgb(96, 200, 150))
+        dashboard.addView(TextView(this).apply {
+            text = "TABLICA PO PROJEKTIMA"
+            textSize = 18f
+            setTextColor(Color.WHITE)
+        })
+        dashboard.addView(TextView(this).apply {
+            text = "Projekt | Ukupno | Otvoreno | Čeka | Gotovo"
+            setTextColor(Color.LTGRAY)
+        })
+        projects.forEach { project ->
+            val tasks = all.filter { it.project == project }
+            val done = tasks.count { it.state == "Dovršeno" }
+            val wait = tasks.count { it.state == "Čeka se" }
+            val active = tasks.count { it.state == "Otvoreno" }
+            dashboard.addView(TextView(this).apply {
+                text = "$project\n  ${tasks.size} ukupno  ·  $active otvoreno  ·  $wait čeka  ·  $done gotovo"
+                setTextColor(Color.WHITE)
+                setPadding(4, 7, 4, 7)
+            })
+            bar("Udio dovršenih · $project", done, tasks.size, Color.rgb(96, 200, 150))
+        }
+        dashboard.addView(TextView(this).apply {
+            text = "Podaci su lokalni. Grafikoni prikazuju broj zadataka, ne prihode ili troškove. Vremenske trendove možemo dodati nakon sigurne migracije baze s datumima."
+            setTextColor(Color.LTGRAY)
+        })
     }
 
     override fun onDestroy() { store.close(); super.onDestroy() }
