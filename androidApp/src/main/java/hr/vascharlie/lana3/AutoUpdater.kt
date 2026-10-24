@@ -71,6 +71,17 @@ class AutoUpdater(
     private var openingInstaller = false
     private var openingInstallPermissionSettings = false
 
+    // DownloadManager broadcasts can be delayed or missed while the Activity is active.
+    // Poll the actual download row, rather than leaving a permanent "downloading" label.
+    private val downloadProgressCheck = object : Runnable {
+        override fun run() {
+            if (prefs.getLong(KEY_DOWNLOAD_ID, -1L) >= 0L) {
+                resumePendingInstall()
+                handler.postDelayed(this, 3_000L)
+            }
+        }
+    }
+
     private val periodicCheck = object : Runnable {
         override fun run() {
             checkNow(force = false)
@@ -95,6 +106,8 @@ class AutoUpdater(
         registerReceiver()
         clearCompletedUpdateState()
         resumePendingInstall()
+        handler.removeCallbacks(downloadProgressCheck)
+        handler.postDelayed(downloadProgressCheck, 3_000L)
         // A fresh Activity starts with a visible "checking" status. Always perform
         // one real check for that launch so the UI cannot remain stuck merely
         // because a previous Activity checked within the periodic interval.
@@ -105,6 +118,7 @@ class AutoUpdater(
 
     fun stop() {
         handler.removeCallbacks(periodicCheck)
+        handler.removeCallbacks(downloadProgressCheck)
         if (receiverRegistered) {
             runCatching { activity.unregisterReceiver(downloadReceiver) }
             receiverRegistered = false
@@ -261,6 +275,8 @@ class AutoUpdater(
         }
 
         postStatus(AutoUpdateStatus.DownloadStarted)
+        handler.removeCallbacks(downloadProgressCheck)
+        handler.postDelayed(downloadProgressCheck, 3_000L)
     }
 
     fun resumePendingInstall() {
@@ -292,7 +308,8 @@ class AutoUpdater(
                         downloadManager.remove(downloadId)
                         clearPendingUpdate()
                         postStatus(AutoUpdateStatus.DownloadFailed)
-                        checkNow(force = true)
+                        // The previous network check may still be in progress.
+                        handler.postDelayed({ checkNow(force = true) }, 1_000L)
                     } else {
                         postStatus(AutoUpdateStatus.Downloading)
                     }
@@ -334,6 +351,7 @@ class AutoUpdater(
             return
         }
 
+        if (openingInstaller) return
         openingInstaller = true
         postStatus(AutoUpdateStatus.ReadyToInstall)
 
