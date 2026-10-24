@@ -13,6 +13,7 @@ import android.widget.Button
 import android.widget.FrameLayout
 import android.widget.ImageView
 import android.widget.LinearLayout
+import android.widget.ScrollView
 import android.widget.TextView
 import hr.vascharlie.lana3.core.model.CapabilityGate
 import hr.vascharlie.lana3.core.model.CapabilityGateResult
@@ -130,12 +131,6 @@ class MainActivity : Activity() {
             }
         )
 
-        root.addView(
-            avatarStage,
-            LinearLayout.LayoutParams(
-                LinearLayout.LayoutParams.MATCH_PARENT, 0, 1f
-            ).apply { setMargins(0, 24, 0, 20) }
-        )
 
         stateLabel = TextView(this).apply {
             textSize = 13f
@@ -151,6 +146,14 @@ class MainActivity : Activity() {
             setPadding(0, 8, 0, 18)
         }
         root.addView(status)
+
+        root.addView(Button(this).apply {
+            text = "Zadaci i podsjetnici · ručni unos"
+            isAllCaps = false
+            setOnClickListener {
+                startActivity(Intent(this@MainActivity, TasksActivity::class.java))
+            }
+        })
 
         root.addView(Button(this).apply {
             text = "Taxi · Tarife i kriteriji"
@@ -190,8 +193,49 @@ class MainActivity : Activity() {
             }
         })
 
+        // Lana is the full-screen primary surface. Developer tools open only on demand.
+        val screen = FrameLayout(this)
+        screen.addView(
+            avatarStage,
+            FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT,
+            )
+        )
+        val menuScroll = ScrollView(this).apply {
+            visibility = android.view.View.GONE
+            setBackgroundColor(Color.rgb(8, 17, 31))
+            isFillViewport = true
+        }
+        menuScroll.addView(root)
+        screen.addView(
+            menuScroll,
+            FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.MATCH_PARENT,
+                FrameLayout.LayoutParams.MATCH_PARENT,
+            )
+        )
+        val menuToggle = Button(this).apply {
+            text = "☰ Alati"
+            isAllCaps = false
+            contentDescription = "Otvori ili zatvori alate"
+            setOnClickListener {
+                val opening = menuScroll.visibility != android.view.View.VISIBLE
+                menuScroll.visibility =
+                    if (opening) android.view.View.VISIBLE else android.view.View.GONE
+                text = if (opening) "✕ Zatvori" else "☰ Alati"
+            }
+        }
+        screen.addView(
+            menuToggle,
+            FrameLayout.LayoutParams(
+                FrameLayout.LayoutParams.WRAP_CONTENT,
+                FrameLayout.LayoutParams.WRAP_CONTENT,
+                Gravity.TOP or Gravity.END,
+            ).apply { setMargins(0, dp(24), dp(16), 0) }
+        )
         startupStage = "set-content-view"
-        setContentView(root)
+        setContentView(screen)
 
         avatarMotionController = LanaAvatarMotionController(avatar)
 
