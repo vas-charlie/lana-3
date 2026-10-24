@@ -153,6 +153,14 @@ class MainActivity : Activity() {
         root.addView(status)
 
         root.addView(Button(this).apply {
+            text = "Zadaci i podsjetnici · ručni unos"
+            isAllCaps = false
+            setOnClickListener {
+                startActivity(Intent(this@MainActivity, TasksActivity::class.java))
+            }
+        })
+
+        root.addView(Button(this).apply {
             text = "Taxi · Tarife i kriteriji"
             isAllCaps = false
             setOnClickListener {
