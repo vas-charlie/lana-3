@@ -7,11 +7,18 @@ enum class AutomationMode {
     EXECUTE,
 }
 
+enum class ExecutionModeBlockReason {
+    OBSERVE_MODE,
+    SUGGEST_MODE,
+    USER_CONFIRMATION_REQUIRED,
+    ACTION_CONFIRMATION_REQUIRED,
+}
+
 sealed interface ExecutionModeGateResult {
     data object Allowed : ExecutionModeGateResult
 
     data class Blocked(
-        val reason: String,
+        val reason: ExecutionModeBlockReason,
         val requiresConfirmation: Boolean = false,
     ) : ExecutionModeGateResult
 }
@@ -22,6 +29,9 @@ sealed interface ExecutionModeGateResult {
  * OBSERVE and SUGGEST never execute actions.
  * CONFIRM executes only after an explicit user confirmation.
  * EXECUTE may run directly unless a specific action forces confirmation.
+ *
+ * The shared gate returns semantic reason codes. Human-language wording belongs
+ * at the presentation boundary.
  */
 class ExecutionModeGate {
     fun evaluate(
@@ -30,11 +40,11 @@ class ExecutionModeGate {
         forceConfirmation: Boolean = false,
     ): ExecutionModeGateResult = when (mode) {
         AutomationMode.OBSERVE -> ExecutionModeGateResult.Blocked(
-            reason = "Observe mode never executes actions.",
+            reason = ExecutionModeBlockReason.OBSERVE_MODE,
         )
 
         AutomationMode.SUGGEST -> ExecutionModeGateResult.Blocked(
-            reason = "Suggest mode never executes actions.",
+            reason = ExecutionModeBlockReason.SUGGEST_MODE,
         )
 
         AutomationMode.CONFIRM -> {
@@ -42,7 +52,7 @@ class ExecutionModeGate {
                 ExecutionModeGateResult.Allowed
             } else {
                 ExecutionModeGateResult.Blocked(
-                    reason = "User confirmation is required.",
+                    reason = ExecutionModeBlockReason.USER_CONFIRMATION_REQUIRED,
                     requiresConfirmation = true,
                 )
             }
@@ -51,7 +61,7 @@ class ExecutionModeGate {
         AutomationMode.EXECUTE -> {
             if (forceConfirmation && !userConfirmed) {
                 ExecutionModeGateResult.Blocked(
-                    reason = "This action requires explicit confirmation.",
+                    reason = ExecutionModeBlockReason.ACTION_CONFIRMATION_REQUIRED,
                     requiresConfirmation = true,
                 )
             } else {

@@ -17,6 +17,7 @@ class ExecutionModeGateTest {
         )
 
         val blocked = assertIs<ExecutionModeGateResult.Blocked>(result)
+        assertEquals(ExecutionModeBlockReason.OBSERVE_MODE, blocked.reason)
         assertFalse(blocked.requiresConfirmation)
     }
 
@@ -25,7 +26,8 @@ class ExecutionModeGateTest {
         val result = gate.evaluate(AutomationMode.SUGGEST)
 
         val blocked = assertIs<ExecutionModeGateResult.Blocked>(result)
-        assertEquals("Suggest mode never executes actions.", blocked.reason)
+        assertEquals(ExecutionModeBlockReason.SUGGEST_MODE, blocked.reason)
+        assertFalse(blocked.requiresConfirmation)
     }
 
     @Test
@@ -37,6 +39,10 @@ class ExecutionModeGateTest {
         )
 
         val blocked = assertIs<ExecutionModeGateResult.Blocked>(before)
+        assertEquals(
+            ExecutionModeBlockReason.USER_CONFIRMATION_REQUIRED,
+            blocked.reason,
+        )
         assertTrue(blocked.requiresConfirmation)
         assertIs<ExecutionModeGateResult.Allowed>(after)
     }
@@ -61,6 +67,10 @@ class ExecutionModeGateTest {
         )
 
         val blocked = assertIs<ExecutionModeGateResult.Blocked>(before)
+        assertEquals(
+            ExecutionModeBlockReason.ACTION_CONFIRMATION_REQUIRED,
+            blocked.reason,
+        )
         assertTrue(blocked.requiresConfirmation)
         assertIs<ExecutionModeGateResult.Allowed>(after)
     }

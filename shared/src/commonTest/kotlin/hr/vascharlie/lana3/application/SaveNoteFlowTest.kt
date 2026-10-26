@@ -1,6 +1,7 @@
 package hr.vascharlie.lana3.application
 
 import hr.vascharlie.lana3.core.authorization.AutomationMode
+import hr.vascharlie.lana3.core.authorization.ExecutionModeBlockReason
 import hr.vascharlie.lana3.core.context.LanaContext
 import hr.vascharlie.lana3.core.diagnostics.DiagnosticEvent
 import hr.vascharlie.lana3.core.diagnostics.DiagnosticSink
@@ -105,7 +106,8 @@ class SaveNoteFlowTest {
             automationMode = AutomationMode.OBSERVE,
         )
 
-        assertIs<SaveNoteFlowResult.Blocked>(result)
+        val blocked = assertIs<SaveNoteFlowResult.ExecutionBlocked>(result)
+        assertEquals(ExecutionModeBlockReason.OBSERVE_MODE, blocked.reason)
         assertTrue(repository.notes.isEmpty())
         assertTrue(sink.events.any { it.code == "save_note_mode_blocked" })
     }
@@ -121,7 +123,11 @@ class SaveNoteFlowTest {
             userConfirmed = false,
         )
 
-        assertIs<SaveNoteFlowResult.AwaitingConfirmation>(waiting)
+        val awaiting = assertIs<SaveNoteFlowResult.AwaitingConfirmation>(waiting)
+        assertEquals(
+            ExecutionModeBlockReason.USER_CONFIRMATION_REQUIRED,
+            awaiting.reason,
+        )
         assertTrue(repository.notes.isEmpty())
 
         val completed = flow.run(
