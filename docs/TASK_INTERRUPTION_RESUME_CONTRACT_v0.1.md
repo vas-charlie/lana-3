@@ -31,3 +31,15 @@ Checkpoint: taskId, taskType, currentStepId, lastConfirmedResultRef, nextActionI
 
 ## Granice ove promjene
 Samo ugovor i kriteriji testiranja. Nema promjena u poznatoj dobroj Android startup/packaging osnovi, nema migracije podataka, nema produkcijskog obećanja. Sljedeća implementacijska promjena mora najprije pronaći postojeći task coordinator i perzistencijski sloj, a zatim dodati jedan testirani vertikalni presjek na zasebnoj grani.
+
+## Provjera stvarnog Android koda — 26.10.2026.
+
+Izravno pregledano na `main`:
+- `androidApp/src/main/java/hr/vascharlie/lana3/TasksActivity.kt`: ručna evidencija `lana_manual_tasks.db`, tablica `tasks(id,title,project,state)`, statusi `Otvoreno / Čeka se / Dovršeno`. Nema polja checkpointa, `PAUSED` ni ugovora za izvršavanje radnji.
+- `androidApp/src/main/java/hr/vascharlie/lana3/TaskDashboardActivity.kt`: samo čita istu bazu radi statistike.
+
+**Zaključak:** Android `TasksActivity` je poslovni popis obveza, a semantički `ACTIVE/PAUSED` lifecycle pripada izvršnim zadacima u shared core. Ne spajati ih promjenom postojećeg SQLite statusa niti pretpostaviti da su ekvivalentni.
+
+**Granica implementacije:** prvi presjek treba napraviti u shared-core orkestraciji izvršnih zadataka uz zasebnu, verzioniranu pohranu checkpointa. Integracija s Android ručnim obvezama dolazi tek nakon zasebne odluke o mapiranju; postojeća lokalna baza mora ostati kompatibilna i neizmijenjena u ovom PR-u.
+
+**Dodatni regresijski test:** postojeći Android ručni zadaci i statistika ostaju nepromijenjeni tijekom pauziranja/nastavka izvršnog zadatka. Nije dokazano testom, ovo je kriterij za budući kod.
