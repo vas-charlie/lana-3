@@ -29,6 +29,9 @@ Scope: proposed scenarios for the existing shared-core task engine; not executed
 | R13 | task contains sensitive note references | checkpoint persisted | only opaque references saved; no raw sensitive content |
 | R14 | user asks 'što smo zadnje radili?' | paused checkpoint exists | return task and next step, with zero side effects |
 
+| R15 | non-idempotent external action dispatched, acknowledgement lost in process crash | app restarts and user requests resume | reconcile using durable operation key or report UNKNOWN and require manual resolution; never blindly retry |
+| R16 | Android manual task rows exist in `lana_manual_tasks.db` | executable shared-core task is paused and resumed | manual task rows, statuses and dashboard statistics remain unchanged |
+
 ## Implementation gate
 Before writing code:
 1. Locate existing task model/state transitions, persistence ports, and tests in actual current main tree.
