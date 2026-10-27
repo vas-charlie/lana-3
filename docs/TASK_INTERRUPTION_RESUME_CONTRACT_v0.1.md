@@ -43,3 +43,30 @@ Izravno pregledano na `main`:
 **Granica implementacije:** prvi presjek treba napraviti u shared-core orkestraciji izvršnih zadataka uz zasebnu, verzioniranu pohranu checkpointa. Integracija s Android ručnim obvezama dolazi tek nakon zasebne odluke o mapiranju; postojeća lokalna baza mora ostati kompatibilna i neizmijenjena u ovom PR-u.
 
 **Dodatni regresijski test:** postojeći Android ručni zadaci i statistika ostaju nepromijenjeni tijekom pauziranja/nastavka izvršnog zadatka. Nije dokazano testom, ovo je kriterij za budući kod.
+
+
+## Implementacijski redoslijed i dokazni kriteriji — 27.10.2026.
+
+### I. Granica modela
+- Izvršni checkpoint nije Androidov ručni task zapis; uvesti zaseban verzionirani ugovor.
+- Ugovor se smije dodati tek nakon pronalaska stvarnih shared-core klasa i provjere postojećih state-machine prijelaza. Ne nagađati putanje datoteka.
+- PAUSED je status izvršnog zadatka, a ne automatski sinonim za 'Čeka se' u poslovnoj bazi.
+
+### II. Sigurnosni invarijanti
+- Spremanje checkpointa mora završiti prije potvrde korisniku da je prekid zapamćen.
+- Resume je dvostupanjski: učitaj i validiraj checkpoint, zatim zasebno autoriziraj eventualnu sljedeću akciju.
+- Ponavljanje istog resume zahtjeva ne smije ponoviti već izvršenu vanjsku radnju; za nepovratne akcije potreban je adapter-level idempotency token ili sigurno ponovno potvrđivanje stanja.
+- Bez valjanog checkpointa ili pri nepoznatoj verziji sheme: ne izvršavati akciju.
+- Nakon ponovnog pokretanja aplikacije ne smije doći do automatskog izvršenja samo zato što postoji PAUSED checkpoint.
+- Čuvati samo minimalne reference, ne transkripte, tokene, lozinke ili osjetljive poslovne podatke.
+
+### III. Prvi kodni presjek
+1. Locirati postojeći shared-core task model, state-machine, storage port i testove.
+2. Dodati najmanji mogući checkpoint contract i fake storage adapter za test.
+3. Napisati test ACTIVE → PAUSED → ponovno učitavanje → validirani nastavak.
+4. Napisati test za dvostruki resume i zabranjeni nastavak terminalnog zadatka.
+5. Pokrenuti postojeće shared-core testove i novi regresijski skup.
+6. Tek nakon uspješne provjere razmotriti Android adapter i fizički test.
+
+### IV. Ograničenje trenutačnog dokaza
+Ovaj dokument dokazuje samo pregled arhitekture i definiranje sigurnosnih kriterija. Ne dokazuje da je checkpoint implementiran, da je build prošao ili da je nastavak testiran na uređaju.
