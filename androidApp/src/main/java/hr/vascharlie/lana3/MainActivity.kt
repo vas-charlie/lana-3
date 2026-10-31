@@ -27,6 +27,8 @@ class MainActivity : Activity() {
         private const val REQUEST_LANA_PERMISSIONS = 3101
     }
 
+    private lateinit var developerMenu: ScrollView
+    private lateinit var toolsToggle: Button
     private lateinit var avatar: ImageView
     private lateinit var avatarStage: FrameLayout
     private lateinit var avatarMotionController: LanaAvatarMotionController
@@ -207,6 +209,7 @@ class MainActivity : Activity() {
             setBackgroundColor(Color.rgb(8, 17, 31))
             isFillViewport = true
         }
+        developerMenu = menuScroll
         menuScroll.addView(root)
         screen.addView(
             menuScroll,
@@ -226,6 +229,7 @@ class MainActivity : Activity() {
                 text = if (opening) "✕ Zatvori" else "☰ Alati"
             }
         }
+        toolsToggle = menuToggle
         screen.addView(
             menuToggle,
             FrameLayout.LayoutParams(
@@ -251,6 +255,16 @@ class MainActivity : Activity() {
             applyAutomaticUpdaterState(status)
         }
         autoUpdater.start()
+    }
+
+    @Deprecated("Android legacy back callback; replace when AndroidX activity is introduced")
+    override fun onBackPressed() {
+        if (::developerMenu.isInitialized && developerMenu.visibility == android.view.View.VISIBLE) {
+            developerMenu.visibility = android.view.View.GONE
+            if (::toolsToggle.isInitialized) toolsToggle.text = "☰ Alati"
+            return
+        }
+        super.onBackPressed()
     }
 
     private fun showStartupFailure(stage: String, error: Throwable) {
