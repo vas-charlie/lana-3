@@ -1,5 +1,6 @@
 package hr.vascharlie.lana3
 
+import android.annotation.SuppressLint
 import android.app.Activity
 import android.content.Intent
 import android.graphics.BitmapFactory
@@ -27,6 +28,9 @@ class MainActivity : Activity() {
         private const val REQUEST_LANA_PERMISSIONS = 3101
     }
 
+    private var backCallback: android.window.OnBackInvokedCallback? = null
+    private lateinit var developerMenu: ScrollView
+    private lateinit var toolsToggle: Button
     private lateinit var avatar: ImageView
     private lateinit var avatarStage: FrameLayout
     private lateinit var avatarMotionController: LanaAvatarMotionController
@@ -207,6 +211,7 @@ class MainActivity : Activity() {
             setBackgroundColor(Color.rgb(8, 17, 31))
             isFillViewport = true
         }
+        developerMenu = menuScroll
         menuScroll.addView(root)
         screen.addView(
             menuScroll,
@@ -226,6 +231,7 @@ class MainActivity : Activity() {
                 text = if (opening) "✕ Zatvori" else "☰ Alati"
             }
         }
+        toolsToggle = menuToggle
         screen.addView(
             menuToggle,
             FrameLayout.LayoutParams(
@@ -236,6 +242,13 @@ class MainActivity : Activity() {
         )
         startupStage = "set-content-view"
         setContentView(screen)
+        if (android.os.Build.VERSION.SDK_INT >= 33) {
+            val callback = android.window.OnBackInvokedCallback { closeDeveloperMenu() }
+            onBackInvokedDispatcher.registerOnBackInvokedCallback(
+                android.window.OnBackInvokedDispatcher.PRIORITY_DEFAULT, callback
+            )
+            backCallback = callback
+        }
 
         avatarMotionController = LanaAvatarMotionController(avatar)
 
@@ -251,6 +264,20 @@ class MainActivity : Activity() {
             applyAutomaticUpdaterState(status)
         }
         autoUpdater.start()
+    }
+
+    private fun closeDeveloperMenu(): Boolean {
+        if (!::developerMenu.isInitialized ||
+            developerMenu.visibility != android.view.View.VISIBLE) return false
+        developerMenu.visibility = android.view.View.GONE
+        if (::toolsToggle.isInitialized) toolsToggle.text = "☰ Alati"
+        return true
+    }
+
+    @SuppressLint("GestureBackNavigation") // API 26-32 fallback; API 33+ uses OnBackInvokedCallback.
+    @Deprecated("Legacy fallback for Android versions below API 33")
+    override fun onBackPressed() {
+        if (!closeDeveloperMenu()) super.onBackPressed()
     }
 
     private fun showStartupFailure(stage: String, error: Throwable) {
@@ -317,6 +344,10 @@ class MainActivity : Activity() {
     }
 
     override fun onDestroy() {
+        if (android.os.Build.VERSION.SDK_INT >= 33) {
+            backCallback?.let { onBackInvokedDispatcher.unregisterOnBackInvokedCallback(it) }
+            backCallback = null
+        }
         if (::avatarMotionController.isInitialized) {
             avatarMotionController.stop()
         }
