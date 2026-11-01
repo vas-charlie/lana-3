@@ -229,6 +229,7 @@ class MainActivity : Activity() {
                 menuScroll.visibility =
                     if (opening) android.view.View.VISIBLE else android.view.View.GONE
                 text = if (opening) "✕ Zatvori" else "☰ Alati"
+                updateBackCallbackRegistration()
             }
         }
         toolsToggle = menuToggle
@@ -242,13 +243,7 @@ class MainActivity : Activity() {
         )
         startupStage = "set-content-view"
         setContentView(screen)
-        if (android.os.Build.VERSION.SDK_INT >= 33) {
-            val callback = android.window.OnBackInvokedCallback { closeDeveloperMenu() }
-            onBackInvokedDispatcher.registerOnBackInvokedCallback(
-                android.window.OnBackInvokedDispatcher.PRIORITY_DEFAULT, callback
-            )
-            backCallback = callback
-        }
+
 
         avatarMotionController = LanaAvatarMotionController(avatar)
 
@@ -266,11 +261,25 @@ class MainActivity : Activity() {
         autoUpdater.start()
     }
 
+    private fun updateBackCallbackRegistration() {
+        if (android.os.Build.VERSION.SDK_INT < 33) return
+        backCallback?.let { onBackInvokedDispatcher.unregisterOnBackInvokedCallback(it) }
+        backCallback = null
+        if (::developerMenu.isInitialized && developerMenu.visibility == android.view.View.VISIBLE) {
+            val callback = android.window.OnBackInvokedCallback { closeDeveloperMenu() }
+            onBackInvokedDispatcher.registerOnBackInvokedCallback(
+                android.window.OnBackInvokedDispatcher.PRIORITY_DEFAULT, callback
+            )
+            backCallback = callback
+        }
+    }
+
     private fun closeDeveloperMenu(): Boolean {
         if (!::developerMenu.isInitialized ||
             developerMenu.visibility != android.view.View.VISIBLE) return false
         developerMenu.visibility = android.view.View.GONE
         if (::toolsToggle.isInitialized) toolsToggle.text = "☰ Alati"
+        updateBackCallbackRegistration()
         return true
     }
 
