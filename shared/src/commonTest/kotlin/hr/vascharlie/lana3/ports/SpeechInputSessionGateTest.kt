@@ -18,8 +18,8 @@ class SpeechInputSessionGateTest {
 
         assertFalse(gate.dispatch(first, late))
         assertTrue(gate.dispatch(second, fresh))
-        assertEquals(emptyList(), old)
-        assertEquals(listOf(fresh), current)
+        assertEquals<List<SpeechInputEvent>>(emptyList(), old)
+        assertEquals<List<SpeechInputEvent>>(listOf(fresh), current)
     }
 
     @Test
@@ -44,7 +44,7 @@ class SpeechInputSessionGateTest {
         assertTrue(gate.dispatch(token, final))
         assertFalse(gate.dispatch(token, final))
         assertFalse(gate.dispatch(token, SpeechInputEvent.PartialTranscript("kasno")))
-        assertEquals(listOf(final), received)
+        assertEquals<List<SpeechInputEvent>>(listOf(final), received)
     }
 
     @Test
@@ -56,6 +56,6 @@ class SpeechInputSessionGateTest {
 
         assertFalse(gate.dispatch(old, SpeechInputEvent.Error("network", "late", true)))
         assertTrue(gate.dispatch(current, SpeechInputEvent.ListeningStarted))
-        assertEquals(listOf(SpeechInputEvent.ListeningStarted), received)
+        assertEquals<List<SpeechInputEvent>>(listOf(SpeechInputEvent.ListeningStarted), received)
     }
 }
